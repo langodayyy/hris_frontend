@@ -41,7 +41,7 @@ Format:
 
 
 ### Examples:
-- taufiq/add-login
-- raffy/payment
-- putri/readme
+- silfi/add-login
+- mumtaz/payment
+- kemal/readme
 - lucky/presensi
