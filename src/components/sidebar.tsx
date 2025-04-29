@@ -2,6 +2,7 @@
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import Navbar from "./navbar";
 import Image from "next/image";
 
 type NavItemProps = {
@@ -12,6 +13,12 @@ type NavItemProps = {
   isOpen?: boolean;
   submenu?: { label: string; href: string }[];
 };
+
+type LayoutProps = {
+  children: React.ReactNode;
+  title: string;
+}
+
 
 function NavItem({
   url,
@@ -123,7 +130,7 @@ function NavItem({
     </li>
   );
 }
-export default function Sidebar() {
+export default function Sidebar({children, title}: LayoutProps) {
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
 
@@ -142,6 +149,21 @@ export default function Sidebar() {
           } z-51`}
         >
           {isOpen ? (
+             <svg
+             xmlns="http://www.w3.org/2000/svg"
+             width="16"
+             height="16"
+             viewBox="0 0 16 16"
+             fill="none"
+           >
+             <path
+               fillRule="evenodd"
+               clipRule="evenodd"
+               d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z"
+               fill="currentColor"
+             />
+           </svg>
+          ) : (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -156,21 +178,7 @@ export default function Sidebar() {
                 fill="currentColor"
               />
             </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z"
-                fill="currentColor"
-              />
-            </svg>
+           
           )}
         </button>
         <nav className="flex flex-col gap-4 w-full">
@@ -303,9 +311,13 @@ export default function Sidebar() {
       <div
         className={`transition-all duration-300 ease-in-out ${
           isOpen ? "ml-64" : "ml-[77px]"
-        } w-full p-4`}
+        } w-full`}
       >
-        <h1 className="text-3xl font-bold">Welcome to the Page</h1>
+
+        <Navbar title={title} />
+        <main>{children}</main>
+        {/* Main Content Area */}
+        {/* <h1 className="text-3xl font-bold">Welcome to the Page</h1>
         <p className="mt-4 text-gray-600">
           This is your main content area. The container adjusts its margin based
           on the sidebar width Lorem, ipsum dolor sit amet consectetur
@@ -316,7 +328,7 @@ export default function Sidebar() {
           corporis aliquam quos et. Delectus illum quae magnam ipsa at
           temporibus quos optio, eveniet ea eligendi earum rem quo deleniti
           ullam..
-        </p>
+        </p> */}
       </div>
     </div>
   );
