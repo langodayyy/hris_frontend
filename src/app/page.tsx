@@ -1,12 +1,13 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { Label } from "@/components/ui/label";
+import Navbar from "@/components/navbar";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] ">
+    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen pb-20 gap-16 font-[family-name:var(--font-geist-sans)] ">
+      <Navbar title="Dashboard" notificationCount={9 }/>
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <Image
           className="dark:invert"
@@ -56,6 +57,9 @@ export default function Home() {
           <div>
             <div className="w-fit">
               <Button variant={"outline"}>Click me</Button>
+            </div>
+            <div className="w-[300px]">
+              <Button>Click me</Button>
             </div>
             <div className="w-[300px]">
               <Button>Click me</Button>
