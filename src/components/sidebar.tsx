@@ -314,21 +314,12 @@ export default function Sidebar({children, title}: LayoutProps) {
         } w-full`}
       >
 
-        <Navbar title={title} />
-        <main>{children}</main>
-        {/* Main Content Area */}
-        {/* <h1 className="text-3xl font-bold">Welcome to the Page</h1>
-        <p className="mt-4 text-gray-600">
-          This is your main content area. The container adjusts its margin based
-          on the sidebar width Lorem, ipsum dolor sit amet consectetur
-          adipisicing elit. Ipsum doloremque accusamus consequuntur rem deleniti
-          pariatur expedita voluptatum vero quaerat suscipit, nemo voluptates,
-          fugiat labore minima quae porro laboriosam similique accusantium?
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consectetur
-          corporis aliquam quos et. Delectus illum quae magnam ipsa at
-          temporibus quos optio, eveniet ea eligendi earum rem quo deleniti
-          ullam..
-        </p> */}
+        <div className="flex flex-col">
+          {/* Navbar Area */}
+          <Navbar title={title} />
+          {/* Main Content Area */}
+          <main className="p-[30px]">{children}</main>
+        </div>
       </div>
     </div>
   );
