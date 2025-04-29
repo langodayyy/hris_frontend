@@ -6,9 +6,11 @@ import  Sidebar  from "../../components/sidebar";
 
 export default function HomePage() {
   return (
-    <div className="flex ">
+    <div className="flex flex-col">
 
         <Sidebar />
+
+        <div className="">halaman employee</div>
     </div>
 
   );
