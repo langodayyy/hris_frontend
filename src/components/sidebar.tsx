@@ -64,6 +64,7 @@ function NavItem({
               {isOpen && submenu.length > 0 && (
                 <span className="text-sm">
                   {isExpanded ? (
+                    
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="14"
@@ -71,7 +72,7 @@ function NavItem({
                       viewBox="0 0 14 14"
                       fill="currentColor"
                     >
-                      <path d="M6.54669 10.3523L1.35456 5.16012C1.10414 4.90971 1.10414 4.50373 1.35456 4.25334L1.96014 3.64776C2.21012 3.39778 2.61527 3.3973 2.86585 3.6467L7.00009 7.76157L11.1343 3.6467C11.3849 3.3973 11.79 3.39778 12.04 3.64776L12.6456 4.25334C12.896 4.50376 12.896 4.90974 12.6456 5.16012L7.4535 10.3523C7.20308 10.6027 6.7971 10.6027 6.54669 10.3523Z" />
+                      <path d="M7.45331 3.64772L12.6454 8.83988C12.8959 9.09029 12.8959 9.49627 12.6454 9.74666L12.0399 10.3522C11.7899 10.6022 11.3847 10.6027 11.1342 10.3533L6.99991 6.23843L2.86569 10.3533C2.61511 10.6027 2.20996 10.6022 1.95997 10.3522L1.3544 9.74666C1.10398 9.49624 1.10398 9.09026 1.3544 8.83988L6.5465 3.64772C6.79692 3.39733 7.2029 3.39733 7.45331 3.64772Z" />
                     </svg>
                   ) : (
                     <svg
@@ -81,7 +82,7 @@ function NavItem({
                       viewBox="0 0 14 14"
                       fill="currentColor"
                     >
-                      <path d="M7.45331 3.64772L12.6454 8.83988C12.8959 9.09029 12.8959 9.49627 12.6454 9.74666L12.0399 10.3522C11.7899 10.6022 11.3847 10.6027 11.1342 10.3533L6.99991 6.23843L2.86569 10.3533C2.61511 10.6027 2.20996 10.6022 1.95997 10.3522L1.3544 9.74666C1.10398 9.49624 1.10398 9.09026 1.3544 8.83988L6.5465 3.64772C6.79692 3.39733 7.2029 3.39733 7.45331 3.64772Z" />
+                      <path d="M6.54669 10.3523L1.35456 5.16012C1.10414 4.90971 1.10414 4.50373 1.35456 4.25334L1.96014 3.64776C2.21012 3.39778 2.61527 3.3973 2.86585 3.6467L7.00009 7.76157L11.1343 3.6467C11.3849 3.3973 11.79 3.39778 12.04 3.64776L12.6456 4.25334C12.896 4.50376 12.896 4.90974 12.6456 5.16012L7.4535 10.3523C7.20308 10.6027 6.7971 10.6027 6.54669 10.3523Z" />
                     </svg>
                   )}
                 </span>
@@ -136,9 +137,10 @@ export default function Sidebar({children, title}: LayoutProps) {
 
   return (
     <div className="flex">
+      
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full bg-white text-neutral-900 py-4 border-r-2 border-neutral-200 
+        className={`fixed top-0 left-0 h-full bg-white text-neutral-900 border-r-2 border-neutral-200 
         ${isOpen ? "w-64" : "w-[77px]"} 
         transition-all duration-300 ease-in-out z-50`}
       >
@@ -181,6 +183,15 @@ export default function Sidebar({children, title}: LayoutProps) {
            
           )}
         </button>
+        <div className="flex items-center justify-center pt-4 pb-[30px] ">
+          <Image
+            src={isOpen ? "/images/logo hris with text.png" : "/images/logo hris with no text.png"}
+            alt="Logo"
+            width={isOpen ? 82 : 33.75}
+            height={isOpen ? 66 : 66}
+            className={`transition-none duration-300  ${isOpen ? "" : ""}`}
+          />
+        </div>
         <nav className="flex flex-col gap-4 w-full">
           <div className="pr-[15px]">
             <NavItem
