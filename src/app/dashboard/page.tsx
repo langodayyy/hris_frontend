@@ -6,7 +6,9 @@ import  Sidebar  from "../../components/sidebar";
 
 export default function Dashboard() {
   return (
-    <div className="flex min-w-full min-h-full bg-accent-800 ">
+    <div className="flex ">
+
+        {/* <Sidebar /> */}
     </div>
 
   );
