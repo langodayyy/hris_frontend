@@ -17,8 +17,7 @@ type NavItemProps = {
 type LayoutProps = {
   children: React.ReactNode;
   title: string;
-}
-
+};
 
 function NavItem({
   url,
@@ -130,7 +129,7 @@ function NavItem({
     </li>
   );
 }
-export default function Sidebar({children, title}: LayoutProps) {
+export default function Sidebar({ children, title }: LayoutProps) {
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
 
@@ -138,7 +137,7 @@ export default function Sidebar({children, title}: LayoutProps) {
     <div className="flex">
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full bg-white text-neutral-900 py-4 border-r-2 border-neutral-200 
+        className={`fixed top-0 left-0 h-full bg-white text-neutral-900  border-r-2 border-neutral-200 
         ${isOpen ? "w-64" : "w-[77px]"} 
         transition-all duration-300 ease-in-out z-50`}
       >
@@ -149,20 +148,20 @@ export default function Sidebar({children, title}: LayoutProps) {
           } z-51`}
         >
           {isOpen ? (
-             <svg
-             xmlns="http://www.w3.org/2000/svg"
-             width="16"
-             height="16"
-             viewBox="0 0 16 16"
-             fill="none"
-           >
-             <path
-               fillRule="evenodd"
-               clipRule="evenodd"
-               d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z"
-               fill="currentColor"
-             />
-           </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z"
+                fill="currentColor"
+              />
+            </svg>
           ) : (
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -178,10 +177,26 @@ export default function Sidebar({children, title}: LayoutProps) {
                 fill="currentColor"
               />
             </svg>
-           
           )}
         </button>
-        <nav className="flex flex-col gap-4 w-full">
+        <nav className="flex flex-col w-full">
+          <div className="flex justify-center pt-4 pb-[30px]">
+            <Image
+              src={
+                isOpen
+                  ? "/images/logo hris with text.png"
+                  : "/images/logo hris with no text.png"
+              }
+              alt="Contoh Gambar"
+              unoptimized
+              width={1} // dummy, agar Next tidak error
+              height={1}
+              className={`h-[66px] ${
+                isOpen ? "w-[82px]" : "w-[40px]"
+              } object-contain`}
+            />
+          </div>
+
           <div className="pr-[15px]">
             <NavItem
               url="/"
@@ -313,7 +328,6 @@ export default function Sidebar({children, title}: LayoutProps) {
           isOpen ? "ml-64" : "ml-[77px]"
         } w-full`}
       >
-
         <Navbar title={title} />
         <main>{children}</main>
         {/* Main Content Area */}
