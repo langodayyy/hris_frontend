@@ -12,6 +12,7 @@ export default function PhoneInput() {
         <Input
           id="phone"
           type="number"
+          name="phone"
           placeholder="Enter your phone number"
           className="border-0 focus-visible:ring-0 focus-visible:border-transparent [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           inputMode="numeric"

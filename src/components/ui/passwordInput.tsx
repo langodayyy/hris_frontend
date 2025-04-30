@@ -10,12 +10,14 @@ interface PasswordInputProps {
   id: string;
   label?: string;
   placeholder?: string;
+  name: string;
 }
 
 export default function PasswordInput({
   id,
   label = "Password",
   placeholder = "Enter your password",
+  name,
 }: PasswordInputProps) {
   const [show, setShow] = useState(false);
 
@@ -25,6 +27,7 @@ export default function PasswordInput({
       <Input
         id={id}
         type={show ? "text" : "password"}
+        name={name}
         placeholder={placeholder}
         className="pr-10"
       />
