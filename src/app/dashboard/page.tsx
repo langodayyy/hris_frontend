@@ -8,7 +8,7 @@ export default function HomePage() {
   return (
     <div className="flex ">
 
-        <Sidebar />
+        {/* <Sidebar /> */}
     </div>
 
   );
