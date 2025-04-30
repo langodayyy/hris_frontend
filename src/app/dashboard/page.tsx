@@ -67,7 +67,7 @@ export default function Dashboard() {
   return (
     <Sidebar title="Dashboard">
       {/* Employee Data Number */}
-      <div className="grid grid-cols-4 gap-[30px]">
+      <div className="grid grid-cols-4 gap-[30px] pb-[30px]">
         {/* Card Total Employee */}
         <Card className="col-span-1 py-0 gap-0">
           <CardContent className="py-[20px] px-[20px]">
