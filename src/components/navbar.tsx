@@ -46,7 +46,7 @@ export default function Navbar({ title, avatarImage, userName, subsPlan, activeP
 
 
   return (
-    <nav className="fixed top-0 flex flex-row items-center w-screen h-auto bg-white px-6 py-[16px] justify-between shadow-[0px_2px_4px_#B0B0B0] grid grid-cols-3">
+    <nav className="sticky z-10 top-0 flex flex-row items-center w-screen h-auto bg-white px-6 py-[16px] justify-between shadow-[0px_2px_4px_#B0B0B0] grid grid-cols-3">
       <div className="flex justify-start w-[230px] h-[29px]">
         <a href="#" className="text-2xl font-medium focus:outline-nonext-left">
           {title}

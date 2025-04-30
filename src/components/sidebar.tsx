@@ -329,7 +329,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
         } w-full`}
       >
         <div className="flex flex-col">
-          <Navbar title={title} />
+          <Navbar title={title} userName="Silfi Nazarina" subsPlan="Free" activePeriod="28 May, 2025" />
           <main className="p-[30px]">{children}</main>
         </div>
         {/* Main Content Area */}
