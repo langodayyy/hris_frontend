@@ -2,6 +2,7 @@
 
 import Sidebar from "@/components/sidebar";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Pie, PieChart } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
@@ -17,6 +18,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
+const chartDataPie = [
+  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
+  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
+  { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
+];
+
+const chartPieConfig = {
+  visitors: {
+    label: "Visitors",
+  },
+  chrome: {
+    label: "Chrome",
+    color: "#257047",
+  },
+  safari: {
+    label: "Safari",
+    color: "#FFAB00",
+  },
+  firefox: {
+    label: "Firefox",
+    color: "#C11106",
+  },
+} satisfies ChartConfig;
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -190,23 +215,62 @@ export default function Dashboard() {
       {/* Chart */}
       <div className="grid grid-cols-2 gap-[30px]">
         <div className="cols-span-1">
-          <ChartContainer config={chartConfig} className="max-h-[500px] w-full">
-            <BarChart accessibilityLayer data={chartData}>
-              <CartesianGrid vertical={true} />
-              <XAxis
-                dataKey="month"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                tickFormatter={(value) => value.slice(0, 3)}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-              <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
-            </BarChart>
-          </ChartContainer>
+          {/* pie chart approval attendance status */}
+          <Card className="flex flex-col py-0 gap-0">
+            <CardContent className="flex flex-row w-full pb-0">
+              <ChartContainer
+                config={chartPieConfig}
+                className="aspect-square max-h-[250px] min-w-[250px]"
+              >
+                <PieChart>
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Pie
+                    data={chartDataPie}
+                    dataKey="visitors"
+                    nameKey="browser"
+                  />
+                </PieChart>
+              </ChartContainer>
+              <div className="py-[20px] w-full">
+                <div className="border-b-1 border-b-black pb-[20px]">
+                  <div className="font-medium text-base text-[#acacac]">
+                    Check Clock Statistic
+                  </div>
+                  <div className="font-bold text-lg">Approval Status Today</div>
+                </div>
+                <div className="flex flex-col gap-[10px] pt-[20px]">
+                  <div className="flex flex-row gap-[10px] items-center">
+                    <div className="w-[10px] h-[10px] rounded-full bg-[#257047]"></div>
+                    <div className="font-normal text-sm w-full">Approved</div>
+                    <div className="font-medium text-sm text-[#acacac]">60%</div>
+                  </div>
+                  <div className="flex flex-row gap-[10px] items-center">
+                    <div className="w-[10px] h-[10px] rounded-full bg-[#FFAB00]"></div>
+                    <div className="font-normal text-sm w-full">Pending</div>
+                    <div className="font-medium text-sm text-[#acacac]">30%</div>
+                  </div>
+                  <div className="flex flex-row gap-[10px] items-center">
+                    <div className="w-[10px] h-[10px] rounded-full bg-[#C11106]"></div>
+                    <div className="font-normal text-sm w-full">Rejected</div>
+                    <div className="font-medium text-sm text-[#acacac]">10%</div>
+                  </div>
+                  </div>
+              </div>
+            </CardContent>
+          </Card>
+          {/* bar chart horizontal current number of employee (new, active, resigned)*/}
+
+          {/* pie chart gender */}
+
+          {/* pie chart maritial status  */}
+
+          {/* pie chart attendance status today */}
         </div>
         <div className="cols-span-1">
+          {/* table late, absence, leave employee today  */}
           <ChartContainer config={chartConfig} className="max-h-[500px] w-full">
             <BarChart accessibilityLayer data={chartData}>
               <CartesianGrid vertical={true} />
@@ -222,6 +286,14 @@ export default function Dashboard() {
               <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
             </BarChart>
           </ChartContainer>
+
+          {/* bar chart vertical employee type status (magang, tetap, pkwt, kontrak) */}
+
+          {/* pie chart age */}
+
+          {/* pie chart religion */}
+
+          {/* pie chart years of works */}
         </div>
       </div>
     </Sidebar>
