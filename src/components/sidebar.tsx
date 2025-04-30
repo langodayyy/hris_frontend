@@ -328,8 +328,10 @@ export default function Sidebar({ children, title }: LayoutProps) {
           isOpen ? "ml-64" : "ml-[77px]"
         } w-full`}
       >
-        <Navbar title={title} />
-        <main>{children}</main>
+        <div className="flex flex-col">
+          <Navbar title={title} />
+          <main className="p-[30px]">{children}</main>
+        </div>
         {/* Main Content Area */}
         {/* <h1 className="text-3xl font-bold">Welcome to the Page</h1>
         <p className="mt-4 text-gray-600">
