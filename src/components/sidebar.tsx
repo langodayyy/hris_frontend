@@ -199,9 +199,9 @@ export default function Sidebar({ children, title }: LayoutProps) {
 
           <div className="pr-[15px]">
             <NavItem
-              url="/"
+              url="/dashboard"
               isOpen={isOpen}
-              isSelected={pathname === "/"}
+              isSelected={pathname === "/dashboard"}
               text="Dashboard"
               svgIcon={
                 <svg

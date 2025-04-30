@@ -8,8 +8,6 @@ import Sidebar from "@/components/sidebar";
 
 export default function Home() {
   return (
-   <Sidebar title="Dashboard">
-     <div>Welcome to the Dashboard</div>
-   </Sidebar>
+   <Button variant={"link"}><a href="/signup">Sign Up Here</a></Button>
   );
 }
