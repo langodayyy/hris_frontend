@@ -92,7 +92,6 @@ export default function Navbar({ title, avatarImage, userName, subsPlan, activeP
             )}
           </div>
         </div>
-
         {/* notification dropdown */}
         <DropdownMenuContent className="absolute w-[300px] p-0 top-3 right-0">
         <DropdownMenuLabel className="bg-neutral-50 text-neutral-900 h-[42px] px-4 py-[10px] text-base items-center">Notification</DropdownMenuLabel>

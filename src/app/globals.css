@@ -1,9 +1,21 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+/* @import "inter.css"; */
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter/Inter-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  
   --color-foreground: var(--foreground);
   --color-background: var(--background);
   --font-sans: var(--font-geist-sans);
@@ -147,8 +159,9 @@
 }
 
 :root {
+  --font-geist-sans: inter, sans-serif;
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background:oklch(0.94 0.02 246);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -213,6 +226,17 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+@layer theme {
+  :root {
+    font-feature-settings: 'liga' 1, 'calt' 1;
+  }
+
+  @supports (font-variation-settings: normal) {
+    :root {
+    --font-inter: InterVariable, sans-serif;
+    }
+  }
 }
 
 @layer base {
