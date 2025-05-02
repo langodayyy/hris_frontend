@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import SignupForm from "../../components/ui/form";
+import SignupForm from "../../components/ui/signupForm";
 
 import { useFormContext } from "@/context/FormContext";
 
