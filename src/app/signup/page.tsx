@@ -1,18 +1,14 @@
 "use client";
 
-import { Metadata } from "next";
-import Sidebar from "../../components/sidebar";
 import Image from "next/image";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import PasswordInput from "../../components/ui/passwordInput";
-import { Eye, EyeOff } from "lucide-react";
-import { link } from "fs";
-// import HomeClient from "./aboutMe";
+import SignupForm from "../../components/ui/form";
+
+import { useFormContext } from "@/context/FormContext";
 
 export default function SignUp() {
+  const { errors } = useFormContext();
+
   return (
     <div className="p-[23px] w-screen h-screen bg-white">
       <div className="flex flex-row w-full h-full">
@@ -37,88 +33,22 @@ export default function SignUp() {
             <span className="text-lg  text-neutral-500">
               Create your account and streamline your employee management.
             </span>
-            <form
-              action=""
-              method="post"
-              className="flex flex-col gap-[25px]"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target as HTMLFormElement);
-                const response = await fetch(
-                  "http://localhost:8000/api/register",
-                  {
-                    method: "POST",
-                    body: formData,
-                  }
-                );
-
-                if (response.ok) {
-                  const data = await response.json();
-                  const token = data.token;
-                  const is_profile_complete = data.is_profile_complete;
-
-                  // Store the token in localStorage
-                  localStorage.setItem("token", token);
-                  localStorage.setItem(
-                    "is_profile_complete",
-                    is_profile_complete
-                  );
-
-                  if (is_profile_complete) {
-                    // Redirect to dashboard or another page
-                    window.location.href = "/dashboard"; // Change this to your desired route
-                  } else {
-                    // Optionally, redirect the user or show a success message
-
-                    window.location.href = "/signup/complete-registration"; // Redirect to dashboard or another page
-                  }
-                } else {// Handle error response
-                  const errorData = await response.json();
-                    const errorMessages = Object.values(errorData.errors)
-                    .flat()
-                    .join("\n");
-                    
-                    // ⚠️change the format to non alert JS⚠️
-                    alert(`Error:\n${errorMessages}`);
-                }
-              }}
-            >
-              <div className="flex flex-col gap-5 w-full">
-                <div className="flex flex-col gap-2 w-full">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter your email"
-                  />
-                </div>
-                <div className="flex flex-col gap-2 w-full">
-                  <PasswordInput id="password" name="password" />
-                </div>
-                <div className="flex flex-col gap-2 w-full">
-                  <PasswordInput
-                    id="password_confirmation"
-                    name="password_confirmation"
-                    label="Confirm Password"
-                  />
-                </div>
+            {/* errors message login failure from backend */}
+            {Object.entries(errors).map(([field, messages]) => (
+              <div key={field} className="text-danger-700">
+                {Array.isArray(messages) ? (
+                  messages.map((message, idx) => (
+                    <div key={idx}>{message}</div>
+                  ))
+                ) : (
+                  <div>{messages}</div>
+                )}
               </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox id="terms2" />
-                <label
-                  htmlFor="terms2"
-                  className="text-sm text-neutral-900 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  I agree with terms of use of HRIS.
-                </label>
-              </div>
-              <div className="w-full">
-                <Button type="submit">Sign Up</Button>
-              </div>
-            </form>
+            ))}
+
+            <SignupForm></SignupForm>
             <div className="w-full">
-              <Button variant={"outline"}>
+              <Button variant={"outline"} >
                 <svg
                   width="21"
                   height="20"
