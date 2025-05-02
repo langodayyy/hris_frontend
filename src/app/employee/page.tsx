@@ -36,7 +36,7 @@ const dummyEmployees = Array.from({ length: 1000 }, (_, i) => ({
   no: i + 1,
   name: `Employee ${i + 1}`,
   gender: i % 2 === 0 ? "Male" : "Female",
-  phone: `08${Math.floor(1000000000 + Math.random() * 900000000)}`,
+  phone: `6287822742996`,
   branch: ["Jakarta", "Bandung", "Surabaya", "Medan", "Bali"][i % 5],
   position: ["CEO", "Manager", "Staff", "Supervisor", "Assistant"][i % 5],
   type: ["Permanent", "Contract", "Intern", "Probationary"][i % 4],
@@ -81,7 +81,7 @@ export default function Employee() {
   return (
     <Sidebar title="Employee">
       <div>
-        <div className="flex justify-center gap-[30px] h-[141px] w-[1302px] mx-auto">
+        <div className="flex justify-center gap-[30px] h-[141px] w-full mx-auto">
           <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
 
             <div className="flex-col mt-[-5px] mx-[10px]">
@@ -135,7 +135,7 @@ export default function Employee() {
             </div>
           </Card>
         </div>
-        <div className="mt-[30px] w-[1302px] mx-auto">
+        <div className="mt-[30px] w-full mx-auto">
           <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
             <CardContent>
               {/* Header: Title - Search - Button */}
