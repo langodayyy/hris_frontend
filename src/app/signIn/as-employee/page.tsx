@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import PasswordInput from "@/components/ui/passwordInput";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export default function SignInAsEmployee() {
 
@@ -38,7 +39,20 @@ export default function SignInAsEmployee() {
                 Remember me
               </label>
             </div>
-            <Button variant={"link"} className="text-base justify-end py-0">Forgot Password?</Button>
+            {/* <Button variant={"link"} className="text-base justify-end py-0">Forgot Password?</Button> */}
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant={"link"} className="text-base justify-end py-0">Forgot Password?</Button>
+                </DialogTrigger>
+                <DialogContent className="p-10 bg-white text-lg">
+                    <DialogHeader>
+                    <DialogTitle>Forgot Password</DialogTitle>
+                    <DialogDescription className="pt-2 text-base">
+                        Please contact admin to reset your password
+                    </DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
           </div>
           <div className="flex flex-col gap-[20px] w-full">
             <Button type="submit">Sign In</Button>
