@@ -39,7 +39,6 @@ export default function SignInAsEmployee() {
                 Remember me
               </label>
             </div>
-            {/* <Button variant={"link"} className="text-base justify-end py-0">Forgot Password?</Button> */}
             <Dialog>
                 <DialogTrigger asChild>
                     <Button variant={"link"} className="text-base justify-end py-0">Forgot Password?</Button>
