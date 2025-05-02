@@ -69,7 +69,7 @@ export default function SignIn() {
           <div className="border border-neutral-300 w-full"></div>
           <div className="flex justify-center w-full text-sm">
             <p>
-              Don't have account yet? &nbsp;
+              Dont have account yet? &nbsp;
               <a href="/signup" className="text-info-500 hover:underline">
                 Sign up now and get started
               </a>
