@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select"
 
 import React, { useState } from "react";
+import Link from "next/link";
 
 const dummyEmployees = Array.from({ length: 1000 }, (_, i) => ({
   no: i + 1,
@@ -79,7 +80,7 @@ export default function Employee() {
   }
 
   return (
-    <Sidebar title="Employee">
+    <Sidebar title="Employee Database">
       <div>
         <div className="flex justify-center gap-[30px] h-[141px] w-full mx-auto">
           <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
@@ -203,14 +204,17 @@ export default function Employee() {
 
                     Import
                   </Button>
-                  <Button className="w-[80px]" variant="default">
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7.5 3.125V11.875" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M3.125 7.5H11.875" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                  <Link href="employee/add">
+                    <Button className="w-[80px]" variant="default" >
+                      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M7.5 3.125V11.875" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M3.125 7.5H11.875" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
 
-                    Add
-                  </Button>
+                      Add
+                    </Button>
+                  </Link>
+                 
                 </div>
               </div>
               <div>
