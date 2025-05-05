@@ -11,9 +11,13 @@ import { Button } from "@/components/ui/button";
 import PhoneInput from "../../../components/ui/phoneInput";
 import { Eye, EyeOff } from "lucide-react";
 import { link } from "fs";
-// import HomeClient from "./aboutMe";
+
+import SignupCompleteForm from "@/components/custom/signupCompletion";
+import { useFormContext } from "@/context/FormContext";
 
 export default function SignUp() {
+  const { errors } = useFormContext();
+
   return (
     <div className="p-[23px] w-screen h-screen bg-white">
       <div className="flex flex-row w-full h-full">
@@ -39,7 +43,22 @@ export default function SignUp() {
               Please provide basic company and HR contact details to help us
               serve you better.
             </span>
-            <form
+
+            {/* errors message login failure from backend */}
+            {Object.entries(errors).map(([field, messages]) => (
+              <div key={field} className="text-danger-700">
+                {Array.isArray(messages) ? (
+                  messages.map((message, idx) => (
+                    <div key={idx}>{message}</div>
+                  ))
+                ) : (
+                  <div>{messages}</div>
+                )}
+              </div>
+            ))}
+            
+            <SignupCompleteForm></SignupCompleteForm>
+            {/* <form
               action=""
               method="post"
               className="flex flex-col  gap-[25px]"
@@ -110,7 +129,7 @@ export default function SignUp() {
               <div className="w-full">
                 <Button type="submit">Submit</Button>
               </div>
-            </form>
+            </form> */}
           </div>
         </div>
       </div>

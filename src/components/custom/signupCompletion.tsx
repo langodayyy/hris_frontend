@@ -7,9 +7,9 @@ import { reporter } from "@felte/reporter-react";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import PasswordInput from "./passwordInput";
+import PhoneInput from "@/components/ui/phoneInput";
+import ErrorAlertForm from "@/components/ui/errorAlertForm";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -17,53 +17,47 @@ import { useRouter } from "next/navigation";
 import { useFormContext } from "@/context/FormContext";
 import { Spinner } from "@/components/ui/spinner";
 
-const signupSchema = z
-  .object({
-    email: z
-      .string()
-      .email("Invalid email address")
-      .nonempty("Email is required"),
+const schema = z
+.object({
+    first_name: z
+        .string()
+        .nonempty("First name is required")
+        .max(50, "Cannot exceed 50 characters"),
+    
+    last_name: z
+        .string()
+        .nonempty("Last name is required")
+        .max(50, "Cannot exceed 50 characters"),
+    
+    // phone: z
+    //     .e164()
+    //     .nonempty("Phone is required")
+    //     .refine((val) => /^\d+$/.test(val), {
+    //         message: "Phone must contain only numbers",
+    //     })
+    //     .refine((val) => val.length >= 10 && val.length <= 15, {
+    //         message: "Phone must be between 10 and 15 characters",
+    //     }),
 
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters long")
-      .regex(/(?=.*[0-9])/, "Password must contain at least one number")
-      .regex(
-        /(?=.*[a-z])/,
-        "Password must contain at least one lowercase letter"
-      )
-      .regex(
-        /(?=.*[A-Z])/,
-        "Password must contain at least one uppercase letter"
-      )
-      .regex(
-        /(?=.*[!@#$%^&*])/,
-        "Password must contain at least one special character"
-      ),
+    company_name: z
+        .string()
+        .nonempty("Company name is required")
+        .max(50, "Cannot exceed 50 characters"),
+});
 
-    password_confirmation: z.string(),
-  })
-  .refine((data) => data.password === data.password_confirmation, {
-    message: "Passwords don't match",
-    path: ["password_confirmation"],
-  });
+type SignupCompleteFormValues = z.infer<typeof schema>;
 
-type SignupFormValues = z.infer<typeof signupSchema>;
-
-export default function SignupForm() {
+export default function SignupCompleteForm() {
   const router = useRouter();
   const { setErrors } = useFormContext();
   const [isLoading, setLoading] = useState(false);
 
-  const { form, errors } = useForm<SignupFormValues>({
-    extend: [validator({ schema: signupSchema }), reporter()],
+  const { form, errors } = useForm<SignupCompleteFormValues>({
+    extend: [validator({ schema: schema }), reporter()],
     onSubmit: async (values) => {
       setLoading(true);
-      const formData = new FormData();
-      Object.entries(values).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
-      const response = await registerUser(formData);
+      
+      const response = await completeRegister(values);
 
       setLoading(false);
 
@@ -71,7 +65,7 @@ export default function SignupForm() {
         // Handle successful registration
         console.log("User registered successfully:", response.data);
 
-        router.push("/signup/complete-registration");
+        router.push("/dashboard");
       } else {
         setErrors(response.errors);
       }
@@ -79,20 +73,146 @@ export default function SignupForm() {
   });
 
   return (
-    <form ref={form} className="flex flex-col gap-[25px]" method="post">
+    <form ref={form} method="post" className="flex flex-col  gap-[25px]">
       <div className="flex flex-col gap-5 w-full">
+        <div className="flex flex-row gap-5 w-full">
+          <div className="flex flex-col gap-2 w-full">
+            <Label htmlFor="firstname">First Name</Label>
+            <Input
+              type="text"
+              name="first_name"
+              id="firstname"
+              placeholder="Enter your first name"
+            />
+            {errors().first_name && (
+            <div className="text-sm p-[10px] bg-danger-50 rounded-md">
+              {Array.isArray(errors().first_name) ? (
+                errors()!.first_name!.map((err, idx) => (
+                  <div
+                    className="flex flex-row items-center gap-2 py-2"
+                    key={idx}
+                  >
+                    <svg
+                      width="15"
+                      height="16"
+                      viewBox="0 0 22 23"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle cx="11" cy="11.5" r="11" fill="#C11106" />
+                      <path
+                        d="M7 8L15 16M15 8L7 16"
+                        stroke="white"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+
+                    <span key={idx} className="text-danger-700 block">
+                      {err}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <span className="text-danger-700">{errors().first_name}</span>
+              )}
+            </div>
+          )}
+          </div>
+          <div className="flex flex-col gap-2 w-full">
+            <Label htmlFor="lastname">Last Name</Label>
+            <Input
+              type="text"
+              name="last_name"
+              id="lastname"
+              placeholder="Enter your last name"
+            />
+            {errors().last_name && (
+            <div className="text-sm p-[10px] bg-danger-50 rounded-md">
+              {Array.isArray(errors().last_name) ? (
+                errors()!.last_name!.map((err, idx) => (
+                  <div
+                    className="flex flex-row items-center gap-2 py-2"
+                    key={idx}
+                  >
+                    <svg
+                      width="15"
+                      height="16"
+                      viewBox="0 0 22 23"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle cx="11" cy="11.5" r="11" fill="#C11106" />
+                      <path
+                        d="M7 8L15 16M15 8L7 16"
+                        stroke="white"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+
+                    <span key={idx} className="text-danger-700 block">
+                      {err}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <span className="text-danger-700">{errors().last_name}</span>
+              )}
+            </div>
+          )}
+          </div>
+        </div>
+
+        <PhoneInput></PhoneInput>
+        {/* still need more research */}
+        {/* {errors().phone && (
+            <div className="text-sm p-[10px] bg-danger-50 rounded-md">
+              {Array.isArray(errors().phone) ? (
+                errors()!.phone!.map((err, idx) => (
+                  <div
+                    className="flex flex-row items-center gap-2 py-2"
+                    key={idx}
+                  >
+                    <svg
+                      width="15"
+                      height="16"
+                      viewBox="0 0 22 23"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle cx="11" cy="11.5" r="11" fill="#C11106" />
+                      <path
+                        d="M7 8L15 16M15 8L7 16"
+                        stroke="white"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+
+                    <span key={idx} className="text-danger-700 block">
+                      {err}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <span className="text-danger-700">{errors().phone}</span>
+              )}
+            </div>
+          )} */}
+
         <div className="flex flex-col gap-2 w-full">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="companyname">Company Name</Label>
           <Input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Enter your email"
+            type="text"
+            name="company_name"
+            id="companyname"
+            placeholder="Enter company name"
           />
-          {errors().email && (
+          {errors().company_name && (
             <div className="text-sm p-[10px] bg-danger-50 rounded-md">
-              {Array.isArray(errors().email) ? (
-                errors()!.email!.map((err, idx) => (
+              {Array.isArray(errors().company_name) ? (
+                errors()!.company_name!.map((err, idx) => (
                   <div
                     className="flex flex-row items-center gap-2 py-2"
                     key={idx}
@@ -119,107 +239,18 @@ export default function SignupForm() {
                   </div>
                 ))
               ) : (
-                <span className="text-danger-700">{errors().email}</span>
+                <span className="text-danger-700">{errors().company_name}</span>
               )}
             </div>
           )}
         </div>
-        <div className="flex flex-col gap-2 w-full">
-          <PasswordInput id="password" name="password" />
-          {errors().password && (
-            <div className="text-sm p-[10px] bg-danger-50 rounded-md">
-              {Array.isArray(errors().password) ? (
-                errors()!.password!.map((err, idx) => (
-                  <div
-                    className="flex flex-row items-center gap-2 py-2"
-                    key={idx}
-                  >
-                    <svg
-                      width="15"
-                      height="16"
-                      viewBox="0 0 22 23"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle cx="11" cy="11.5" r="11" fill="#C11106" />
-                      <path
-                        d="M7 8L15 16M15 8L7 16"
-                        stroke="white"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-
-                    <span key={idx} className="text-danger-700 block">
-                      {err}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <span className="text-danger-700">{errors().password}</span>
-              )}
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col gap-2 w-full">
-          <PasswordInput
-            id="password_confirmation"
-            name="password_confirmation"
-            label="Confirm Password"
-          />
-          {errors().password_confirmation && (
-            <div className="text-sm p-[10px] bg-danger-50 rounded-md">
-              {Array.isArray(errors().password_confirmation) ? (
-                errors()!.password_confirmation!.map((err, idx) => (
-                  <div
-                    className="flex flex-row items-center gap-2 py-2"
-                    key={idx}
-                  >
-                    <svg
-                      width="15"
-                      height="16"
-                      viewBox="0 0 22 23"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle cx="11" cy="11.5" r="11" fill="#C11106" />
-                      <path
-                        d="M7 8L15 16M15 8L7 16"
-                        stroke="white"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-
-                    <span key={idx} className="text-danger-700 block">
-                      {err}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <span className="text-danger-700">
-                  {errors().password_confirmation}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="flex items-center space-x-2">
-        <Checkbox id="terms2" name="terms_check"/>
-        <label
-          htmlFor="terms2"
-          className="text-sm text-neutral-900 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          I agree with terms of use of HRIS.
-        </label>
       </div>
       <div className="w-full">
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? (
+        {isLoading ? (
             <Spinner size={"small"}></Spinner>
           ) : (
-            "Sign Up"
+            "Submit"
           )}
         </Button>
       </div>
@@ -227,13 +258,15 @@ export default function SignupForm() {
   );
 }
 
-export async function registerUser(formData: FormData) {
+export async function completeRegister(data: Record<string, any>) {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/register`,
+      `${process.env.NEXT_PUBLIC_API_URL}/completeRegister`,
       {
         method: "POST",
-        body: formData,
+        headers: {
+            "Content-Type": "application/json",
+          },
       }
     );
 

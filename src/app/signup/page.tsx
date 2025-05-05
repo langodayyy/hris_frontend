@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import SignupForm from "../../components/ui/signupForm";
+import SignupForm from "../../components/custom/signupForm";
 
 import { useFormContext } from "@/context/FormContext";
 
@@ -33,6 +33,7 @@ export default function SignUp() {
             <span className="text-lg  text-neutral-500">
               Create your account and streamline your employee management.
             </span>
+            
             {/* errors message login failure from backend */}
             {Object.entries(errors).map(([field, messages]) => (
               <div key={field} className="text-danger-700">
