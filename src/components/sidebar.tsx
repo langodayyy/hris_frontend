@@ -50,7 +50,7 @@ function NavItem({
               onClick={handleToggle}
               className={`flex items-center justify-between gap-2 px-[21px] py-4 rounded-lg w-full transition-all text-left ${
                 isSelected
-                  ? "bg-primary-900 text-white"
+                  ? "bg-primary-900 text-white "
                   : "bg-white text-neutral-900 hover:bg-primary-950 hover:text-white"
               }`}
             >
@@ -92,7 +92,7 @@ function NavItem({
               href={url}
               className={`flex items-center justify-between gap-2 px-[21px] py-4 rounded-lg w-full transition-all text-left ${
                 isSelected
-                  ? "bg-primary-900 text-white"
+                  ? " bg-primary-900 text-white"
                   : "bg-white text-neutral-900 hover:bg-primary-950 hover:text-white"
               }`}
             >
@@ -114,8 +114,10 @@ function NavItem({
                     href={item.href}
                     className={`block px-4 py-2 rounded-lg font-medium text-base${
                       isSelected && url === item.href
-                        ? "bg-primary-900 text-white "
-                        : "text-neutral-900 hover:bg-primary-950 hover:text-white"
+                        ? 
+                        " bg-primary-900 text-white "
+                        : 
+                        "text-neutral-900 hover:bg-primary-950 hover:text-white"
                     }`}
                   >
                     {item.label}
@@ -340,9 +342,9 @@ export default function Sidebar({ children, title }: LayoutProps) {
               }
             />
             <NavItem
-              url="/checkclock"
+              url="/checkclock/checkclock-management"
               isOpen={isOpen}
-              isSelected={pathname === "/checkclock"}
+              isSelected={pathname === "/checkclock/checkclock-management"}
               text="Checkclock"
               svgIcon={
                 <svg
@@ -362,7 +364,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
                 </svg>
               }
               submenu={[
-                { label: "Management", href: "/checkclock/management" },
+                { label: "Management", href: "/checkclock/checkclock-management" },
                 { label: "Setting", href: "/checkclock/setting" },
               ]}
             />
@@ -409,7 +411,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
       >
         <div className="flex flex-col">
           <Navbar title={title} userName="Silfi Nazarina" subsPlan="Free" activePeriod="28 May, 2025" />
-          <main className="p-[30px]">{children}</main>
+          <main className="p-[30px] ">{children}</main>
         </div>
         {/* Main Content Area */}
         {/* <h1 className="text-3xl font-bold">Welcome to the Page</h1>
