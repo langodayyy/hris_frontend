@@ -1,7 +1,11 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function PhoneInput() {
+interface PhoneInputProps {
+  placeholder?: string;
+}
+
+export default function PhoneInput({ placeholder = "Enter your phone number" }: PhoneInputProps) {
   return (
     <div className="flex flex-col gap-2 w-full">
       <Label htmlFor="phone">Phone Number</Label>
@@ -13,7 +17,7 @@ export default function PhoneInput() {
           id="phone"
           type="number"
           name="phone"
-          placeholder="Enter your phone number"
+          placeholder={placeholder}
           className="border-0 focus-visible:ring-0 focus-visible:border-transparent [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           inputMode="numeric"
         />
