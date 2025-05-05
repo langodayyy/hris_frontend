@@ -35,7 +35,7 @@ async function getData(): Promise<CheckclockOverview[]> {
       id: "1",
       employeeName: "Juanita",
       position: "CEO",
-      date: "2023-10-01",
+      date: "2023-10-10",
       clockIn: "08:00",
       clockOut: "17:00",
       workType: "WFO",
