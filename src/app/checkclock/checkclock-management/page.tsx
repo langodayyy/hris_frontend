@@ -33,7 +33,7 @@ async function getData(): Promise<CheckclockOverview[]> {
   return [
     {
       id: "1",
-      employeeName: "Juanita",
+      employeeName: "Balerina Capucina",
       position: "CEO",
       date: "2023-10-10",
       clockIn: "08:00",
@@ -44,7 +44,7 @@ async function getData(): Promise<CheckclockOverview[]> {
     },
     {
       id: "2",
-      employeeName: "John",
+      employeeName: "Bombardilo Crocodillo",
       position: "Manager",
       date: "2023-10-01",
       clockIn: "09:00",
@@ -52,6 +52,17 @@ async function getData(): Promise<CheckclockOverview[]> {
       workType: "WFH",
       status: "Late",
       approvalStatus: "Pending",
+    },
+    {
+      id: "3",
+      employeeName: "Agus",
+      position: "HRD",
+      date: "2023-10-01",
+      clockIn: "09:00",
+      clockOut: "18:00",
+      workType: "WFH",
+      status: "Late",
+      approvalStatus: "Rejected",
     },
     // ...
   ]
