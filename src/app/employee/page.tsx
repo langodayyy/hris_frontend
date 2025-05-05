@@ -204,7 +204,7 @@ export default function Employee() {
 
                     Import
                   </Button>
-                  <Link href="employee/add">
+                  <Link href="/employee/add">
                     <Button className="w-[80px]" variant="default" >
                       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M7.5 3.125V11.875" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -247,9 +247,12 @@ export default function Employee() {
                         <TableCell>{employee.type}</TableCell>
                         <TableCell>{employee.status}</TableCell>
                         <TableCell>
+                          <Link href="/employee/details">
                           <Button variant="outline" size="sm">
                             View
                           </Button>
+                          </Link>
+                        
                         </TableCell>
                       </TableRow>
                     ))}
