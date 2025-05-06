@@ -303,7 +303,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
             />
             <NavItem
               url="/employee"
-              isSelected={pathname.startWith("/employee")}
+              isSelected={pathname.startsWith("/employee")}
               text="Employees"
               isOpen={isOpen}
               svgIcon={
