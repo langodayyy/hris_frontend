@@ -62,7 +62,7 @@ export default function SignInAsEmployee() {
           <div className="flex justify-center w-full text-sm">
             <p>
               Dont have account yet? &nbsp;
-              <a href="/signup" className="text-info-500 hover:underline">
+              <a href="/sign-up" className="text-info-500 hover:underline">
                 Sign up now and get started
               </a>
             </p>

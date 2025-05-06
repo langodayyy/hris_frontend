@@ -20,7 +20,7 @@ export default function SetNewPassword() {
           <Button type="submit">Reset Password</Button>
           <div className="flex items-center justify-center w-full text-sm gap-[10px]">
               <img src="/arrow-left.svg" alt="left arrow Icon" />
-              <a href="/signin" className="text-info-500 hover:underline">
+              <a href="/sign-in" className="text-info-500 hover:underline">
                 Back to Sign In
               </a>
           </div>

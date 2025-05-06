@@ -74,7 +74,7 @@ export default function SignupForm() {
         Cookies.set("token", response.data.token);
         Cookies.set("is_profile_complete", response.data.is_profile_complete);
 
-        router.push("/signup/complete-registration");
+        router.push("/sign-up/complete-registration");
       } else {
         setErrors(response.errors);
       }
