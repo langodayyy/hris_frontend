@@ -9,7 +9,6 @@ export default function CheckEmail() {
         <div className="w-1/2 flex flex-col items-center justify-center px-[80px] py-[10px] gap-[25px] overflow-y-auto">
           <h4 className="text-[34px] font-medium text-neutral-900">Check Your Email</h4>
           <p className="text-base text-neutral-500 text-center">We sent password reset link to your email (username@gamil.com) whoch valid for 24 hours after receives the email. Please check your inbox!</p>
-          <Button type="submit">Reset Password</Button>
           <div className="flex justify-center w-full text-sm">
             <p>
               Dont receive the email? &nbsp;

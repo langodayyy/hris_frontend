@@ -64,7 +64,7 @@ export default function SignIn() {
                   />
                 </svg>
               Sign In with Google</Button>
-              <Button variant={"outline"}>Sign In as Employee</Button>
+              <a href="/sign-in/as-employee"><Button variant={"outline"}>Sign In as Employee</Button></a>
           </div>
           <div className="border border-neutral-300 w-full"></div>
           <div className="flex justify-center w-full text-sm">
