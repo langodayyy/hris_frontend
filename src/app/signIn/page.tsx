@@ -34,7 +34,7 @@ export default function SignIn() {
                 Remember me
               </label>
             </div>
-            <Button variant={"link"} className="text-base justify-end py-0">Forgot Password?</Button>
+            <Button variant={"link"}  className="text-base justify-end py-0"><a href="signin/forgot-password">Forgot Password?</a></Button>
           </div>
           <div className="flex flex-col gap-[20px] w-full">
             <Button type="submit">Sign In</Button>

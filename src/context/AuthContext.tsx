@@ -43,7 +43,10 @@ export function AuthProvider({children}: { children: React.ReactNode }) {
                         return
                     }
                 } else {
-                    router.push('/signin') // Redirect to sign-in page if no token
+                    // Allow access to sign-up page if not authenticated
+                    if (window.location.pathname !== '/signup') {
+                        router.push('/signin')
+                    }
                 }
             } catch (error) {
                 console.error('Error initializing auth:', error)
@@ -70,6 +73,7 @@ export function AuthProvider({children}: { children: React.ReactNode }) {
             Cookies.remove('token')
             Cookies.remove('is_profile_complete')
             // setUser(null)
+            router.push('/')
         } catch (error) {
             console.error('Error signing out:', error)
         }
