@@ -3,37 +3,23 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 
-import { MoreHorizontal } from "lucide-react";
+
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export type CheckclockOverview = {
-  id: string;
+  id: number; 
   employeeName: string;
-  position:
-    | "CEO"
-    | "Manager"
-    | "Head of HR"
-    | "HRD"
-    | "CPO"
-    | "Supervisor"
-    | "OB";
+  position:string;
   date: string;
   clockIn: string;
   clockOut: string;
-  workType: "WFO" | "WFH";
-  status: "On Time" | "Late" | "Anual Leave" | "fSick Leave" | "Absent";
-  approvalStatus: "Approved" | "Pending" | "Rejected";
+  workType: string;
+  status: string;
+  approvalStatus: string;
 };
 
 export const columns: ColumnDef<CheckclockOverview>[] = [
@@ -56,6 +42,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
           </div>
         </Button>
       );
+      
     },
 
     cell: ({ row }) => {
@@ -83,9 +70,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
       <div className="text-center">{row.getValue("position")}</div>
     ),
     filterFn: (row, columnId, filterValue) => {
-      // Check if the row's position is included in the filterValue array
       return filterValue.includes(row.getValue(columnId));
-    },
+    }
   },
   {
     accessorKey: "date",
@@ -132,9 +118,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
       <div className="text-center">{row.getValue("workType")}</div>
     ),
     filterFn: (row, columnId, filterValue) => {
-      // Check if the row's position is included in the filterValue array
       return filterValue.includes(row.getValue(columnId));
-    },
+    }
   },
   {
     accessorKey: "status",
@@ -145,9 +130,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
       <div className="text-center">{row.getValue("status")}</div>
     ),
     filterFn: (row, columnId, filterValue) => {
-      // Check if the row's position is included in the filterValue array
       return filterValue.includes(row.getValue(columnId));
-    },
+    }
   },
   {
     accessorKey: "approvalStatus",
@@ -178,7 +162,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
         },
       };
 
-      const { bgColor, textColor, iconColor } = statusStyles[status];
+      const { bgColor, textColor, iconColor } = statusStyles[status as keyof typeof statusStyles];
 
       return (
         <div className="w-full flex items-center justify-center">
@@ -192,9 +176,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
       );
     },
     filterFn: (row, columnId, filterValue) => {
-      // Check if the row's position is included in the filterValue array
       return filterValue.includes(row.getValue(columnId));
-    },
+    }
   },
   {
     accessorKey: "Details",
