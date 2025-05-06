@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 import Sidebar from "../../../components/sidebar";
 import * as React from "react";
 import { Input } from "@/components/ui/input";
@@ -69,17 +69,17 @@ async function getData(): Promise<CheckclockOverview[]> {
 }
 
 export default async function CheckclockOverviewPage() {
-  const [date, setDate] = React.useState<Date>();
-  const [roles, setRoles] = React.useState<string[]>(["CEO"]);
+  // const [date, setDate] = React.useState<Date>();
+  // const [roles, setRoles] = React.useState<string[]>(["CEO"]);
   const data = await getData()
 
-  const handleToggle = (role: string) => {
-    setRoles((prevRoles) =>
-      prevRoles.includes(role)
-        ? prevRoles.filter((r) => r !== role)
-        : [...prevRoles, role]
-    );
-  };
+  // const handleToggle = (role: string) => {
+  //   setRoles((prevRoles) =>
+  //     prevRoles.includes(role)
+  //       ? prevRoles.filter((r) => r !== role)
+  //       : [...prevRoles, role]
+  //   );
+  // };
 
 
  
@@ -87,7 +87,7 @@ export default async function CheckclockOverviewPage() {
   return (
     <Sidebar title="Checkclock">
       <div className=" h-screen bg-white rounded-[15px] p-[20px] flex flex-col gap-[10px]">
-        <div className="py-[10px] flex gap-6 items-center ">
+        {/* <div className="py-[10px] flex gap-6 items-center ">
           <span className="w-[187px] text-lg flex-none">
             Checkclock Overview
           </span>
@@ -243,8 +243,8 @@ export default async function CheckclockOverviewPage() {
               Add
             </Button>
           </div>
-        </div>
-        <div className="container mx-auto py-10">
+        </div> */}
+        <div className="container mx-auto">
       <DataTable columns={columns} data={data} />
     </div>
       </div>
