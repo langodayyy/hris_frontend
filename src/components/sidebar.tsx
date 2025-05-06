@@ -1,3 +1,4 @@
+
 "use client";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -302,7 +303,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
             />
             <NavItem
               url="/employee"
-              isSelected={pathname === "/employee"}
+              isSelected={pathname.startWith("/employee")}
               text="Employees"
               isOpen={isOpen}
               svgIcon={
@@ -430,3 +431,4 @@ export default function Sidebar({ children, title }: LayoutProps) {
     </div>
   );
 }
+
