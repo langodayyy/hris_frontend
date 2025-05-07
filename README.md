@@ -45,3 +45,8 @@ Format:
 - mumtaz/payment
 - kemal/readme
 - lucky/presensi
+
+make file .env.local
+```
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
+```

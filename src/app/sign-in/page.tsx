@@ -34,7 +34,7 @@ export default function SignIn() {
                 Remember me
               </label>
             </div>
-            <Button variant={"link"} className="text-base justify-end py-0">Forgot Password?</Button>
+            <Button variant={"link"}  className="text-base justify-end py-0"><a href="sign-in/forgot-password">Forgot Password?</a></Button>
           </div>
           <div className="flex flex-col gap-[20px] w-full">
             <Button type="submit">Sign In</Button>
@@ -64,13 +64,13 @@ export default function SignIn() {
                   />
                 </svg>
               Sign In with Google</Button>
-              <Button variant={"outline"}>Sign In as Employee</Button>
+              <a href="/sign-in/as-employee"><Button variant={"outline"}>Sign In as Employee</Button></a>
           </div>
           <div className="border border-neutral-300 w-full"></div>
           <div className="flex justify-center w-full text-sm">
             <p>
               Dont have account yet? &nbsp;
-              <a href="/signup" className="text-info-500 hover:underline">
+              <a href="/sign-up" className="text-info-500 hover:underline">
                 Sign up now and get started
               </a>
             </p>

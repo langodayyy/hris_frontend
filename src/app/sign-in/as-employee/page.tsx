@@ -55,14 +55,14 @@ export default function SignInAsEmployee() {
           </div>
           <div className="flex flex-col gap-[20px] w-full">
             <Button type="submit">Sign In</Button>
-            <Button variant={"outline"}>Use a different sign in method</Button>
-            <Button variant={"outline"}>Sign In as Employee</Button>
+            {/* <Button variant={"outline"}>Use a different sign in method</Button> */}
+            <a href="/sign-in"><Button variant={"outline"}>Sign In as Admin</Button></a>
           </div>
           <div className="border border-neutral-300 w-full"></div>
           <div className="flex justify-center w-full text-sm">
             <p>
               Dont have account yet? &nbsp;
-              <a href="/signup" className="text-info-500 hover:underline">
+              <a href="/sign-up" className="text-info-500 hover:underline">
                 Sign up now and get started
               </a>
             </p>
