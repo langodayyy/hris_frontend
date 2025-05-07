@@ -22,7 +22,7 @@ function generateDummyOvertimeData(count: number) {
 
   for (let i = 1; i <= count; i++) {
     const randomNameIndex = Math.floor(Math.random() * names.length);
-    const randomPositionIndex = Math.floor(  * position.length);
+    const randomPositionIndex = Math.floor(Math.random() * position.length);
     const randomOT =
       overtimeTypes[Math.floor(Math.random() * overtimeTypes.length)];
     const randomHour = (Math.floor(Math.random() * 3) + 1) * 2;
