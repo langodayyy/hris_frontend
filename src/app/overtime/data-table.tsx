@@ -95,38 +95,38 @@ export function DataTable<TData, TValue>({
                     <path
                       d="M16.6663 2.08333V6.25"
                       stroke="#B0B0B0"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
                       d="M8.33333 2.08333V6.25"
                       stroke="#B0B0B0"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
                       d="M3.125 9.375H21.875"
                       stroke="#B0B0B0"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
+                      fillRule="evenodd"
+                      clipRule="evenodd"
                       d="M19.7917 4.16667H5.20833C4.05729 4.16667 3.125 5.09896 3.125 6.25001V19.7917C3.125 20.9427 4.05729 21.875 5.20833 21.875H19.7917C20.9427 21.875 21.875 20.9427 21.875 19.7917V6.25001C21.875 5.09896 20.9427 4.16667 19.7917 4.16667Z"
                       stroke="#B0B0B0"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
                       d="M7.30495 13.2594C7.1612 13.2594 7.04453 13.376 7.04558 13.5198C7.04558 13.6635 7.16224 13.7802 7.30599 13.7802C7.44974 13.7802 7.56641 13.6635 7.56641 13.5198C7.56641 13.376 7.44974 13.2594 7.30495 13.2594"
                       stroke="#B0B0B0"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path

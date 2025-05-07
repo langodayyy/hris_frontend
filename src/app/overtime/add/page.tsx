@@ -239,7 +239,7 @@ export default function AddOvertimeEmployees() {
 
         {/* Action Buttons */}
         <div className="flex flex-row gap-[15px] justify-end items-center">
-          <Button type="button" variant="outline" className="w-[98px]">
+          <Button variant="outline" className="w-[98px]">
             Cancel
           </Button>
           <Button type="submit" variant="default" className="w-[98px]">

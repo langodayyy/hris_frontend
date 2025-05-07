@@ -1,6 +1,6 @@
 'user client'
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import {
     DialogHeader,
     DialogTitle,
     DialogDescription,
-    DialogFooter,
     DialogClose,
     } from "@/components/ui/dialog"
 import {
@@ -202,7 +201,7 @@ const PersonalInformation = () => {
                                         <div className="flex gap-[10px] justify-end">
                                             <div>
                                                 <DialogClose asChild>
-                                                    <Button className="w-[80px]" variant="outline" size="lg" type="button">
+                                                    <Button className="w-[80px]" variant="outline" size="lg">
                                                         Cancel
                                                     </Button>
                                                 </DialogClose>
