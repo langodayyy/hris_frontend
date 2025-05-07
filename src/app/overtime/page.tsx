@@ -17,6 +17,7 @@ function generateDummyOvertimeData(count: number) {
     { name: "Weekend Overtime", rate: 150000 },
     { name: "Holiday Overtime", rate: 230000 },
   ];
+  const approvalStatus = ["Pending", "Approved", "Rejected"];
 
   const data = [];
 
@@ -27,6 +28,8 @@ function generateDummyOvertimeData(count: number) {
       overtimeTypes[Math.floor(Math.random() * overtimeTypes.length)];
     const randomHour = (Math.floor(Math.random() * 3) + 1) * 2;
     const date = new Date(2025, 4, (i % 31) + 1).toLocaleDateString("en-GB");
+    const randomStatus =
+      approvalStatus[Math.floor(Math.random() * approvalStatus.length)];
 
     data.push({
       id: `OVT${i.toString().padStart(4, "0")}`,
@@ -36,6 +39,7 @@ function generateDummyOvertimeData(count: number) {
       date: date,
       hour: randomHour,
       ovt_payroll: randomHour * randomOT.rate,
+      approvalStatus: randomStatus
     });
   }
 

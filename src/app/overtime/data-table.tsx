@@ -61,7 +61,8 @@ export function DataTable<TData, TValue>({
   return (
     <div className="flex flex-col gap-[10px]">
       <div className="flex flex-row justify-start items-center py-[10px] px-6 gap-4">
-        <h5 className="font-medium text-lg w-[340px]">Overtime Employees</h5>
+        {/* <h5 className="font-medium text-lg !w-[300px]">Overtime Employees</h5> */}
+        <span className="w-auto text-lg flex-none">Overtime Employees</span>
         {/* Filter input + icon */}
         <div className="relative w-full">
           <img
