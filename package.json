@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.13",
     "@felte/react": "^1.2.14",
     "@felte/reporter-react": "^1.2.10",
     "@felte/validator-zod": "^1.0.18",
