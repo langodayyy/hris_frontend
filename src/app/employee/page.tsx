@@ -81,9 +81,9 @@ export default function Employee() {
 
   return (
     <Sidebar title="Employee Database">
-      <div>
-        <div className="flex justify-center gap-[30px] h-[141px] w-full mx-auto">
-          <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
+      <div className="w-full">
+        <div className="flex flex-wrap justify-center gap-[30px] min-h-[141px] w-full mx-auto">
+          <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
 
             <div className="flex-col mt-[-5px] mx-[10px]">
               <div className="flex w-full h-[44px] items-center gap-[10px] mx-[20px]">
@@ -98,7 +98,7 @@ export default function Employee() {
               <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">May 2025</p>
             </div>
           </Card>
-          <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
+          <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
           <div className="flex-col mt-[-5px] mx-[10px]">
               <div className="flex w-full h-[44px] items-center gap-[10px] mx-[20px]">
                 <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -109,7 +109,7 @@ export default function Employee() {
               <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{dummyEmployees.length}</p>
             </div>
           </Card>
-          <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
+          <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
           <div className="flex-col mt-[-5px] mx-[10px]">
               <div className="flex w-full h-[44px] items-center gap-[10px] mx-[20px]">
                 <svg width="31" height="30" viewBox="0 0 31 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -122,7 +122,7 @@ export default function Employee() {
               <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">200</p>
             </div>
           </Card>
-          <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
+          <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
           <div className="flex-col mt-[-5px] mx-[10px]">
               <div className="flex w-full h-[44px] items-center gap-[10px] mx-[20px]">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -136,14 +136,14 @@ export default function Employee() {
             </div>
           </Card>
         </div>
-        <div className="mt-[30px] w-full mx-auto">
+        <div className="mt-[30px] w-full overflow-x-auto">
           <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
-            <CardContent>
+            <CardContent className="overflow-x-auto">
               {/* Header: Title - Search - Button */}
-              <div className="flex items-center justify-between mb-6 gap-4">
+              <div className="flex items-center justify-between mb-6 gap-4 min-w-[1000px]">
                 {/* Judul dan Search bar di satu sisi */}
                 <div className="flex items-center gap-4 flex-1">
-                  <h2 className="text-lg font-medium whitespace-nowrap">All Employee Information</h2>
+                  <h2 className="text-lg font-medium">All Employee Information</h2>
                   {/* Search input melar */}
                   <div className="flex-1 relative">
                     <svg className="absolute left-3 top-1/2 transform -translate-y-1/2" width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -158,13 +158,13 @@ export default function Employee() {
                         setSearchTerm(e.target.value);
                         setCurrentPage(1);
                       }}
-                      className="pl-10 rounded-[8px] bg-[#ff] flex-1"
+                      className="pl-10 rounded-[8px] bg-[#ff] flex-1 min-w-[300px]"
                     />
                   </div>
                 </div>
 
                 {/* Tombol-tombol */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 min-w-[400px] w-max">
                   <Button className="w-[100px]" variant="outline">
                     <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M2.5 6.3335H17.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -217,24 +217,22 @@ export default function Employee() {
                  
                 </div>
               </div>
-              <div>
-                {/* Table */}
-                <Table className="border-separate border-spacing-0 rounded-t-lg table-fixed w-full">
-                  {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
+              <div className="min-w-[1000px]">
+                <Table className="border-separate border-spacing-0 rounded-t-lg table-fixed">
                   <TableHeader className="bg-neutral-50 [&_th]:font-medium [&_th]:text-center [&_th]:p-4 [&_th]:border-b [&_th]:border-r">
                     <TableRow>
-                      <TableHead className="rounded-tl-lg w-[60px]">No</TableHead>
-                      <TableHead className="w-[250px] !text-left">Employee Name</TableHead>
-                      <TableHead className="w-[120px]">Gender</TableHead>
-                      <TableHead className="w-[150px]">Mobile Number</TableHead>
-                      <TableHead className="w-[150px]">Branch</TableHead>
-                      <TableHead className="w-[150px]">Position</TableHead>
-                      <TableHead className="w-[120px]">Employment Type</TableHead>
-                      <TableHead className="w-[100px]">Status</TableHead>
-                      <TableHead className="rounded-tr-lg w-[100px]">Details</TableHead>
+                      <TableHead className="rounded-tl-lg w-[5%] min-w-[60px]">No</TableHead>
+                      <TableHead className="w-[20%] min-w-[200px] !text-left">Employee Name</TableHead>
+                      <TableHead className="w-[10%] min-w-[100px]">Gender</TableHead>
+                      <TableHead className="w-[15%] min-w-[150px]">Mobile Number</TableHead>
+                      <TableHead className="w-[15%] min-w-[150px]">Branch</TableHead>
+                      <TableHead className="w-[15%] min-w-[150px]">Position</TableHead>
+                      <TableHead className="w-[10%] min-w-[120px]">Type</TableHead>
+                      <TableHead className="w-[10%] min-w-[120px]">Status</TableHead>
+                      <TableHead className="rounded-tr-lg w-[10%] min-w-[120px]">Details</TableHead>
                     </TableRow>
                   </TableHeader>
-    
+
                   <TableBody className="[&_td]:text-center">
                     {currentData.map((employee, index) => (
                       <TableRow key={index}>
@@ -248,19 +246,18 @@ export default function Employee() {
                         <TableCell>{employee.status}</TableCell>
                         <TableCell>
                           <Link href="/employee/details">
-                          <Button variant="outline" size="sm">
-                            View
-                          </Button>
+                            <Button variant="outline" size="sm">
+                              View
+                            </Button>
                           </Link>
-                        
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
-
                 </Table>
               </div>
-              <div className="w-full flex justify-between mt-[10px]">
+
+              <div className="w-full flex flex-wrap justify-between mt-[10px]">
                 {/* Select Rows */}
                 <div className="flex items-center gap-[10px]">
                   <p className="text-base font-medium">Showing</p>
