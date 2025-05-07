@@ -99,129 +99,143 @@ export default function AddOvertimeEmployees() {
         </div>
         <Card className="p-[20px] gap-[30px] flex flex-col">
           {/* Employee Selection */}
-          <div className="flex flex-col w-full gap-2">
-            <Label>Employee Name</Label>
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={open}
-                  className={cn(
-                    "justify-between border-neutral-300 w-full hover:bg-primary-900 h-[45px]",
-                    !value ? "text-neutral-300" : "text-neutral-900"
-                  )}
+
+          <div className="flex flex-row gap-[30px]">
+            <div className="flex flex-col w-full gap-2">
+              <Label>Employee Name</Label>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className={cn(
+                      "justify-between border-neutral-300 w-full hover:bg-primary-900 h-[45px]",
+                      !value ? "text-neutral-300" : "text-neutral-900"
+                    )}
+                  >
+                    {value
+                      ? employeeOptions.find((emp) => emp.value === value)
+                          ?.label
+                      : "Choose employee or search"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  align="start"
+                  className="p-0 !w-[596px] left-0 right-0"
                 >
-                  {value
-                    ? employeeOptions.find((emp) => emp.value === value)?.label
-                    : "Choose employee or search"}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0">
-                <Command>
-                  <CommandInput placeholder="Search employee..." />
-                  <CommandList>
-                    <CommandEmpty>No employee found.</CommandEmpty>
-                    <CommandGroup>
-                      {employeeOptions.map((emp) => (
-                        <CommandItem
-                          key={emp.value}
-                          value={emp.value}
-                          onSelect={(currentValue) => {
-                            setValue(
-                              currentValue === value ? "" : currentValue
-                            );
-                            setOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              value === emp.value ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {emp.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Overtime Type */}
-          <div className="flex flex-col w-full gap-2">
-            <Label>Overtime Type</Label>
-            <Select onValueChange={(val) => setSelectedOvertimeType(val)}>
-              <SelectTrigger className="h-[45px] w-full p-4 border-neutral-300 text-neutral-300">
-                <SelectValue placeholder="Choose overtime type" />
-              </SelectTrigger>
-              <SelectContent>
-                {overtimeSettingSample.map((Item) => (
-                  <SelectItem key={Item.id_ovt_setting} value={Item.id_ovt_setting}>
-                    {Item.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Total Hour */}
-          <div className="flex flex-col w-full gap-2">
-            <Label>Total Hour</Label>
-            <div className="flex flex-row gap-2 items-center">
-              <Input
-                type="number"
-                placeholder="Enter overtime duration"
-                value={totalHour}
-                onChange={handleHourChange}
-                required
-              />
-              <span>Hour</span>
+                  <Command className="w-full">
+                    <CommandInput placeholder="Search employee..." />
+                    <CommandList>
+                      <CommandEmpty>No employee found.</CommandEmpty>
+                      <CommandGroup>
+                        {employeeOptions.map((emp) => (
+                          <CommandItem
+                            key={emp.value}
+                            value={emp.value}
+                            onSelect={(currentValue) => {
+                              setValue(
+                                currentValue === value ? "" : currentValue
+                              );
+                              setOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                value === emp.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {emp.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
-            {selectedOvertimeType && (
-              <p className="text-neutral-400 text-sm pl-1">
-                Overtime hours must be a multiple of{" "}
-                {selectedOvertime?.calculation}
-              </p>
-            )}
+
+            {/* Overtime Type */}
+            <div className="flex flex-col w-full gap-2">
+              <Label>Overtime Type</Label>
+              <Select onValueChange={(val) => setSelectedOvertimeType(val)}>
+                <SelectTrigger className="h-[45px] w-full p-4 border-neutral-300 text-neutral-300">
+                  <SelectValue placeholder="Choose overtime type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {overtimeSettingSample.map((Item) => (
+                    <SelectItem
+                      key={Item.id_ovt_setting}
+                      value={Item.id_ovt_setting}
+                    >
+                      {Item.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          {/* Overtime Date with Calendar */}
-          <div className="flex flex-col w-full gap-2">
-            <Label>Overtime Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal text-neutral-900 border-neutral-300",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? (
-                    format(date, "dd/MM/yyyy")
-                  ) : (
-                    <span className="text-neutral-300">Pick a date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                  classNames={{
-                    day_selected:
-                      "bg-secondary-600 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-secondary-600 focus:text-primary-foreground  ",
-                  }}
+          <div className="flex flex-row gap-[30px]">
+            {/* Overtime Date */}
+            <div className="flex flex-col w-full gap-2">
+              <Label>Overtime Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal text-neutral-900 border-neutral-300",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? (
+                      format(date, "dd/MM/yyyy")
+                    ) : (
+                      <span className="text-neutral-300">Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                    classNames={{
+                      day_selected:
+                        "bg-secondary-600 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-secondary-600 focus:text-primary-foreground  ",
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Total Hour */}
+            <div className="flex flex-col w-full gap-2">
+              <Label>Total Hour</Label>
+              <div className="flex flex-row gap-2 items-center">
+                <Input
+                  type="number"
+                  placeholder="Enter overtime duration"
+                  value={totalHour}
+                  onChange={handleHourChange}
+                  required
                 />
-              </PopoverContent>
-            </Popover>
+                <span>Hour</span>
+              </div>
+              {selectedOvertimeType && (
+                <p className="text-neutral-400 text-sm pl-1">
+                  Overtime hours must be a multiple of{" "}
+                  {selectedOvertime?.calculation}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Overtime Pay */}
