@@ -20,6 +20,8 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-info-500 underline-offset-4 hover:underline",
+        calendar:
+          "border border-neutral-300 text-primary-900 bg-white shadow-xs hover:bg-primary-950 hover:text-white dark:bg-input/30 dark:border-input dark:hover:bg-input/50 cursor-pointer",
       },
       size: {
         // default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -33,27 +35,33 @@ const buttonVariants = cva(
       size: "lg",
     },
   }
-)
+);
 
 function Button({
   className,
   variant,
   size,
+  icon,
   asChild = false,
+  children,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
+    asChild?: boolean;
+    icon?: React.ReactNode;
   }) {
-  const Comp = asChild ? Slot : "button"
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
-    />
-  )
+    >
+      {icon && <span className="shrink-0">{icon}</span>}
+      {children}
+    </Comp>
+  );
 }
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };

@@ -24,12 +24,9 @@ import { Button } from "@/components/ui/button";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
-// import { useRouter } from "next/router";
-// import { addDays, format } from "date-fns";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -63,33 +60,110 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="flex flex-col gap-[10px]">
-      <div className="flex flex-row justify-between items-center py-[10px] px-6">
-        <p className="font-medium text-lg">Overtime Employees</p>
-        <img
-          src="./search.svg"
-          alt="search"
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4"
-        />
-        <Input
-          placeholder="Filter employee name..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+      <div className="flex flex-row justify-start items-center py-[10px] px-6 gap-4">
+        <h5 className="font-medium text-lg w-[340px]">Overtime Employees</h5>
+        {/* Filter input + icon */}
+        <div className="relative w-full">
+          <img
+            src="/search.svg"
+            alt="search"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4"
+          />
+          <Input
+            placeholder="Filter employee name..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("name")?.setFilterValue(event.target.value)
+            }
+            className="pl-10"
+          />
+        </div>
         <div className="flex gap-2">
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 id="date"
-                variant={"outline"}
+                variant={"calendar"}
+                icon={
+                  <svg
+                    width="25"
+                    height="25"
+                    viewBox="0 0 25 25"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M16.6663 2.08333V6.25"
+                      stroke="#B0B0B0"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M8.33333 2.08333V6.25"
+                      stroke="#B0B0B0"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M3.125 9.375H21.875"
+                      stroke="#B0B0B0"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M19.7917 4.16667H5.20833C4.05729 4.16667 3.125 5.09896 3.125 6.25001V19.7917C3.125 20.9427 4.05729 21.875 5.20833 21.875H19.7917C20.9427 21.875 21.875 20.9427 21.875 19.7917V6.25001C21.875 5.09896 20.9427 4.16667 19.7917 4.16667Z"
+                      stroke="#B0B0B0"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M7.30495 13.2594C7.1612 13.2594 7.04453 13.376 7.04558 13.5198C7.04558 13.6635 7.16224 13.7802 7.30599 13.7802C7.44974 13.7802 7.56641 13.6635 7.56641 13.5198C7.56641 13.376 7.44974 13.2594 7.30495 13.2594"
+                      stroke="#B0B0B0"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M12.5139 13.2594C12.3702 13.2594 12.2535 13.376 12.2546 13.5198C12.2546 13.6635 12.3712 13.7802 12.515 13.7802C12.6587 13.7802 12.7754 13.6635 12.7754 13.5198C12.7754 13.376 12.6587 13.2594 12.5139 13.2594"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M17.7219 13.2594C17.5782 13.2594 17.4615 13.376 17.4626 13.5198C17.4626 13.6635 17.5792 13.7802 17.723 13.7802C17.8667 13.7802 17.9834 13.6635 17.9834 13.5198C17.9834 13.376 17.8667 13.2594 17.7219 13.2594"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M7.30495 17.426C7.1612 17.426 7.04453 17.5427 7.04558 17.6865C7.04558 17.8302 7.16224 17.9469 7.30599 17.9469C7.44974 17.9469 7.56641 17.8302 7.56641 17.6865C7.56641 17.5427 7.44974 17.426 7.30495 17.426"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M12.5139 17.426C12.3702 17.426 12.2535 17.5427 12.2546 17.6865C12.2546 17.8302 12.3712 17.9469 12.515 17.9469C12.6587 17.9469 12.7754 17.8302 12.7754 17.6865C12.7754 17.5427 12.6587 17.426 12.5139 17.426"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                }
                 className={cn(
                   "w-[300px] justify-start text-left font-normal",
                   !date?.from && "text-muted-foreground"
                 )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4 text-neutral-300" />
                 {date?.from && date?.to ? (
                   <>
                     {format(date.from, "dd/MM/yyyy")} -{" "}
@@ -107,7 +181,7 @@ export function DataTable<TData, TValue>({
                 defaultMonth={date?.from}
                 selected={date}
                 onSelect={setDate}
-                numberOfMonths={2}
+                numberOfMonths={1}
               />
             </PopoverContent>
           </Popover>
