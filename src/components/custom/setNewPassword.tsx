@@ -17,28 +17,28 @@ import PasswordInput from "../ui/passwordInput";
 const resetPassSchema = z
   .object({
     password: z
-      .string()
-      .min(8, "Password must be at least 8 characters long")
-      .regex(/(?=.*[0-9])/, "Password must contain at least one number")
-      .regex(
-        /(?=.*[a-z])/,
-        "Password must contain at least one lowercase letter"
-      )
-      .regex(
-        /(?=.*[A-Z])/,
-        "Password must contain at least one uppercase letter"
-      )
-      .regex(
-        /(?=.*[!@#$%^&*])/,
-        "Password must contain at least one special character"
-      ),
+      .string(),
+      // .min(8, "Password must be at least 8 characters long")
+      // .regex(/(?=.*[0-9])/, "Password must contain at least one number")
+      // .regex(
+      //   /(?=.*[a-z])/,
+      //   "Password must contain at least one lowercase letter"
+      // )
+      // .regex(
+      //   /(?=.*[A-Z])/,
+      //   "Password must contain at least one uppercase letter"
+      // )
+      // .regex(
+      //   /(?=.*[!@#$%^&*])/,
+      //   "Password must contain at least one special character"
+      // ),
 
     password_confirmation: z.string(),
   })
-  .refine((data) => data.password === data.password_confirmation, {
-    message: "Passwords don't match",
-    path: ["password_confirmation"],
-  });
+  // .refine((data) => data.password === data.password_confirmation, {
+  //   message: "Passwords don't match",
+  //   path: ["password_confirmation"],
+  // });
 
 type resetPassFormValues = z.infer<typeof resetPassSchema>;
 
@@ -177,7 +177,7 @@ export async function resetPassword(formData: FormData) {
     if (!response.ok) {
       // If the response is not OK, parse the error response
       const errorData = await response.json();
-      return { success: false, errors: errorData.message };
+      return { success: false, errors: errorData.errors };
     }
 
     // Parse and return the success response

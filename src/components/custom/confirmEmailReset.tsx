@@ -120,7 +120,7 @@ export async function requestResetPassword(formData: FormData) {
     if (!response.ok) {
       // If the response is not OK, parse the error response
       const errorData = await response.json();
-      return { success: false, errors: errorData.message };
+      return { success: false, errors: errorData.errors };
     }
 
     // Parse and return the success response

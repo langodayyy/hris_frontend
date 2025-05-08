@@ -33,7 +33,17 @@ export default function SignIn() {
         </p>
 
         {/* errors message login failure from backend */}
-        {<div className="text-danger-700">{errors}</div>}
+        {Object.entries(errors).map(([field, messages]) => (
+              <div key={field} className="text-danger-700">
+                {Array.isArray(messages) ? (
+                  messages.map((message, idx) => (
+                    <div key={idx}>{message}</div>
+                  ))
+                ) : (
+                  <div>{messages}</div>
+                )}
+              </div>
+            ))}
 
         <SigninForm></SigninForm>
         <div className="flex flex-col gap-[20px] w-full">

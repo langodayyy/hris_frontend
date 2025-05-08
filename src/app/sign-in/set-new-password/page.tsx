@@ -1,10 +1,17 @@
 "use client";
 import SetNewPassForm from "@/components/custom/setNewPassword";
 import { Spinner } from "@/components/ui/spinner";
-import { ResetPassProvider, useResetPassContext } from "@/context/ResetTokenContext";
+import { useFormContext } from "@/context/FormContext";
+import {
+  ResetPassProvider,
+  useResetPassContext,
+} from "@/context/ResetTokenContext";
 
 function SetNewPasswordContent() {
   const { isLoading } = useResetPassContext();
+  const { errors } = useFormContext();
+
+  console.log("errors", errors);
 
   return (
     <div className="relative w-1/2 flex flex-col items-center justify-center px-[80px] py-[10px] gap-[25px] overflow-y-auto">
@@ -13,10 +20,25 @@ function SetNewPasswordContent() {
           <Spinner size="small" />
         </div>
       )}
-      <h4 className="text-[34px] font-medium text-neutral-900">Set New Password</h4>
+
+      <h4 className="text-[34px] font-medium text-neutral-900">
+        Set New Password
+      </h4>
       <p className="text-base text-neutral-500 text-center">
-        Enter your new password below to complete the reset process. Ensure it’s strong and secure.
+        Enter your new password below to complete the reset process. Ensure it’s
+        strong and secure.
       </p>
+
+      {/* error message when fail validation from backend */}
+      {Object.entries(errors).map(([field, messages]) => (
+        <div key={field} className="w-full justify-start text-danger-700">
+          {Array.isArray(messages) ? (
+            messages.map((message, idx) => <div key={idx}>{message}</div>)
+          ) : (
+            <div>{messages}</div>
+          )}
+        </div>
+      ))}
 
       <SetNewPassForm />
       <div className="flex items-center justify-center w-full text-sm gap-[10px]">
