@@ -70,7 +70,6 @@ export default function SignupForm() {
 
       if (response.success) {
         // Handle successful registration
-        console.log("User registered successfully:", response.data);
         Cookies.set("token", response.data.token);
         Cookies.set("is_profile_complete", response.data.is_profile_complete);
 
