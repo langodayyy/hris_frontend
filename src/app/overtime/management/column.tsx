@@ -14,11 +14,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import Router from "next/router";
 import { ApprovalStatusBadge } from "@/components/ui/approval";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
+
 type OvertimeRecord = {
   id: string;
   name: string;
@@ -30,7 +28,9 @@ type OvertimeRecord = {
   approvalStatus: string;
 };
 
-export const OvertimeColumn: ColumnDef<OvertimeRecord>[] = [
+
+export const OvertimeColumn = (onEdit: (id: string) => void):
+ ColumnDef<OvertimeRecord>[] => [
   {
     accessorKey: "id",
     enableSorting: true,
@@ -107,7 +107,6 @@ export const OvertimeColumn: ColumnDef<OvertimeRecord>[] = [
       const status = row.getValue(
         "approvalStatus"
       ) as OvertimeRecord["approvalStatus"];
-      const record = row.original;
 
       if (status === "Pending") {
         return <ApprovalStatusBadge status="Pending" />;
@@ -115,11 +114,12 @@ export const OvertimeColumn: ColumnDef<OvertimeRecord>[] = [
         return <ApprovalStatusBadge status="Rejected" />;
       } else {
         return (
-          <div className="flex px-6 justify-center">
+          <div className="flex px-6 justify-center gap-1">
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => Router.push("/overtime/edit/" + record.id)}
+              onClick={() => onEdit(row.original.id)}
+              className="p-1 h-auto w-auto"
               icon={
                 <svg
                   width="17"
@@ -128,7 +128,7 @@ export const OvertimeColumn: ColumnDef<OvertimeRecord>[] = [
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <g clip-path="url(#clip0_459_4153)">
+                  <g clipPath="url(#clip0_459_4153)">
                     <path
                       d="M13.2368 0.62016L5.10883 8.74816C4.79839 9.05692 4.55228 9.4242 4.38475 9.82872C4.21722 10.2332 4.13159 10.667 4.13283 11.1048V12.0002C4.13283 12.177 4.20306 12.3465 4.32809 12.4716C4.45311 12.5966 4.62268 12.6668 4.79949 12.6668H5.69483C6.13267 12.6681 6.56641 12.5824 6.97093 12.4149C7.37545 12.2474 7.74273 12.0013 8.05149 11.6908L16.1795 3.56283C16.5691 3.17227 16.7879 2.64314 16.7879 2.09149C16.7879 1.53984 16.5691 1.01071 16.1795 0.62016C15.7833 0.241423 15.2563 0.0300598 14.7082 0.0300598C14.16 0.0300598 13.633 0.241423 13.2368 0.62016V0.62016ZM15.2368 2.62016L7.10883 10.7482C6.73291 11.1218 6.22483 11.3321 5.69483 11.3335H5.46616V11.1048C5.46755 10.5748 5.67787 10.0667 6.05149 9.69083L14.1795 1.56283C14.3219 1.4268 14.5112 1.35089 14.7082 1.35089C14.9051 1.35089 15.0944 1.4268 15.2368 1.56283C15.3768 1.70317 15.4554 1.89329 15.4554 2.09149C15.4554 2.2897 15.3768 2.47982 15.2368 2.62016V2.62016Z"
                       fill="#374957"
@@ -141,8 +141,8 @@ export const OvertimeColumn: ColumnDef<OvertimeRecord>[] = [
                   <defs>
                     <clipPath id="clip0_459_4153">
                       <rect
-                        width="16"
-                        height="16"
+                        width="17"
+                        height="20"
                         fill="white"
                         transform="translate(0.798828)"
                       />
@@ -152,7 +152,7 @@ export const OvertimeColumn: ColumnDef<OvertimeRecord>[] = [
               }
             ></Button>
             <AlertDialog>
-              <AlertDialogTrigger className="hover:bg-danger-50 rounded-md p-2">
+              <AlertDialogTrigger className="hover:bg-danger-50 rounded-md p-1 h-auto w-auto">
                 <svg
                   width="19"
                   height="18"
@@ -191,7 +191,7 @@ export const OvertimeColumn: ColumnDef<OvertimeRecord>[] = [
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This action cannot be undone. This will permanently delete
-                    your account and remove your data from our servers.
+                    your data and remove your data from our servers.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -207,8 +207,6 @@ export const OvertimeColumn: ColumnDef<OvertimeRecord>[] = [
           </div>
         );
       }
-
-      return <ApprovalStatusBadge status={status as "Approved" | "Pending"} />;
     },
     filterFn: (row, columnId, filterValue) => {
       return filterValue.includes(row.getValue(columnId));
