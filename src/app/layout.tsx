@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { FormProvider } from "@/context/FormContext";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = Geist({

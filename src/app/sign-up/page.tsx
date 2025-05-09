@@ -5,11 +5,15 @@ import { Button } from "@/components/ui/button";
 import SignupForm from "../../components/custom/signupForm";
 
 import { useFormContext } from "@/context/FormContext";
+import GoogleAuthButton from "@/components/custom/googleAuth";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export default function SignUp() {
   const { errors } = useFormContext();
 
   return (
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+    {/*  <GoogleOAuthProvider clientId="991851578776-ca2is9ju0hs4ft2ivt0u0ekug5pi3jh2.apps.googleusercontent.com"> */}
     <div className="p-[23px] w-screen h-screen bg-white">
       <div className="flex flex-row w-full h-full">
         <div className="w-full h-full">
@@ -49,7 +53,8 @@ export default function SignUp() {
 
             <SignupForm></SignupForm>
             <div className="w-full">
-              <Button variant={"outline"} >
+            <GoogleAuthButton></GoogleAuthButton>
+              {/* <Button variant={"outline"} >
                 <svg
                   width="21"
                   height="20"
@@ -75,7 +80,7 @@ export default function SignUp() {
                   />
                 </svg>
                 Sign Up with Google
-              </Button>
+              </Button> */}
             </div>
             <div className="border border-neutral-300"></div>
             <div className="flex justify-center text-sm ">
@@ -90,5 +95,6 @@ export default function SignUp() {
         </div>
       </div>
     </div>
+    </GoogleOAuthProvider>
   );
 }
