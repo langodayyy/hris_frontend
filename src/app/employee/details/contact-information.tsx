@@ -66,7 +66,7 @@ const ContactInformation = () => {
                                         <div className="flex gap-[10px] justify-end">
                                             <div>
                                                 <DialogClose asChild>
-                                                    <Button className="w-[80px]" variant="outline" size="lg" type="button">
+                                                    <Button className="w-[80px]" variant="outline" size="lg">
                                                         Cancel
                                                     </Button>
                                                 </DialogClose>

@@ -39,18 +39,18 @@ export function AuthProvider({children}: { children: React.ReactNode }) {
                     if (!response.ok) {
                         Cookies.remove('token'); 
                         Cookies.remove('is_profile_complete'); 
-                        router.push('/signin'); // Redirect to sign-in page
+                        router.push('/sign-in'); // Redirect to sign-in page
                         return
                     }
                 } else {
                     // Allow access to sign-up page if not authenticated
-                    if (window.location.pathname !== '/signup') {
-                        router.push('/signin')
+                    if (window.location.pathname !== '/sign-up') {
+                        router.push('/sign-in')
                     }
                 }
             } catch (error) {
                 console.error('Error initializing auth:', error)
-                router.push('/signin') // Redirect to sign-in page on error
+                router.push('/sign-in') // Redirect to sign-in page on error
             } finally {
                 setIsLoading(false)
             }

@@ -4,6 +4,7 @@ import PasswordInput from "@/components/ui/passwordInput";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import SigninEmployeeForm from "@/components/custom/signinEmployeeForm";
 
 export default function SignInAsEmployee() {
 
@@ -21,7 +22,7 @@ export default function SignInAsEmployee() {
             <h4 className="text-[34px] font-medium text-neutral-900">Sign In as Employee</h4>
           </div>
           <p className="text-base text-neutral-500">Welcome back to HRIS cmlabs! Manage everything with ease.</p>
-          <div className="flex flex-col w-full gap-2">
+          {/* <div className="flex flex-col w-full gap-2">
             <label htmlFor="id_company" className="font-medium text-neutral-900">ID Company</label>
             <Input type="number" id="id_company" name="id_company" placeholder="Enter your company id" required/>
           </div>
@@ -52,17 +53,18 @@ export default function SignInAsEmployee() {
                     </DialogHeader>
                 </DialogContent>
             </Dialog>
-          </div>
+          </div> */}
+          <SigninEmployeeForm></SigninEmployeeForm>
           <div className="flex flex-col gap-[20px] w-full">
-            <Button type="submit">Sign In</Button>
-            <Button variant={"outline"}>Use a different sign in method</Button>
-            <Button variant={"outline"}>Sign In as Employee</Button>
+            {/* <Button type="submit">Sign In</Button> */}
+            {/* <Button variant={"outline"}>Use a different sign in method</Button> */}
+            <a href="/sign-in"><Button variant={"outline"}>Sign In as Admin</Button></a>
           </div>
           <div className="border border-neutral-300 w-full"></div>
           <div className="flex justify-center w-full text-sm">
             <p>
               Dont have account yet? &nbsp;
-              <a href="/signup" className="text-info-500 hover:underline">
+              <a href="/sign-up" className="text-info-500 hover:underline">
                 Sign up now and get started
               </a>
             </p>

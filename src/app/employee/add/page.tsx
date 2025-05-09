@@ -72,7 +72,7 @@ export default function AddEmployee() {
                                 onChange={handleFileChange}
                                 />
                                 {/* Label triggers file input */}
-                                <Button asChild variant="default" type="button">
+                                <Button asChild variant="default">
                                     <label htmlFor="avatarInput" className="cursor-pointer">Upload Avatar</label>
                                 </Button>
 
@@ -308,7 +308,7 @@ export default function AddEmployee() {
                 </div>
                 <div className="flex mx-[20px] gap-[10px] justify-end">
                     <Link href="/employee">
-                        <Button className="w-[80px]" variant="outline" size="lg" type="button">
+                        <Button className="w-[80px]" variant="outline" size="lg">
                             Cancel
                         </Button>
                     </Link>

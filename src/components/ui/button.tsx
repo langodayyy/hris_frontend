@@ -36,7 +36,7 @@ const buttonVariants = cva(
       size: "lg",
     },
   }
-)
+);
 
 function Button({
   className,
@@ -48,21 +48,21 @@ function Button({
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-    icon?: React.ReactNode
+    asChild?: boolean;
+    icon?: React.ReactNode;
   }) {
-  const Comp = asChild ? Slot : "button"
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
-    data-slot="button"
-    className={cn(buttonVariants({ variant, size, className }))}
-    {...props}
-  >
-    {icon && <span className="shrink-0">{icon}</span>}
-    {children}
-  </Comp>
-  )
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    >
+      {icon && <span className="shrink-0">{icon}</span>}
+      {children}
+    </Comp>
+  );
 }
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };
