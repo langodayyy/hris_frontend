@@ -345,7 +345,8 @@ export default function Sidebar({ children, title }: LayoutProps) {
             <NavItem
               url="/checkclock/checkclock-management"
               isOpen={isOpen}
-              isSelected={pathname === "/checkclock/checkclock-management"}
+              isSelected={pathname.startsWith("/checkclock")}
+              // isSubmenu={true}
               text="Checkclock"
               svgIcon={
                 <svg
@@ -372,8 +373,12 @@ export default function Sidebar({ children, title }: LayoutProps) {
             <NavItem
               url="/overtime"
               isOpen={isOpen}
-              isSelected={pathname === "/overtime"}
+              isSelected={pathname.startsWith("/overtime")}
               text="Overtime"
+              submenu={[
+                { label: "Management", href: "/overtime/overtime-management" },
+                { label: "Setting", href: "/overtime/overtime-setting" },
+              ]}
               svgIcon={
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
