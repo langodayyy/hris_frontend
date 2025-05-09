@@ -40,7 +40,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-
+  const [globalFilter, setGlobalFilter] = React.useState(""); // Add the globalFilter state
   const table = useReactTable({
     data,
     columns,
@@ -49,10 +49,18 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     state: {
-      // sorting,
       columnFilters,
+      globalFilter, 
     },
-    // onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter, // Update globalFilter on change
+    globalFilterFn: (row, columnId, filterValue) => {
+      const name = row.getValue("name")?.toString().toLowerCase() || ""; 
+      const id = row.getValue("id")?.toString().toLowerCase() || "";
+      return (
+        name.includes(filterValue.toLowerCase()) ||
+        id.includes(filterValue.toLowerCase())
+      );
+    },
   });
 
   const [date, setDate] = React.useState<DateRange | undefined>(undefined);
@@ -60,8 +68,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="flex flex-col gap-[10px]">
-      <div className="flex flex-row justify-start items-center py-[10px] px-6 gap-4">
-        {/* <h5 className="font-medium text-lg !w-[300px]">Overtime Employees</h5> */}
+      <div className="flex flex-row justify-start items-center py-[10px] px-6 gap-4 w-full">
         <span className="w-auto text-lg flex-none">Overtime Employees</span>
         {/* Filter input + icon */}
         <div className="relative w-full">
@@ -71,11 +78,9 @@ export function DataTable<TData, TValue>({
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4"
           />
           <Input
-            placeholder="Filter employee name..."
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
-            }
+            placeholder="Filter employee by name or ID"
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
             className="pl-10"
           />
         </div>
@@ -161,7 +166,7 @@ export function DataTable<TData, TValue>({
                   </svg>
                 }
                 className={cn(
-                  "w-[300px] justify-start text-left font-normal",
+                  "w-auto justify-start text-left font-normal",
                   !date?.from && "text-muted-foreground"
                 )}
               >
