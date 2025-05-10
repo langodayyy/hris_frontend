@@ -70,8 +70,10 @@ export default function SignupForm() {
 
       if (response.success) {
         // Handle successful registration
-        Cookies.set("token", response.data.token);
-        Cookies.set("is_profile_complete", response.data.is_profile_complete);
+        if (Cookies.get("token")) {
+          Cookies.remove("token");
+        }
+        Cookies.set("token", response.data.token, { expires: 7, secure:true });
 
         router.push("/sign-up/complete-registration");
       } else {
@@ -247,8 +249,6 @@ export async function registerUser(formData: FormData) {
 
     // Parse and return the success response
     const data = await response.json();
-    Cookies.set("token", data.token, { expires: 7, secure: true });
-    Cookies.set("is_profile_complete", data.is_profile_complete, { expires: 7, secure: true });
 
     return { success: true, data };
   } catch (error: any) {
