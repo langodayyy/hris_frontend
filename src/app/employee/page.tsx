@@ -229,7 +229,72 @@ export default function Employee() {
                           <div>
                               <form action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data">
                                   <div className="flex flex-col gap-[15px] mt-[15px]">
-                                      
+                                      <div className="flex gap-[15px]">
+                                        <div className="flex flex-col flex-1 gap-[8px]">
+                                          <Label htmlFor="department">Department</Label>
+                                          <Select defaultValue="semua">
+                                              <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
+                                                  <SelectValue placeholder="Select department" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                  <SelectItem value="semua">Semua</SelectItem>
+                                                  <SelectItem value="department_a">Department A</SelectItem>
+                                                  <SelectItem value="department_b">Department B</SelectItem>
+                                                  <SelectItem value="department_c">Department C</SelectItem>
+                                                  <SelectItem value="department_d">Department D</SelectItem>
+                                              </SelectContent>
+                                          </Select>
+                                        </div>
+                                        <div className="flex flex-col flex-1 gap-[8px]">
+                                          <Label htmlFor="position">Position</Label>
+                                          <Select defaultValue="semua">
+                                              <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
+                                                  <SelectValue placeholder="Select position" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="semua">Semua</SelectItem>
+                                                  <SelectItem value="position_a">Position A</SelectItem>
+                                                  <SelectItem value="position_b">Position B</SelectItem>
+                                                  <SelectItem value="position_c">Position C</SelectItem>
+                                                  <SelectItem value="position_d">Position D</SelectItem>
+                                              </SelectContent>
+                                          </Select>
+                                        </div>
+                                      </div>
+                                      <div className="flex gap-[15px]">
+                                         <div className="flex flex-col flex-1 gap-[8px]">
+                                          <Label htmlFor="type">Type</Label>
+                                          <Select defaultValue="semua">
+                                              <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
+                                                  <SelectValue placeholder="Select Type" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="semua">Semua</SelectItem>
+                                                  <SelectItem value="type_a">Type A</SelectItem>
+                                                  <SelectItem value="type_b">Type B</SelectItem>
+                                                  <SelectItem value="type_c">Type C</SelectItem>
+                                                  <SelectItem value="type_d">Type D</SelectItem>
+                                              </SelectContent>
+                                          </Select>
+                                        </div>
+                                        <div className="flex flex-col flex-1 gap-[8px]">
+                                          <Label htmlFor="status">Status</Label>
+                                          <Select defaultValue="semua">
+                                              <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
+                                                  <SelectValue placeholder="Select Status" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                  <SelectItem value="semua">Semua</SelectItem>
+                                                  <SelectItem value="status_a">Status A</SelectItem>
+                                                  <SelectItem value="status_b">Status B</SelectItem>
+                                                  <SelectItem value="status_c">Status C</SelectItem>
+                                                  <SelectItem value="status_d">Status D</SelectItem>
+                                              </SelectContent>
+                                          </Select>
+                                        </div>
+                                       
+                                      </div>
+                                        
                                       <div className="flex gap-[10px] justify-end">
                                           <div>
                                               <DialogClose asChild>
