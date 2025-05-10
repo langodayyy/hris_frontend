@@ -2,15 +2,12 @@
 
 import React, { useState } from "react";
 import { Button } from "../ui/button";
-import {
-  GoogleLogin,
-  TokenResponse,
-  useGoogleLogin,
-} from "@react-oauth/google";
+import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
 import { useFormContext } from "@/context/FormContext";
+import Cookies from "js-cookie";
 
-export default function GoogleAuthButton() {
+export default function GoogleAuthInButton() {
   const router = useRouter();
   const { setErrors } = useFormContext();
   const [isLoading, setLoading] = useState(false);
@@ -36,27 +33,32 @@ export default function GoogleAuthButton() {
   //   });
   return (
     <GoogleLogin
-      onSuccess={ async (credentialResponse) => {
+      text="signin_with"
+      locale="en"
+      onSuccess={async (credentialResponse) => {
         setLoading(true);
-          console.log(credentialResponse);
-          console.log(credentialResponse.credential);
 
-          const response = await signupGoogle(credentialResponse.credential!)
-
+        const response = await signinGoogle(credentialResponse.credential!);
           if (response.success) {
-              setLoading(false);
-
-              router.push("sign-up/complete-registration");
-            } else {
-              console.log("Error:", response.errors);
-              setErrors(response.errors);
+            setLoading(false);
+            if (Cookies.get("token")) {
+              Cookies.remove("token");
             }
+            Cookies.set("token", response.data.token, { expires:7, secure:true});
+            if (response.data.is_profile_complete) {
+              router.push("dashboard");
+            } else {
+              router.push("sign-up/complete-registration");
+            }
+          } else {
+            setErrors(response.errors);
+          }
       }}
       onError={() => {
         console.log("Login Failed");
       }}
     />
-    
+
     // <Button variant={"outline"} onClick={() => login()}>
     //   <svg
     //     width="21"
@@ -87,10 +89,10 @@ export default function GoogleAuthButton() {
   );
 }
 
-export async function signupGoogle(id_token: string) {
+export async function signinGoogle(id_token: string) {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/signup-with-google`,
+      `${process.env.NEXT_PUBLIC_API_URL}/signin-with-google`,
       {
         method: "POST",
         headers: {

@@ -47,7 +47,7 @@ export default function SigninEmployeeForm() {
 
       if (response.success) {
         // Handle successful registration
-        Cookies.set("token", response.data.token);
+        Cookies.set("token", response.data.token, { expires:7, secure:true });
 
         router.push("/dashboard");
       } else {
@@ -114,7 +114,6 @@ export async function loginUser(formData: FormData) {
 
     // Parse and return the success response
     const data = await response.json();
-    Cookies.set("token", data.token, { expires: 7, secure: true });
 
     return { success: true, data };
   } catch (error: any) {
