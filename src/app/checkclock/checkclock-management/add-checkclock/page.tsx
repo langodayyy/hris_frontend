@@ -4,12 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@radix-ui/react-label";
 import * as React from "react";
-import { Check, ChevronsUpDown, ClockIcon, Key } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar"; // Pastikan Anda memiliki komponen Calendar
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
 
 import {
   Command,
@@ -26,6 +25,8 @@ import {
 } from "@/components/ui/popover";
 import { TimeInput } from "@/components/ui/timeInput";
 import { DateRange } from "react-day-picker";
+import { FileUploader } from "@/components/ui/fileUploader";
+import { SelectPopover } from "@/components/ui/selectPopover";
 
 const employeesSample = [
   {
@@ -62,9 +63,6 @@ const employeesSample = [
   },
 ];
 
-// const handleSelectEmployee = (value: string) => {
-//   console.log("Selected Employee:", value);
-// };
 
 const attendanceType = [
   { label: "Clock In", value: "clockIn" },
@@ -74,7 +72,6 @@ const attendanceType = [
 ];
 
 export default function AddCheckclockPage() {
-  const [openEmployee, setOpenEmployee] = React.useState(false);
   const [OpenAttendanceType, setOpenAttendanceType] = React.useState(false);
   const [valueEmployee, setValueEmployee] = React.useState("");
   const [valueAttendanceType, setValueAttendanceType] = React.useState("");
@@ -83,9 +80,7 @@ export default function AddCheckclockPage() {
     (employee) => employee.Name === valueEmployee
   );
   const workType = selectedEmployee ? selectedEmployee.workType : "";
-  console.log("workType", workType);
   const currentDate = new Date();
-  const validateWorkType = workType === "WFH";
   const validateAttendanceType =
     valueAttendanceType === "Anual Leave" ||
     valueAttendanceType === "Sick Leave";
@@ -101,21 +96,11 @@ export default function AddCheckclockPage() {
   });
 
   const [date, setDate] = React.useState<DateRange | undefined>(undefined);
-  const anual = valueAttendanceType === "Anual Leave" || valueAttendanceType === "Sick Leave";
+  const anual =
+    valueAttendanceType === "Anual Leave" ||
+    valueAttendanceType === "Sick Leave";
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const formData = {
-      employeeName: valueEmployee,
-      attendanceType: valueAttendanceType,
-      workType: workType,
-      date: currentDate.toISOString().split("T")[0], // Format tanggal
-    };
-
-    console.log("Form Data:", formData);
-
-    // Kirim data ke server atau API
-    // submitToDatabase(formData);
   };
 
   return (
@@ -131,88 +116,24 @@ export default function AddCheckclockPage() {
                 {/* employee name */}
                 <div className="flex flex-col gap-2">
                   <Label>Employee Name</Label>
-                  <div className="relative w-full ">
-                    <Popover open={openEmployee} onOpenChange={setOpenEmployee}>
-                      <div className="relative">
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={openEmployee}
-                            className={cn(
-                              "justify-between border-neutral-300 w-full hover:bg-primary-900 h-[45px]",
-                              !valueEmployee
-                                ? "text-neutral-300"
-                                : "text-neutral-900"
-                            )}
-                            ref={inputRef}
-                          >
-                            {valueEmployee
-                              ? employeesSample.find(
-                                  (employee) => employee.Name === valueEmployee
-                                )?.Name
-                              : "Select employee"}
-
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <div className="w-full relative z-50 mt-2 p-0">
-                          <PopoverContent
-                            className="absolute left-0 top-full mt-2 z-50 text-neutral-600"
-                            style={{
-                              width: inputRef.current
-                                ? `${inputRef.current.offsetWidth}px`
-                                : "200px",
-                            }}
-                            align="start"
-                          >
-                            <Command className="w-full">
-                              <CommandInput placeholder="Search employee" />
-                              <CommandList className="w-full">
-                                <CommandEmpty>No employee found.</CommandEmpty>
-                                <CommandGroup>
-                                  {employeesSample.map((employee) => (
-                                    <CommandItem
-                                      key={employee.Name}
-                                      value={employee.Name}
-                                      onSelect={(currentValue) => {
-                                        setValueEmployee(
-                                          currentValue === valueEmployee
-                                            ? ""
-                                            : currentValue
-                                        );
-                                        setValueEmployee(currentValue);
-                                        setOpenEmployee(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          valueEmployee === employee.Name
-                                            ? "opacity-100"
-                                            : "opacity-0"
-                                        )}
-                                      />
-                                      {employee.Name}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </div>
-                      </div>
-                    </Popover>
-                    <Input
-                      name="employeeName"
-                      type="hidden"
-                      value={valueEmployee}
-                    />
-                  </div>
+                  <SelectPopover
+                    options={employeesSample.map((employee) => ({
+                      label: employee.Name,
+                      value: employee.Name,
+                    }))}
+                    value={valueEmployee}
+                    onChange={(value: string) => setValueEmployee(value)}
+                    placeholder="Select employee"
+                  />
+                  <Input
+                    name="employeeName"
+                    type="hidden"
+                    value={valueEmployee}
+                  />
                 </div>
                 {/* Attendance Type */}
                 <div className="flex flex-col gap-2">
-                  <Label>Attendance Type</Label>
+                  <Label>Attendance Type</Label>    
                   <div className="relative w-full ">
                     <Popover
                       open={OpenAttendanceType}
@@ -435,41 +356,48 @@ export default function AddCheckclockPage() {
                   />
                 </div>
 
-                {!anual?
-                (
-
-
-                <div
-                  className={cn(
-                    "grid gap-[10px]",
-                    !selectedEmployee?.clockIn ? "grid-cols-1" : "grid-cols-2" // Ubah grid menjadi 1 kolom jika tidak ada clockIn
-                  )}
-                >
-                  {/* Clock In */}
-                  <div className="flex-col gap-2 flex">
-                    <TimeInput
-                      label="Clock In"
-                      name="clockIn"
-                      defaultValue={selectedEmployee?.clockIn || ""} // Gunakan nilai clockIn jika ada
-                      readOnly={!!selectedEmployee?.clockIn} // Read-only jika clockIn ada
-                    />
-                  </div>
-                  {/* Clock Out */}
-                  {selectedEmployee?.clockIn && ( // Hanya tampilkan Clock Out jika tidak ada clockIn
+                {!anual ? (
+                  <div
+                    className={cn(
+                      "grid gap-[10px]",
+                      !selectedEmployee?.clockIn ? "grid-cols-1" : "grid-cols-2" // Ubah grid menjadi 1 kolom jika tidak ada clockIn
+                    )}
+                  >
+                    {/* Clock In */}
                     <div className="flex-col gap-2 flex">
                       <TimeInput
-                        label="Clock Out"
-                        name="clockOut"
-                        defaultValue={selectedEmployee?.clockOut || ""} // Kosong jika tidak ada clockOut
-                        disabled={!selectedEmployee?.clockIn} // Disabled jika tidak ada clockIn
+                        label="Clock In"
+                        name="clockIn"
+                        defaultValue={selectedEmployee?.clockIn || ""} // Gunakan nilai clockIn jika ada
+                        readOnly={!!selectedEmployee?.clockIn} // Read-only jika clockIn ada
                       />
                     </div>
-                  )}
-                </div>
-                ):("")
-                }
+                    {/* Clock Out */}
+                    {selectedEmployee?.clockIn && ( // Hanya tampilkan Clock Out jika tidak ada clockIn
+                      <div className="flex-col gap-2 flex">
+                        <TimeInput
+                          label="Clock Out"
+                          name="clockOut"
+                          defaultValue={selectedEmployee?.clockOut || ""} // Kosong jika tidak ada clockOut
+                          disabled={!selectedEmployee?.clockIn} // Disabled jika tidak ada clockIn
+                        />
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Label>Upload Supporting Evidence</Label>
+                    <FileUploader
+                      onDrop={(files) => console.log("Image Files:", files)}
+                      accept={{
+                        "image/png": [],
+                        "image/jpeg": [],
+                        "image/jpg": [],
+                      }}
+                    />
+                  </div>
+                )}
                 {/* Time */}
-
               </div>
             </Card>
           </form>
