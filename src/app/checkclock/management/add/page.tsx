@@ -394,6 +394,7 @@ export default function AddCheckclockPage() {
                         "image/jpeg": [],
                         "image/jpg": [],
                       }}
+                      type="Only support .png, .jpg, .jpeg"
                     />
                   </div>
                 )}

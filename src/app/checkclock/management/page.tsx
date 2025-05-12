@@ -11,69 +11,90 @@ export default function CheckclockOverviewPage() {
 
   useEffect(() => {
     async function fetchData() {
-      // const dynamicData = await getCheckClock();
-      // // if (response.success) {
-      // //   setData(response.data);
-      // // } else {
-      // //   console.error("Error fetching data:", response.errors);
-      // // }
-      // //     const dynamicData = Array.from({ length: 50 }, (_, i) => ({
-      // //       id: i + 1,
-      // //       employeeName: `Employee Name 00 ${i + 1}`,
-      // //       position: ["CEO", "Manager", "HRD", "Supervisor", "OB"][
-      // //         Math.floor(Math.random() * 5)
-      // //       ],
-      // //       date: `2023-10-${String(Math.floor(Math.random() * 30) + 1).padStart(
-      // //         2,
-      // //         "0"
-      // //       )}`,
-      // //       clockIn: `${String(Math.floor(Math.random() * 3) + 8).padStart(
-      // //         2,
-      // //         "0"
-      // //       )}:00`,
-      // //       clockOut: `${String(Math.floor(Math.random() * 3) + 17).padStart(
-      // //         2,
-      // //         "0"
-      // //       )}:00`,
-      // //     workType: ["WFO", "WFH"][Math.floor(Math.random() * 2)],
-      // //     status: ["On Time", "Late", "Absent", "Sick Leave", "Anual Leave"][
-      // //       Math.floor(Math.random() * 3)
-      // //     ],
-      // //     approvalStatus: ["Approved", "Pending", "Rejected"][
-      // //       Math.floor(Math.random() * 3)
-      // //     ],
-      // //   })
-      // // );
+      // Simulate additional table data for Annual Leave and Sick Leave
+      const leaveData = Array.from({ length: 20 }, (_, i) => {
+        const startDate = `2023-10-${String(
+          Math.floor(Math.random() * 30) + 1
+        ).padStart(2, "0")}`;
+        const endDate = `2023-10-${String(
+          Math.min(
+            30,
+            parseInt(startDate.split("-")[2]) +
+              Math.floor(Math.random() * 5) +
+              1
+          )
+        ).padStart(2, "0")}`;
 
-      // console.log("lmdmds",dynamicData.data);
-      // setData(dynamicData.data);
+        return {
+          employeeId: i + 1,
+          status: ["Annual Leave", "Sick Leave"][Math.floor(Math.random() * 2)],
+          startDate,
+          endDate,
+        };
+      });
 
-      const dynamicData = Array.from({ length: 50 }, (_, i) => ({
-        id: i + 1,
-        employeeName: `Employee Name 00 ${i + 1}`,
-        position: ["CEO", "Manager", "HRD", "Supervisor", "OB"][
-          Math.floor(Math.random() * 5)
-        ],
-        date: `2023-10-${String(Math.floor(Math.random() * 30) + 1).padStart(
-          2,
-          "0"
-        )}`,
-        clockIn: `${String(Math.floor(Math.random() * 3) + 8).padStart(
-          2,
-          "0"
-        )}:00`,
-        clockOut: `${String(Math.floor(Math.random() * 3) + 17).padStart(
-          2,
-          "0"
-        )}:00`,
-        workType: ["WFO", "WFH"][Math.floor(Math.random() * 2)],
-        status: ["On Time", "Late", "Absent", "Sick Leave", "Anual Leave"][
-          Math.floor(Math.random() * 3)
-        ],
-        approvalStatus: ["Approved", "Pending", "Rejected"][
-          Math.floor(Math.random() * 3)
-        ],
-      }));
+      const dynamicData = Array.from({ length: 50 }, (_, i) => {
+        const status = [
+          "On Time",
+          "Late",
+          "Absent",
+          "Sick Leave",
+          "Annual Leave",
+        ][Math.floor(Math.random() * 5)];
+
+        const workType = ["WFO", "WFH"][Math.floor(Math.random() * 2)];
+        const hasClockIn = !["Absent", "Sick Leave", "Annual Leave"].includes(
+          status
+        );
+
+        // Find leave data for the current employee if status is Sick Leave or Annual Leave
+        const leaveInfo = leaveData.find(
+          (leave) => leave.employeeId === i + 1 && leave.status === status
+        );
+
+        return {
+          id: i + 1,
+          employeeName: `Employee Name 00 ${i + 1}`,
+          position: ["CEO", "Manager", "HRD", "Supervisor", "OB"][
+            Math.floor(Math.random() * 5)
+          ],
+          date: leaveInfo
+            ? { startDate: leaveInfo.startDate, endDate: leaveInfo.endDate }
+            : `2023-10-${String(Math.floor(Math.random() * 30) + 1).padStart(
+                2,
+                "0"
+              )}`,
+          clockIn: hasClockIn
+            ? `${String(Math.floor(Math.random() * 3) + 8).padStart(2, "0")}:00`
+            : "--:--",
+          clockOut: hasClockIn
+            ? `${String(Math.floor(Math.random() * 3) + 17).padStart(
+                2,
+                "0"
+              )}:00`
+            : "--:--",
+          workType,
+          location: hasClockIn
+            ? ["Malang", "Jakarta", "Surabaya", "Bandung"][
+                Math.floor(Math.random() * 4)
+              ]
+            : "-",
+          address: hasClockIn ? `Address ${i + 1}` : "",
+          latitude: hasClockIn
+            ? parseFloat((Math.random() * 90).toFixed(6))
+            : 0,
+          longitude: hasClockIn
+            ? parseFloat((Math.random() * 180).toFixed(6))
+            : 0,
+          status,
+          approvalStatus: ["Sick Leave", "Annual Leave"].includes(status)
+            ? ["Approved", "Pending", "Rejected"][Math.floor(Math.random() * 3)]
+            : undefined,
+        };
+      });
+
+      console.log("Leave Data:", leaveData);
+      console.log("Dynamic Data:", dynamicData);
       console.log(dynamicData);
       setData(dynamicData);
     }
