@@ -259,7 +259,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                 View
               </Button>
             </SheetTrigger>
-            {selectedRow?.workType === "WFO" && (
+            {selectedRow?.workType === "WFO" ? (
               <>
                 <SheetContent className="bg-white">
                   <SheetHeader className="py-3 z-50">
@@ -279,7 +279,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                             className="text-left truncate font-semibold"
                             title={selectedRow?.employeeName || ""} // Tooltip untuk menampilkan nama lengkap
                           >
-                            {selectedRow?.employeeName?.length > 20
+                            {(selectedRow?.employeeName ?? "").length > 20
                               ? `${selectedRow?.employeeName.slice(0, 20)}...`
                               : selectedRow?.employeeName}
                           </div>
@@ -457,9 +457,12 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                               <Information
                                 label="status"
                                 value={
-                                  selectedRow?.clockIn || selectedRow?.clockOut
+                                  selectedRow?.status === "Absent"
+                                    ? "Absent"
+                                    : selectedRow?.clockIn ||
+                                      selectedRow?.clockOut
                                     ? "Present"
-                                    : "ABSENT"
+                                    : "N/A"
                                 }
                               ></Information>
                               <Information
@@ -467,7 +470,6 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                 value={selectedRow.workType}
                               ></Information>
                               {selectedRow?.status !== "Absent" && (
-
                                 <Information
                                   label="Work Hours"
                                   value={calculateWorkHours(
@@ -507,6 +509,347 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                             </div>
                           </div>
                         </div>
+                      </>
+                    )}
+                  </div>
+
+                  {selectedRow?.status === "On Time" ||
+                  selectedRow?.status === "Late" ? (
+                    <SheetFooter>
+                      <div className="flex gap-2 flex-wrap">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive">
+                              Reject Attendance
+                            </Button>
+                          </AlertDialogTrigger>
+
+                          <AlertDialogContent>
+                            <form
+                              onSubmit={(e) => {
+                                e.preventDefault();
+                                const formData = new FormData(e.currentTarget);
+                                const name = formData.get("name");
+                                console.log("Submitted name:", name);
+                                // Lanjutkan aksi setelah submit...
+                              }}
+                            >
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Are you sure you want to reject this
+                                  attendance?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Please enter the reason for rejection.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+
+                              <div className="py-4 flex flex-col gap-3">
+                                <Input
+                                  name="reason"
+                                  placeholder="Enter the reason"
+                                  type="text"
+                                ></Input>
+                              </div>
+
+                              <AlertDialogFooter>
+                                <AlertDialogCancel
+                                  type="button"
+                                  className="w-auto"
+                                >
+                                  Cancel
+                                </AlertDialogCancel>
+                                <Button type="submit" className="w-auto">
+                                  Submit
+                                </Button>
+                              </AlertDialogFooter>
+                            </form>
+                          </AlertDialogContent>
+                        </AlertDialog>
+
+                        <SheetClose asChild>
+                          <Button type="button" variant={"outline"}>
+                            Close
+                          </Button>
+                        </SheetClose>
+                      </div>
+                    </SheetFooter>
+                  ) : (
+                    <SheetFooter>
+                      <div className="flex gap-2 flex-wrap">
+                        {selectedRow?.approvalStatus === "Pending" ? (
+                          <>
+                            <Button>Approve</Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="outline">
+                                  Reject Attendance
+                                </Button>
+                              </AlertDialogTrigger>
+
+                              <AlertDialogContent>
+                                <form
+                                  onSubmit={(e) => {
+                                    e.preventDefault();
+                                    const formData = new FormData(
+                                      e.currentTarget
+                                    );
+                                    const name = formData.get("name");
+                                    console.log("Submitted name:", name);
+                                    // Lanjutkan aksi setelah submit...
+                                  }}
+                                >
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Are you sure you want to reject this
+                                      attendance?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Please enter the reason for rejection.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+
+                                  <div className="py-4 flex flex-col gap-3">
+                                    <Input
+                                      name="reason"
+                                      placeholder="Enter the reason"
+                                      type="text"
+                                    ></Input>
+                                  </div>
+
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel
+                                      type="button"
+                                      className="w-auto"
+                                    >
+                                      Cancel
+                                    </AlertDialogCancel>
+                                    <Button type="submit" className="w-auto">
+                                      Submit
+                                    </Button>
+                                  </AlertDialogFooter>
+                                </form>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </>
+                        ) : (
+                          <SheetClose asChild>
+                            <Button type="button" variant={"outline"}>
+                              Close
+                            </Button>
+                          </SheetClose>
+                        )}
+                      </div>
+                    </SheetFooter>
+                  )}
+                </SheetContent>
+              </>
+            ):(
+               <>
+                <SheetContent className="bg-white">
+                  <SheetHeader className="py-3 z-50">
+                    <SheetTitle className="text-neutral-500 text-2xl">
+                      Attendance Details
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="grid gap-4 px-4">
+                    <div className="flex px-2 py-4 border-2 border-neutral-300 gap-2 items-center justify-between rounded-sm">
+                      <div className="flex gap-2">
+                        <Avatar className="w-12 h-12 z-0">
+                          <AvatarImage src="https://github.com/shadcn.png" />
+                          <AvatarFallback>CN</AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col gap-1">
+                          <div
+                            className="text-left truncate font-semibold"
+                            title={selectedRow?.employeeName || ""} // Tooltip untuk menampilkan nama lengkap
+                          >
+                            {(selectedRow?.employeeName ?? "").length > 20
+                              ? `${selectedRow?.employeeName.slice(0, 20)}...`
+                              : selectedRow?.employeeName}
+                          </div>
+                          <span className="text-xs font-semibold text-neutral-500">
+                            {selectedRow?.position || ""}
+                          </span>
+                        </div>
+                      </div>
+                      {selectedRow?.status === "On Time" ||
+                      selectedRow?.status === "Late" ? (
+                        <div className="w-fit flex justify-end items-center">
+                          <ApprovalStatusBadge
+                            status={selectedRow?.status as "On Time" | "Late"}
+                          />
+                        </div>
+                      ) : selectedRow?.status === "Absent" ? null : (
+                        <div className="w-fit flex justify-end items-center">
+                          <ApprovalStatusBadge
+                            status={
+                              selectedRow?.approvalStatus as
+                                | "Pending"
+                                | "Rejected"
+                                | "Approved"
+                            }
+                          />
+                        </div>
+                      )}
+                    </div>
+                    {selectedRow?.status === "Sick Leave" ||
+                    selectedRow?.status === "Annual Leave" ? (
+                      <>
+                        <div className="flex flex-col px-2 py-4 border-2 border-neutral-300 gap-3 rounded-sm">
+                          <span className="font-semibold">
+                            Attendance Information
+                          </span>
+                          <div className="grid grid-cols-3 gap-3 w-auto">
+                            <Information
+                              label="Status"
+                              value={selectedRow.status}
+                            ></Information>
+                            <textarea id="editor">Tulis konten di sini...</textarea>
+
+                            <Information
+                              label="Start Date"
+                              value={
+                                typeof selectedRow?.date === "object" &&
+                                selectedRow?.date?.startDate
+                                  ? (console.log(
+                                      "Start Date:",
+                                      selectedRow.date.startDate
+                                    ),
+                                    selectedRow.date.startDate)
+                                  : "N/A"
+                              }
+                            ></Information>
+                            <Information
+                              label="End Date"
+                              value={
+                                typeof selectedRow?.date === "object" &&
+                                selectedRow?.date?.endDate
+                                  ? (console.log(selectedRow.date.endDate),
+                                    selectedRow.date.endDate)
+                                  : "N/A"
+                              }
+                            ></Information>
+                          </div>
+                        </div>
+                        <div className="flex flex-col px-2 py-4 border-2 border-neutral-300 gap-3 rounded-sm">
+                          <span className="font-semibold">Proof of Leave</span>
+                          <div className="p-3 border border-neutral-200 rounded-sm flex gap-2 justify-between">
+                            <span className="text-base flex items-center w-full h-full">
+                              (nama file)
+                            </span>
+                            <div className="flex gap-4">
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    className="w-auto"
+                                    size={"icon"}
+                                    onClick={() => {
+                                      // Handle view action here
+                                      console.log("View file");
+                                    }}
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      width="24"
+                                      height="24"
+                                      strokeWidth="2"
+                                    >
+                                      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                                      <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                                    </svg>
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Proove of Leave
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription className="max-h-96 overflow-auto">
+                                      <img
+                                        src="https://www.talenta.co/wp-content/uploads/2022/05/6-1086x1536.jpg"
+                                        alt="Proof of Leave"
+                                      />
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Close</AlertDialogCancel>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+
+                              <Button
+                                variant="ghost"
+                                className="w-auto"
+                                size={"icon"}
+                                onClick={() => {
+                                  // Handle download action here
+                                  console.log("Download file");
+                                }}
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  width="24"
+                                  height="24"
+                                  strokeWidth="2"
+                                >
+                                  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+                                  <path d="M7 11l5 5l5 -5"></path>
+                                  <path d="M12 4l0 12"></path>
+                                </svg>
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex flex-col px-2 py-4 border-2 border-neutral-300 gap-3 rounded-sm">
+                          <span className="font-semibold">
+                            Attendance Information
+                          </span>
+                          <div className="flex flex-col gap-6">
+                            <div className="grid grid-cols-3 gap-3 w-auto">
+                              <Information
+                                label="Date"
+                                value={
+                                  typeof selectedRow?.date === "string"
+                                    ? selectedRow?.date
+                                    : `${selectedRow?.date?.startDate} - ${selectedRow?.date?.endDate}`
+                                }
+                              ></Information>
+                              <Information
+                                label="Clock In"
+                                value={selectedRow?.clockIn || ""}
+                              ></Information>
+                               <Information
+                                label="status"
+                                value={
+                                  selectedRow?.status === "Absent"
+                                    ? "Absent"
+                                    : selectedRow?.clockIn ||
+                                      selectedRow?.clockOut
+                                    ? "Present"
+                                    : "N/A"
+                                }
+                              ></Information>
+                            </div>
+                            
+                          </div>
+                        </div>
+
+                       
                       </>
                     )}
                   </div>
