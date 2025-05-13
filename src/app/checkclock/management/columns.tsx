@@ -705,8 +705,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                               label="Status"
                               value={selectedRow.status}
                             ></Information>
-                            <textarea id="editor">Tulis konten di sini...</textarea>
-
+                            
                             <Information
                               label="Start Date"
                               value={
