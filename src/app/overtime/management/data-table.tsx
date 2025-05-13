@@ -225,7 +225,7 @@ export function DataTable<TData, TValue>({
           <Button
             className="w-[80px] cursor-pointer"
             variant="default"
-            onClick={() => router.push("/overtime/add")}
+            onClick={() => router.push("/overtime/management/add")}
           >
             <svg
               width="15"
