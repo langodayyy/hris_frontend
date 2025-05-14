@@ -59,11 +59,11 @@ export default function RootLayout({
       >
         {/* <AuthProvider> */}
         {/* <AuthGate> */}
-        {/* <FormProvider>{children}</FormProvider> */}
+        <FormProvider>{children}</FormProvider>
         {/* </AuthGate> */}
         {/* </AuthProvider> */}
 
-        <AuthProvider>
+        {/* <AuthProvider>
           <FormProvider>
             <BrowserRouter>
               <Routes>
@@ -122,7 +122,7 @@ export default function RootLayout({
               </Routes>
             </BrowserRouter>
           </FormProvider>
-        </AuthProvider>
+        </AuthProvider> */}
       </body>
     </html>
   );
