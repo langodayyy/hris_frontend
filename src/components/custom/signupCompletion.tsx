@@ -63,10 +63,6 @@ export default function SignupCompleteForm() {
 
       if (response.success) {
         // Handle successful registration
-        // console.log("User registered successfully:", response.data);
-
-        Cookies.set("is_profile_complete", "true");
-
         router.push("/dashboard");
       } else {
         setErrors(response.errors);
@@ -167,41 +163,6 @@ export default function SignupCompleteForm() {
         </div>
 
         <PhoneInput></PhoneInput>
-        {/* still need more research */}
-        {/* {errors().phone && (
-            <div className="text-sm p-[10px] bg-danger-50 rounded-md">
-              {Array.isArray(errors().phone) ? (
-                errors()!.phone!.map((err, idx) => (
-                  <div
-                    className="flex flex-row items-center gap-2 py-2"
-                    key={idx}
-                  >
-                    <svg
-                      width="15"
-                      height="16"
-                      viewBox="0 0 22 23"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle cx="11" cy="11.5" r="11" fill="#C11106" />
-                      <path
-                        d="M7 8L15 16M15 8L7 16"
-                        stroke="white"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-
-                    <span key={idx} className="text-danger-700 block">
-                      {err}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <span className="text-danger-700">{errors().phone}</span>
-              )}
-            </div>
-          )} */}
 
         <div className="flex flex-col gap-2 w-full">
           <Label htmlFor="companyname">Company Name</Label>
