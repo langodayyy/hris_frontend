@@ -40,7 +40,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [globalFilter, setGlobalFilter] = React.useState(""); // Add the globalFilter state
+  const [globalFilter, setGlobalFilter] = React.useState(""); 
   const table = useReactTable({
     data,
     columns,
@@ -225,7 +225,7 @@ export function DataTable<TData, TValue>({
           <Button
             className="w-[80px] cursor-pointer"
             variant="default"
-            onClick={() => router.push("/overtime/add")}
+            onClick={() => router.push("/overtime/management/add")}
           >
             <svg
               width="15"
