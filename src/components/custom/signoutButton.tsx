@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useAuth } from '@/context/v1';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LogoutButton() {
     const { signOut } = useAuth(); // Access the signOut function from AuthContext

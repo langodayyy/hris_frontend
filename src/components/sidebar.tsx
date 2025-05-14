@@ -343,7 +343,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
               }
             />
             <NavItem
-              url="/checkclock/management"
+              url="/checkclock/checkclock-management"
               isOpen={isOpen}
               isSelected={pathname.startsWith("/checkclock")}
               // isSubmenu={true}
@@ -366,18 +366,18 @@ export default function Sidebar({ children, title }: LayoutProps) {
                 </svg>
               }
               submenu={[
-                { label: "Management", href: "/checkclock/management" },
+                { label: "Management", href: "/checkclock/checkclock-management" },
                 { label: "Setting", href: "/checkclock/setting" },
               ]}
             />
             <NavItem
-              url="/overtime/management"
+              url="/overtime"
               isOpen={isOpen}
               isSelected={pathname.startsWith("/overtime")}
               text="Overtime"
               submenu={[
-                { label: "Management", href: "/overtime/management" },
-                { label: "Setting", href: "/overtime/setting" },
+                { label: "Management", href: "/overtime/overtime-management" },
+                { label: "Setting", href: "/overtime/overtime-setting" },
               ]}
               svgIcon={
                 <svg

@@ -12,8 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import Cookies from "js-cookie";
-
 interface NavbarProps {
   title: string; 
   avatarImage?: string;

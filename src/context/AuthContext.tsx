@@ -1,100 +1,95 @@
-'use client';
-// src/context/AuthContext.tsx
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+'use client'
 
-// Define types
-interface User {
-  email: string;
-  // Add other user properties as needed
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useState
+} from 'react'
+import Cookies from 'js-cookie' 
+import { useRouter } from 'next/navigation'
+
+type AuthContextType = {
+    // signInWithGoogle: () => Promise<void>
+    signOut: () => Promise<void>
+    isLoading: boolean
 }
 
-interface AuthContextType {
-  currentUser: User | null;
-  loading: boolean;
-  login: (userData: User) => boolean;
-  logout: () => void;
-  register: (userData: User) => boolean;
-  isAuthenticated: () => boolean;
-}
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Create the Auth Context with default values
-const AuthContext = createContext<AuthContextType | null>(null);
+export function AuthProvider({children}: { children: React.ReactNode }) {
+    // const [user, setUser] = useState(null)
+    const [isLoading, setIsLoading] = useState(true)
+    const router = useRouter()
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+    useEffect(() => {
+        // Initialize auth from cookies
+        const initializeAuth = async () => {
+            try {
+                const userCookie = Cookies.get('token') // Read user data from cookie
+                if (userCookie) {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/verifyToken`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${userCookie}`,
+                        },
+                    });
 
-// Create a provider component
-export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  
-  // Check for existing authentication on mount
-  useEffect(() => {
-    // Check if user data exists in localStorage
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        setCurrentUser(JSON.parse(storedUser));
-      } catch (error) {
-        // Handle potential JSON parse error
-        console.error('Failed to parse stored user data:', error);
-        localStorage.removeItem('user');
-      }
+                    if (!response.ok) {
+                        Cookies.remove('token'); 
+                        Cookies.remove('is_profile_complete'); 
+                        router.push('/sign-in'); // Redirect to sign-in page
+                        return
+                    }
+                } else {
+                    // Allow access to sign-up page if not authenticated
+                    if (window.location.pathname !== '/sign-up') {
+                        router.push('/sign-in')
+                    }
+                }
+            } catch (error) {
+                console.error('Error initializing auth:', error)
+                router.push('/sign-in') // Redirect to sign-in page on error
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        initializeAuth()
+    }, [router])
+
+    // const signInWithGoogle = async () => {
+    //     try {
+    //         Cookies.set('user', JSON.stringify(fakeUser), {secure: true, sameSite: 'strict'})
+    //         setUser(fakeUser)
+    //     } catch (error) {
+    //         console.error('Error signing in with Google:', error)
+    //     }
+    // }
+
+    const signOut = async () => {
+        try {
+            Cookies.remove('token')
+            Cookies.remove('is_profile_complete')
+            // setUser(null)
+            router.push('/')
+        } catch (error) {
+            console.error('Error signing out:', error)
+        }
     }
-    setLoading(false);
-  }, []);
 
-  // Login function
-  const login = (userData: User): boolean => {
-    // Store user data in localStorage
-    localStorage.setItem('user', JSON.stringify(userData));
-    setCurrentUser(userData);
-    return true;
-  };
+    return (
+        <AuthContext.Provider value={{signOut, isLoading}}>
+            {children}
+        </AuthContext.Provider>
+    )
+}
 
-  // Logout function
-  const logout = (): void => {
-    localStorage.removeItem('user');
-    setCurrentUser(null);
-  };
-
-  // Registration function
-  const register = (userData: User): boolean => {
-    // You would typically make an API call here
-    // For now, we'll just set the user in localStorage
-    localStorage.setItem('user', JSON.stringify(userData));
-    setCurrentUser(userData);
-    return true;
-  };
-
-  // Check if user is authenticated
-  const isAuthenticated = (): boolean => {
-    return !!currentUser;
-  };
-
-  // Values to be provided to consumers
-  const value: AuthContextType = {
-    currentUser,
-    login,
-    logout,
-    register,
-    isAuthenticated,
-    loading
-  };
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-// Custom hook for using the auth context
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export function useAuth() {
+    const context = useContext(AuthContext)
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider')
+    }
+    return context
+}
