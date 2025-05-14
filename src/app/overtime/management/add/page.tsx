@@ -13,21 +13,8 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-
-//sample aja
-const employeesSample = [
-  { id_employee: "EMP0001", Name: "Mumtaz", position: "Manager" },
-  { id_employee: "EMP0002", Name: "Kemal", position: "Manager" },
-  { id_employee: "EMP0003", Name: "Lucky", position: "Manager" },
-  { id_employee: "EMP0004", Name: "Silfi", position: "Manager" },
-];
-
-//sample aja
-const overtimeSettingSample = [
-  { id_ovt_setting: "OTS001", name: "Weekday Overtime", type: "Goverment Regulation", calculation: "2", rate:"400000" },
-  { id_ovt_setting: "OTS002", name: "Weekend Overtime", type: "Company Regulation", calculation: "1", rate:"150000" },
-  { id_ovt_setting: "OTS003", name: "Holiday Overtime", type: "Company Regulation", calculation: "1", rate:"230000" },
-];
+import { employeesSample, overtimeSettingSample } from "@/components/dummy/overtimeData";
+import { useRouter } from "next/navigation";
 
 
 export default function AddOvertimeEmployees() {
@@ -66,9 +53,6 @@ export default function AddOvertimeEmployees() {
     // Cek apakah kelipatan
     if (val % calc === 0) {
       setTotalHour(inputVal); // valid
-    } else {
-      // Jika tidak valid, jangan update state (atau bisa juga reset totalHour)
-      // alert(`Jumlah jam lembur harus kelipatan ${calc}`);
     }
   };
 
@@ -89,6 +73,7 @@ export default function AddOvertimeEmployees() {
         }`
       : "";
 
+  const router = useRouter()
   return (
     <Sidebar title="Overtime Management">
       <Card className="flex flex-col gap-[15px] px-[20px] py-[26px]">
@@ -99,7 +84,6 @@ export default function AddOvertimeEmployees() {
         </div>
         <Card className="p-[20px] gap-[30px] flex flex-col">
           {/* Employee Selection */}
-
           <div className="flex flex-row gap-[30px]">
             <div className="flex flex-col w-full gap-2">
               <Label>Employee Name</Label>
@@ -121,10 +105,7 @@ export default function AddOvertimeEmployees() {
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent
-                  align="start"
-                  className="p-0 !w-[596px] left-0 right-0"
-                >
+                <PopoverContent align="start" className="p-0 w-[400px]">
                   <Command className="w-full">
                     <CommandInput placeholder="Search employee..." />
                     <CommandList>
@@ -133,11 +114,9 @@ export default function AddOvertimeEmployees() {
                         {employeeOptions.map((emp) => (
                           <CommandItem
                             key={emp.value}
-                            value={emp.value}
-                            onSelect={(currentValue) => {
-                              setValue(
-                                currentValue === value ? "" : currentValue
-                              );
+                            value={emp.label.toLowerCase()} // ✅ biar yang dicari tetap nama
+                            onSelect={() => {
+                              setValue(emp.value); // tetap simpan ID sebagai value
                               setOpen(false);
                             }}
                           >
@@ -163,7 +142,7 @@ export default function AddOvertimeEmployees() {
             <div className="flex flex-col w-full gap-2">
               <Label>Overtime Type</Label>
               <Select onValueChange={(val) => setSelectedOvertimeType(val)}>
-                <SelectTrigger className="h-[45px] w-full p-4 border-neutral-300 text-neutral-300">
+                <SelectTrigger className="h-[45px] w-full p-4 border-neutral-300 text-neutral-900">
                   <SelectValue placeholder="Choose overtime type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -209,7 +188,7 @@ export default function AddOvertimeEmployees() {
                     initialFocus
                     classNames={{
                       day_selected:
-                        "bg-secondary-600 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-secondary-600 focus:text-primary-foreground  ",
+                        "text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-secondary-600 focus:text-primary-foreground  ",
                     }}
                   />
                 </PopoverContent>
@@ -253,7 +232,11 @@ export default function AddOvertimeEmployees() {
 
         {/* Action Buttons */}
         <div className="flex flex-row gap-[15px] justify-end items-center">
-          <Button variant="outline" className="w-[98px]">
+          <Button
+            variant="outline"
+            className="w-[98px]"
+            onClick={() => router.push("/overtime/management")}
+          >
             Cancel
           </Button>
           <Button type="submit" variant="default" className="w-[98px]">

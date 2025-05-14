@@ -312,34 +312,35 @@ export function DataTable<TData, TValue>({
           </DropdownMenu>
         </div>
         <div className="w-fit">
-          <Button
+            <Button
             icon={
               <svg
-                width="15"
-                height="15"
-                viewBox="0 0 15 15"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 15 15"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
               >
-                <path
-                  d="M7.5 3.125V11.875"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M3.125 7.5H11.875"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+              <path
+                d="M7.5 3.125V11.875"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M3.125 7.5H11.875"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
               </svg>
             }
-          >
+            onClick={() => (window.location.href = "/checkclock/management/add")}
+            >
             Add
-          </Button>
+            </Button>
         </div>
       </div>
       <div className="rounded-md border">

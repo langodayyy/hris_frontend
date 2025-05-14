@@ -1,58 +1,29 @@
 "use client";
 
+import React, { useMemo } from "react";
 import Sidebar from "@/components/sidebar";
 import { Card } from "@/components/ui/card";
-import { DataTable } from "@/app/overtime/data-table";
+import { DataTable } from "@/app/overtime/management/data-table";
 import { OvertimeColumn } from "./column";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useState } from "react";
-// import { DateRange } from "react-day-picker";
-
-function generateDummyOvertimeData(count: number) {
-  const names = ["Mumtaz", "Kemal", "Lucky", "Silfi"];
-  const position = ["Manager", "Staff", "Supervisor", "Admin"];
-  const overtimeTypes = [
-    { name: "Weekday Overtime", rate: 400000 },
-    { name: "Weekend Overtime", rate: 150000 },
-    { name: "Holiday Overtime", rate: 230000 },
-  ];
-  const approvalStatus = ["Pending", "Approved", "Rejected"];
-
-  const data = [];
-
-  for (let i = 1; i <= count; i++) {
-    const randomNameIndex = Math.floor(Math.random() * names.length);
-    const randomPositionIndex = Math.floor(Math.random() * position.length);
-    const randomOT =
-      overtimeTypes[Math.floor(Math.random() * overtimeTypes.length)];
-    const randomHour = (Math.floor(Math.random() * 3) + 1) * 2;
-    const date = new Date(2025, 4, (i % 31) + 1).toLocaleDateString("en-GB");
-    const randomStatus =
-      approvalStatus[Math.floor(Math.random() * approvalStatus.length)];
-
-    data.push({
-      id: `OVT${i.toString().padStart(4, "0")}`,
-      name: names[randomNameIndex],
-      position: position[randomPositionIndex],
-      overtimeName: randomOT.name,
-      date: date,
-      hour: randomHour,
-      ovt_payroll: randomHour * randomOT.rate,
-      approvalStatus: randomStatus
-    });
-  }
-
-  return data;
-}
+import { useRouter } from "next/navigation";
+import { generateDummyOvertimeData } from "@/components/dummy/overtimeData";
 
 
 export default function OvertimeManagement(){
-  const overtimeDisplay = generateDummyOvertimeData(50);
-
+  const overtimeDisplay = useMemo(() => generateDummyOvertimeData(25), []);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10); // Default to 10 rows per page
+  const [rowsPerPage, setRowsPerPage] = useState(10); 
   const totalPages = Math.ceil(overtimeDisplay.length / rowsPerPage);
+  const router = useRouter();
+
+  const handleEdit = (id: string) => {
+    router.push(`/overtime/edit/${id}`);
+  };
+
+  const column = OvertimeColumn(handleEdit);
 
   // Fungsi untuk menangani perubahan halaman
   const handlePageChange = (page: number) => {
@@ -81,7 +52,7 @@ export default function OvertimeManagement(){
         <div className="flex flex-col gap-[10px]">
           <div>
             {/* Table */}
-            <DataTable columns={OvertimeColumn} data={data} />
+            <DataTable columns={column} data={data} />
           </div>
           {/* pagination */}
           <div className="w-full flex justify-between">
