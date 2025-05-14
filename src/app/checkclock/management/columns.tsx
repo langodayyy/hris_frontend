@@ -34,6 +34,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { start } from "repl";
+import DownloadButton from "@/components/ui/downloadButton";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -386,7 +387,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                     </AlertDialogTitle>
                                     <AlertDialogDescription className="max-h-96 overflow-auto">
                                       <img
-                                        src="https://www.talenta.co/wp-content/uploads/2022/05/6-1086x1536.jpg"
+                                        src="/images/proove-of-leave.jpg"
                                         alt="Proof of Leave"
                                       />
                                     </AlertDialogDescription>
@@ -397,31 +398,12 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                 </AlertDialogContent>
                               </AlertDialog>
 
-                              <Button
-                                variant="ghost"
-                                className="w-auto"
-                                size={"icon"}
-                                onClick={() => {
-                                  // Handle download action here
-                                  console.log("Download file");
-                                }}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  width="24"
-                                  height="24"
-                                  strokeWidth="2"
-                                >
-                                  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
-                                  <path d="M7 11l5 5l5 -5"></path>
-                                  <path d="M12 4l0 12"></path>
-                                </svg>
-                              </Button>
+                              <DownloadButton
+                              // fileUrl={`/images/bukti-absen-${selectedRow?.employeeName}.jpg`}
+
+                                fileUrl="/images/proove-of-levave.jpg"
+                                fileName={`proove of leave ${selectedRow?.employeeName}.jpg`}
+                              />
                             </div>
                           </div>
                         </div>
@@ -644,8 +626,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                   )}
                 </SheetContent>
               </>
-            ):(
-               <>
+            ) : (
+              <>
                 <SheetContent className="bg-white">
                   <SheetHeader className="py-3 z-50">
                     <SheetTitle className="text-neutral-500 text-2xl">
@@ -705,7 +687,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                               label="Status"
                               value={selectedRow.status}
                             ></Information>
-                            
+
                             <Information
                               label="Start Date"
                               value={
@@ -772,7 +754,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                     </AlertDialogTitle>
                                     <AlertDialogDescription className="max-h-96 overflow-auto">
                                       <img
-                                        src="https://www.talenta.co/wp-content/uploads/2022/05/6-1086x1536.jpg"
+                                        src="/images/proove-of-leave.jpg"
                                         alt="Proof of Leave"
                                       />
                                     </AlertDialogDescription>
@@ -783,31 +765,12 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                 </AlertDialogContent>
                               </AlertDialog>
 
-                              <Button
-                                variant="ghost"
-                                className="w-auto"
-                                size={"icon"}
-                                onClick={() => {
-                                  // Handle download action here
-                                  console.log("Download file");
-                                }}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  width="24"
-                                  height="24"
-                                  strokeWidth="2"
-                                >
-                                  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
-                                  <path d="M7 11l5 5l5 -5"></path>
-                                  <path d="M12 4l0 12"></path>
-                                </svg>
-                              </Button>
+                             <DownloadButton
+                              // fileUrl={`/images/bukti-absen-${selectedRow?.employeeName}.jpg`}
+
+                                fileUrl="/images/proove-of-leave.jpg"
+                                fileName={`proove of leave ${selectedRow?.employeeName}.jpg`}
+                              />
                             </div>
                           </div>
                         </div>
@@ -832,7 +795,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                 label="Clock In"
                                 value={selectedRow?.clockIn || ""}
                               ></Information>
-                               <Information
+                              <Information
                                 label="status"
                                 value={
                                   selectedRow?.status === "Absent"
@@ -844,11 +807,88 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                 }
                               ></Information>
                             </div>
-                            
                           </div>
                         </div>
+                        <div className="flex flex-col px-2 py-4 border-2 border-neutral-300 gap-3 rounded-sm ">
+                          <span className="font-semibold">
+                            Location Information
+                          </span>
+                          <div className="flex flex-col gap-6">
+                            <div className="grid grid-cols-2 gap-3 w-auto">
+                              <Information
+                                label="Latitude"
+                                value={selectedRow?.latitude}
+                              ></Information>
+                              <Information
+                                label="Longitude"
+                                value={selectedRow?.longitude}
+                              ></Information>
+                            </div>
+                          </div>
+                        </div>
+                        {selectedRow?.status !== "Absent" && (
 
-                       
+                        <div className="flex flex-col px-2 py-4 border-2 border-neutral-300 gap-3 rounded-sm">
+                          <span className="font-semibold">
+                            Proof of Attendance
+                          </span>
+                          <div className="p-3 border border-neutral-200 rounded-sm flex gap-2 justify-between">
+                            <span className="text-base flex items-center w-full h-full">
+                              (nama file)
+                            </span>
+                            <div className="flex gap-4">
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    className="w-auto"
+                                    size={"icon"}
+                                   
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      width="24"
+                                      height="24"
+                                      strokeWidth="2"
+                                    >
+                                      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                                      <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                                    </svg>
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Proove of Leave
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription className="max-h-96 overflow-auto">
+                                      <img
+                                        src="/images/proove-of-attendance.jpg"
+                                        alt="Proof of attendance"
+                                      />
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Close</AlertDialogCancel>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+
+                              <DownloadButton
+                              // fileUrl={`/images/bukti-absen-${selectedRow?.employeeName}.jpg`}
+
+                                fileUrl="/images/proove-of-attendance.jpg"
+                                fileName={`proove of attendance ${selectedRow?.employeeName}.jpg`}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        )}
                       </>
                     )}
                   </div>

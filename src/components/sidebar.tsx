@@ -1,4 +1,3 @@
-
 "use client";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -35,22 +34,26 @@ function NavItem({
       setIsExpanded((prev) => !prev);
     }
   };
+const pathname = usePathname(); // ✅ hook dipanggil di level atas
+
+const isSubmenuSelected = submenu?.some(
+  (item) => item.href === pathname
+);
 
   return (
     <li className="flex flex-col w-full">
       <div className="flex gap-[5px] w-full">
         <div
           className={`pr-[7px] rounded-r-lg ${
-            isSelected ? "bg-primary-900" : ""
+            isSelected || isSubmenuSelected ? "bg-primary-900" : ""
           }`}
         ></div>
         <div className="flex flex-col w-full">
           {submenu && submenu.length > 0 ? (
-            // Jika ada submenu
             <button
               onClick={handleToggle}
               className={`flex items-center justify-between gap-2 px-[21px] py-4 rounded-lg w-full transition-all text-left ${
-                isSelected
+                isSelected || isSubmenuSelected
                   ? "bg-primary-900 text-white "
                   : "bg-white text-neutral-900 hover:bg-primary-950 hover:text-white"
               }`}
@@ -88,7 +91,6 @@ function NavItem({
               )}
             </button>
           ) : (
-            // Jika tidak ada submenu
             <Link
               href={url}
               className={`flex items-center justify-between gap-2 px-[21px] py-4 rounded-lg w-full transition-all text-left ${
@@ -114,11 +116,9 @@ function NavItem({
                   <Link
                     href={item.href}
                     className={`block px-4 py-2 rounded-lg font-medium text-base${
-                      isSelected && url === item.href
-                        ? 
-                        " bg-primary-900 text-white "
-                        : 
-                        "text-neutral-900 hover:bg-primary-950 hover:text-white"
+                      usePathname() === item.href
+                        ? " bg-primary-900 text-white "
+                        : "text-neutral-900 hover:bg-primary-950 hover:text-white"
                     }`}
                   >
                     {item.label}
@@ -416,7 +416,12 @@ export default function Sidebar({ children, title }: LayoutProps) {
         } w-full`}
       >
         <div className="flex flex-col">
-          <Navbar title={title} userName="Silfi Nazarina" subsPlan="Free" activePeriod="28 May, 2025" />
+          <Navbar
+            title={title}
+            userName="Silfi Nazarina"
+            subsPlan="Free"
+            activePeriod="28 May, 2025"
+          />
           <main className="p-[30px] ">{children}</main>
         </div>
         {/* Main Content Area */}
@@ -436,4 +441,3 @@ export default function Sidebar({ children, title }: LayoutProps) {
     </div>
   );
 }
-
