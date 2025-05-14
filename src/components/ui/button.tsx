@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -10,16 +11,18 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary-900 text-white shadow-xs hover:bg-primary-950 w-full",
+          "bg-primary-900 text-white shadow-xs hover:bg-primary-950 w-full cursor-pointer",
         destructive:
-          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+          "cursor-pointer bg-danger-600 text-white shadow-xs hover:bg-danger-700 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
-          "border border-primary-900 text-primary-900 bg-white shadow-xs hover:bg-primary-950 hover:text-white dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+          "cursor-pointer border border-primary-900 text-primary-900 bg-white shadow-xs hover:bg-primary-950 hover:text-white dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
+          "cursor-pointer bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
         ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-info-500 underline-offset-4 hover:underline",
+          "cursor-pointer hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        link: "cursor-pointer text-info-500 underline-offset-4 hover:underline",
+        calendar:
+        "border border-neutral-300 text-primary-900 bg-white shadow-xs hover:bg-primary-950 hover:text-white dark:bg-input/30 dark:border-input dark:hover:bg-input/50 cursor-pointer",
       },
       size: {
         // default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -33,27 +36,33 @@ const buttonVariants = cva(
       size: "lg",
     },
   }
-)
+);
 
 function Button({
   className,
   variant,
   size,
+  icon,
   asChild = false,
+  children,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
+    asChild?: boolean;
+    icon?: React.ReactNode;
   }) {
-  const Comp = asChild ? Slot : "button"
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
-    />
-  )
+    >
+      {icon && <span className="shrink-0">{icon}</span>}
+      {children}
+    </Comp>
+  );
 }
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };
