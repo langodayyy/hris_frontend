@@ -45,9 +45,16 @@ export default function SigninForm() {
 
       if (response.success) {
         // Handle successful registration
-        Cookies.set("token", response.data.token);
+        if (Cookies.get("token")) {
+          Cookies.remove("token");
+        }
+        Cookies.set("token", response.data.token, { expires:7, secure:true });
 
-        router.push("/dashboard");
+        if (response.data.is_profile_complete) {
+          router.push("dashboard");
+        } else {
+          router.push("sign-up/complete-registration");
+        }
       } else {
         setErrors(response.errors);
       }
@@ -202,7 +209,6 @@ export async function loginAdmin(formData: FormData) {
 
     // Parse and return the success response
     const data = await response.json();
-    Cookies.set("token", data.token, { expires: 7, secure: true });
 
     return { success: true, data };
   } catch (error: any) {
