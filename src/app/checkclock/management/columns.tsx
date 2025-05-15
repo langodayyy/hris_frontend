@@ -18,7 +18,6 @@ import {
   SheetFooter,
   SheetClose,
 } from "@/components/ui/sheet";
-import { Label } from "@radix-ui/react-dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import Information from "@/components/ui/attendance-information";
@@ -33,7 +32,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { start } from "repl";
 import DownloadButton from "@/components/ui/downloadButton";
 
 // This type is used to define the shape of our data.
@@ -53,7 +51,7 @@ export type CheckclockOverview = {
   latitude: number;
   longitude: number;
 };
-
+ 
 const calculateWorkHours = (
   clockIn: string | undefined,
   clockOut: string | undefined

@@ -27,13 +27,14 @@ import { TimeInput } from "@/components/ui/timeInput";
 import { DateRange } from "react-day-picker";
 import { FileUploader } from "@/components/ui/fileUploader";
 import { SelectPopover } from "@/components/ui/selectPopover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const employeesSample = [
   {
     id_employee: "EMP0001",
     Name: "Mumtaz",
     position: "Manager",
-    workType: "WFO",
+    workType: "",
     clockIn: "",
     clockOut: "",
   },
@@ -41,7 +42,7 @@ const employeesSample = [
     id_employee: "EMP0002",
     Name: "Kemal",
     position: "Manager",
-    workType: "WFH",
+    workType: "",
     clockIn: "",
     clockOut: "",
   },
@@ -49,7 +50,7 @@ const employeesSample = [
     id_employee: "EMP0003",
     Name: "Lucky",
     position: "Manager",
-    workType: "WFO",
+    workType: "",
     clockIn: "08:00",
     clockOut: "",
   },
@@ -57,18 +58,22 @@ const employeesSample = [
     id_employee: "EMP0004",
     Name: "Silfi",
     position: "Manager",
-    workType: "WFO",
+    workType: "",
     clockIn: "08:00",
     clockOut: "",
   },
 ];
-
 
 const attendanceType = [
   { label: "Clock In", value: "clockIn" },
   { label: "Clock Out", value: "clockOut" },
   { label: "Anual Leave", value: "anualLeave" },
   { label: "Sick Leave", value: "sickLeave" },
+];
+
+const workType = [
+  { label: "WFO", value: "wfo" },
+  { label: "WFA", value: "wfa" },
 ];
 
 export default function AddCheckclockPage() {
@@ -79,7 +84,7 @@ export default function AddCheckclockPage() {
   const selectedEmployee = employeesSample.find(
     (employee) => employee.Name === valueEmployee
   );
-  const workType = selectedEmployee ? selectedEmployee.workType : "";
+  const selectedWorkType = selectedEmployee ? selectedEmployee.workType : "";
   const currentDate = new Date();
   const validateAttendanceType =
     valueAttendanceType === "Anual Leave" ||
@@ -133,7 +138,7 @@ export default function AddCheckclockPage() {
                 </div>
                 {/* Attendance Type */}
                 <div className="flex flex-col gap-2">
-                  <Label>Attendance Type</Label>    
+                  <Label>Attendance Type</Label>
                   <div className="relative w-full ">
                     <Popover
                       open={OpenAttendanceType}
@@ -158,7 +163,7 @@ export default function AddCheckclockPage() {
                                   (attendanceType) =>
                                     attendanceType.label === valueAttendanceType
                                 )?.label
-                              : "Select Attendance Type"}
+                              : "Select attendance type"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
                         </PopoverTrigger>
@@ -348,12 +353,18 @@ export default function AddCheckclockPage() {
                 {/* WorkType */}
                 <div className="flex flex-col gap-2">
                   <Label>Work Type</Label>
-                  <Input
-                    value={workType}
-                    readOnly
-                    className=" text-neutral-600 "
-                    placeholder="-- Select Employee First --"
-                  />
+                  <Select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select work type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {workType.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {!anual ? (

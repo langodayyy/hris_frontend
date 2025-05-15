@@ -27,18 +27,16 @@ function NavItem({
   isOpen,
   submenu,
 }: NavItemProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const pathname = usePathname(); // Ensure this hook is always called at the top level
+
+  const isSubmenuSelected = submenu?.some((item) => item.href === pathname);
+  const [isExpanded, setIsExpanded] = useState(isSubmenuSelected); // Initialize based on selection
 
   const handleToggle = () => {
     if (submenu && submenu.length > 0) {
       setIsExpanded((prev) => !prev);
     }
   };
-const pathname = usePathname(); // ✅ hook dipanggil di level atas
-
-const isSubmenuSelected = submenu?.some(
-  (item) => item.href === pathname
-);
 
   return (
     <li className="flex flex-col w-full">
@@ -116,7 +114,7 @@ const isSubmenuSelected = submenu?.some(
                   <Link
                     href={item.href}
                     className={`block px-4 py-2 rounded-lg font-medium text-base${
-                      usePathname() === item.href
+                      pathname === item.href
                         ? " bg-primary-900 text-white "
                         : "text-neutral-900 hover:bg-primary-950 hover:text-white"
                     }`}
@@ -222,7 +220,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
                     fill="#24375C"
                   />
                   <path
-                    d="M1.36023 11.9661C1.75819 11.3831 2.55388 10.6468 3.13531 10.3706C3.74741 10.0638 4.87983 9.81836 5.73675 9.81836C6.59367 9.84904 7.75665 10.0025 8.33819 10.2172C8.9503 10.432 9.92957 10.9536 10.5724 11.4445C11.1845 11.9047 12.0414 12.9786 12.4698 13.807C12.8983 14.6661 13.3879 16.3536 13.5716 17.5809C13.7552 18.7775 14.0307 20.0354 14.1837 20.3422C14.3368 20.6184 14.4591 23.0422 14.4591 25.7115C14.4591 29.0865 14.3673 30.6513 14.0918 30.9274C13.8777 31.1115 13.5716 31.2956 13.4186 31.2956C13.2349 31.2956 12.684 30.6513 12.1637 29.8229C11.6741 29.0252 10.4806 27.3377 9.53173 26.0797C8.58301 24.8218 6.59367 22.4593 5.12465 20.8638C3.65562 19.2684 2.03357 17.274 1.57449 16.4149C1.08486 15.5865 0.687012 14.482 0.687012 13.9604C0.687012 13.4695 0.993064 12.549 1.36023 11.9661Z"
+                    d="M1.36023 11.9661C1.75819 11.3831 2.55388 10.6468 3.13531 10.3706C3.74741 10.0638 4.87983 9.81836 5.73675 9.81836C6.59367 9.84904 7.75665 10.0025 8.33819 10.217C8.9503 10.432 9.92957 10.9536 10.5724 11.4445C11.1845 11.9047 12.0414 12.9786 12.4698 13.807C12.8983 14.6661 13.3879 16.3536 13.5716 17.5809C13.7552 18.7775 14.0307 20.0354 14.1837 20.3422C14.3368 20.6184 14.4591 23.0422 14.4591 25.7115C14.4591 29.0865 14.3673 30.6513 14.0918 30.9274C13.8777 31.1115 13.5716 31.2956 13.4186 31.2956C13.2349 31.2956 12.684 30.6513 12.1637 29.8229C11.6741 29.0252 10.4806 27.3377 9.53173 26.0797C8.58301 24.8218 6.59367 22.4593 5.12465 20.8638C3.65562 19.2684 2.03357 17.274 1.57449 16.4149C1.08486 15.5865 0.687012 14.482 0.687012 13.9604C0.687012 13.4695 0.993064 12.549 1.36023 11.9661Z"
                     fill="#82A4BC"
                   />
                   <path

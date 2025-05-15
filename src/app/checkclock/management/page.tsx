@@ -42,7 +42,7 @@ export default function CheckclockOverviewPage() {
           "Annual Leave",
         ][Math.floor(Math.random() * 5)];
 
-        const workType = ["WFO", "WFH"][Math.floor(Math.random() * 2)];
+        const workType = ["WFO", "WFA"][Math.floor(Math.random() * 2)];
         const hasClockIn = !["Absent", "Sick Leave", "Annual Leave"].includes(
           status
         );
