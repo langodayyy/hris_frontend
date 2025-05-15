@@ -1,14 +1,6 @@
 "use client";
 
 import Sidebar from "@/components/sidebar";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-import { Pie, PieChart } from "recharts";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
 
 import {
   Card,
@@ -28,48 +20,6 @@ import { YearsofWorks } from "@/components/custom/dashboardChart/YearsofWorks";
 import { CurrentEmployee } from "@/components/custom/dashboardChart/CurrentEmployee";
 import { EmployeeWorkStatus } from "@/components/custom/dashboardChart/EmployeeWorkStatus";
 import { CheckClockListToday } from "@/components/custom/dashboardChart/CheckClockListToday";
-// import RealTimeChart from "@/components/custom/dashboardChart/Chart";
-
-const chartDataPie = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
-];
-
-const chartPieConfig = {
-  chrome: {
-    label: "Chrome",
-    color: "#257047",
-  },
-  safari: {
-    label: "Safari",
-    color: "#FFAB00",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "#C11106",
-  },
-} satisfies ChartConfig;
-
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  // { month: "April", desktop: 73, mobile: 190 },
-  // { month: "May", desktop: 209, mobile: 130 },
-  // { month: "June", desktop: 214, mobile: 140 },
-];
-
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "#2563eb",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "#60a5fa",
-  },
-} satisfies ChartConfig;
 
 export default function Dashboard() {
   return (
