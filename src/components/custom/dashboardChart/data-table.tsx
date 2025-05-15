@@ -18,9 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {

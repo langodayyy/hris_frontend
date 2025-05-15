@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   ChartConfig,
@@ -6,6 +7,18 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Pie, PieChart } from "recharts";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuRadioItem,
+  DropdownMenuRadioGroup,
+} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 
 // fetch data from db here
 const chartDataPieFromDB = [
@@ -16,7 +29,10 @@ const chartDataPieFromDB = [
 
 // make a new const variable in addition of fill
 const chartDataPie = chartDataPieFromDB.map((item) => {
-  const key = item.name.toLowerCase().replace(/\s+/g, "_").replace(/\+\+/g, "plus");
+  const key = item.name
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/\+\+/g, "plus");
   return {
     ...item,
     fill: `var(--color-${key})`,
@@ -52,7 +68,10 @@ const presetColors = [
 // define the config
 const chartPieConfig = Object.fromEntries(
   chartDataPie.map((item, index) => {
-    const key = item.name.toLowerCase().replace(/\s+/g, "_").replace(/\+\+/g, "plus");
+    const key = item.name
+      .toLowerCase()
+      .replace(/\s+/g, "_")
+      .replace(/\+\+/g, "plus");
     const color =
       index < presetColors.length ? presetColors[index] : getRandomColor();
     return [key, { color, label: item.name }];
@@ -66,12 +85,16 @@ const dataSum = chartDataPie.reduce((sum, item) => sum + item.value, 0);
 // 2. Generate percentage summary
 const dataSummary = chartDataPie.reduce((summary, item) => {
   // You can optionally normalize the key
-  const key = item.name.toLowerCase().replace(/\s+/g, "_").replace(/\+\+/g, "plus"); // e.g., "pending_approval"
+  const key = item.name
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/\+\+/g, "plus"); // e.g., "pending_approval"
   summary[key] = ((item.value / dataSum) * 100).toFixed(1) + "%";
   return summary;
 }, {} as Record<string, string>);
 
 export function Age() {
+  const [position, setPosition] = useState("5")
   return (
     <Card className="flex flex-col py-0 gap-0">
       <CardContent className="flex flex-row w-full pb-0">
@@ -88,13 +111,50 @@ export function Age() {
           </PieChart>
         </ChartContainer>
         <div className="py-[20px] w-full">
-          <div className="border-b-1 border-b-black pb-[20px]">
-            <div className="font-medium text-base text-[#acacac]">
-              Employee Statistic
+          <div className="flex border-b-1 border-b-black pb-[20px] justify-between">
+            <div>
+              <div className="font-medium text-base text-[#acacac]">
+                Employee Statistic
+              </div>
+              <div className="font-bold text-lg">Age</div>
             </div>
-            <div className="font-bold text-lg">
-                Age
-            </div>
+            <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+              variant={"ghost"}
+              size={"icon"}
+              className="flex items-center"
+            >
+              <svg
+                width="4"
+                height="14"
+                viewBox="0 0 4 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 4.99997C3.10556 4.99997 4 5.89442 4 6.99997C4 8.10553 3.10556 8.99997 2 8.99997C0.894444 8.99997 0 8.10553 0 6.99997C0 5.89442 0.894444 4.99997 2 4.99997ZM0 2.11108C0 3.21664 0.894444 4.11108 2 4.11108C3.10556 4.11108 4 3.21664 4 2.11108C4 1.00553 3.10556 0.111084 2 0.111084C0.894444 0.111084 0 1.00553 0 2.11108ZM0 11.8889C0 12.9944 0.894444 13.8889 2 13.8889C3.10556 13.8889 4 12.9944 4 11.8889C4 10.7833 3.10556 9.88886 2 9.88886C0.894444 9.88886 0 10.7833 0 11.8889Z"
+                  fill="black"
+                />
+              </svg>
+            </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-fit" align="end">
+              <DropdownMenuRadioGroup
+                value={position}
+                onValueChange={setPosition}
+              >
+                <DropdownMenuRadioItem value="5">Per 5 Year</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="10">
+                  Per 10 Year
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="15">
+                  Per 15 Year
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+            
           </div>
 
           {/* return the data summary */}
@@ -112,7 +172,6 @@ export function Age() {
               </div>
             ))}
           </div>
-          
         </div>
       </CardContent>
     </Card>
