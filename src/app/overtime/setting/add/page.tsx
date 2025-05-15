@@ -1,5 +1,6 @@
 "use client";
 import {
+  governmentFormula,
   overtimecategory,
   overtimeType,
 } from "@/components/dummy/overtimeData";
@@ -17,14 +18,47 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function AddOvertimeSetting() {
+  
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedType, setSelectedType] = useState("");
-  // const [customFormula, setCustomFormula] = useState("");
-  const [selectedFormula, setSelectedFormula] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [calculation, setCalculation] = useState("");
+  const [rate, setRate] = useState("");
+  const [workWeekDuration, setWorkWeekDuration] = useState<number | null>(null); // null, 5, atau 6
+  const [formulaText, setFormulaText] = useState("");
+
+  // for government regulation formula filtered by work week duration and category
+  useEffect(() => {
+    if (!selectedCategory) {
+      setFormulaText("");
+      return;
+    }
+
+    const filteredFormula = governmentFormula.filter(
+      (item) =>
+        item.category === selectedCategory &&
+        (item.work_week_duration === null ||
+          item.work_week_duration === workWeekDuration)
+    );
+
+    const result = filteredFormula
+      .map((item) => {
+        const hourRange =
+          item.from_hour === item.to_hour
+            ? `${item.from_hour} hour`
+            : `${item.from_hour}–${item.to_hour} hour`;
+        return `${hourRange} = ${item.multiplier} x ( basic salary / 173))`;
+      })
+      .join("\n");
+
+    setFormulaText(result);
+  }, [selectedCategory, workWeekDuration]);
+  
 
   return (
     <Sidebar title="Overtime Setting">
@@ -92,44 +126,6 @@ export default function AddOvertimeSetting() {
             </div>
           </div>
 
-          {selectedType === "Company Regulation" && (
-            <div className="flex flex-col gap-[30px]">
-              <div className="flex flex-col gap-[15px]">
-                <Label>Choose Formula Type</Label>
-                <RadioGroup
-                  value={selectedFormula}
-                  onValueChange={(val) => setSelectedFormula(val)}
-                  className="flex flex-col gap-5"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="f1" id="default" />
-                    <Label htmlFor="default">Formula 1</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="f2" id="default" />
-                    <Label htmlFor="default">Formula 2</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="custom" id="custom" />
-                    <Label htmlFor="custom">Custom Formula</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-              {selectedFormula === "custom" && (
-                <div className="flex flex-col w-full gap-2">
-                  <Label>Custom Formula</Label>
-                  <Input
-                    type="text"
-                    id="custom_formula"
-                    name="custom_formula"
-                    placeholder="Enter custom formula"
-                    required
-                  />
-                </div>
-              )}
-            </div>
-          )}
-
           {/* if ovettime type is flat, user can custom the overtime calculation and rate */}
           {selectedType === "Flat" && (
             <div className="gap-[30px] flex flex-col">
@@ -148,7 +144,9 @@ export default function AddOvertimeSetting() {
                     type="number"
                     id="ovt_cal"
                     name="ovt_cal"
-                    placeholder="Enter overtime calculation"
+                    value={calculation}
+                    onChange={(e) => setCalculation(e.target.value)}
+                    placeholder="Ex: '1' or '0.5'"
                     required
                   />
                   <Input
@@ -168,33 +166,69 @@ export default function AddOvertimeSetting() {
                   type="number"
                   id="ovt_rate"
                   name="ovt_rate"
-                  placeholder="Enter overtime rate. Ex:'200000'"
+                  value={rate}
+                  onChange={(e) => setRate(e.target.value)}
+                  placeholder="Ex: '200000'"
                   required
+                />
+              </div>
+
+              {/* overtime formula */}
+              <div className="flex flex-col w-full gap-2">
+                <Label>Formula</Label>
+                <Input
+                  type="text"
+                  id="ovt_formula"
+                  name="ovt_formula"
+                  value={
+                    calculation && rate
+                      ? `${calculation} hour x IDR ${rate}`
+                      : ""
+                  }
+                  readOnly
+                  disabled
+                  className="bg-neutral-100 text-neutral-900"
                 />
               </div>
             </div>
           )}
 
-          {/* if category goverment regulation is Holiday we must know in 5 days work or 6 */}
-          {selectedCategory === "Holiday" &&
-            selectedType === "Government Regulation" && (
-              <div className="flex flex-col w-full gap-[15px]">
-                <Label>Workweek Duration</Label>
+          {/* if type is goverment regulation we must know in 5 days work or 6 */}
+          {selectedType === "Government Regulation" &&
+            selectedCategory === "Holiday" && !!selectedCategory &&(
+              <div className="gap-[30px] flex flex-col">
+                {/* overtime calculation */}
                 <RadioGroup
-                  defaultValue="default"
+                  onValueChange={(value) => setWorkWeekDuration(Number(value))}
                   className="flex flex-col gap-5"
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="5" id="5" />
-                    <Label htmlFor="r1">5 days in a week</Label>
+                    <Label htmlFor="5">5 days in a week</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="6" id="6" />
-                    <Label htmlFor="r2">6 days in a week</Label>
+                    <Label htmlFor="6">6 days in a week</Label>
                   </div>
                 </RadioGroup>
               </div>
             )}
+
+          {selectedType === "Government Regulation" && (
+            <div className="gap-[30px] flex flex-col">
+              <div className="flex flex-col w-full gap-2 ">
+                <Label>Formula</Label>
+                <Textarea
+                  id="ovt_formula"
+                  name="ovt_formula"
+                  value={formulaText}
+                  readOnly
+                  disabled
+                  className="bg-neutral-100 text-neutral-900 whitespace-pre-line"
+                />
+              </div>
+            </div>
+          )}
         </Card>
 
         {/* Action Buttons */}
@@ -202,7 +236,7 @@ export default function AddOvertimeSetting() {
           <Button
             variant="outline"
             className="w-[98px]"
-            onClick={() => router.push("/overtime/settings")}
+            onClick={() => router.push("/overtime/setting")}
           >
             Cancel
           </Button>
@@ -213,4 +247,44 @@ export default function AddOvertimeSetting() {
       </Card>
     </Sidebar>
   );
+}
+
+{
+  /* {selectedType === "Company Regulation" && (
+  <div className="flex flex-col gap-[30px]">
+    <div className="flex flex-col gap-[15px]">
+      <Label>Choose Formula Type</Label>
+      <RadioGroup
+        value={selectedFormula}
+        onValueChange={(val) => setSelectedFormula(val)}
+        className="flex flex-col gap-5"
+      >
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="f1" id="default" />
+          <Label htmlFor="default">Formula 1</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="f2" id="default" />
+          <Label htmlFor="default">Formula 2</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="custom" id="custom" />
+          <Label htmlFor="custom">Custom Formula</Label>
+        </div>
+      </RadioGroup>
+    </div>
+    {selectedFormula === "custom" && (
+      <div className="flex flex-col w-full gap-2">
+        <Label>Custom Formula</Label>
+        <Input
+          type="text"
+          id="custom_formula"
+          name="custom_formula"
+          placeholder="Enter custom formula"
+          required
+        />
+      </div>
+    )}
+  </div>
+)} */
 }

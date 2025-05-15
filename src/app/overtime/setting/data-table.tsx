@@ -35,7 +35,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [globalFilter, setGlobalFilter] = React.useState(""); // Add the globalFilter state
+  const [globalFilter, setGlobalFilter] = React.useState(""); 
   const table = useReactTable({
     data,
     columns,
@@ -47,11 +47,7 @@ export function DataTable<TData, TValue>({
       columnFilters,
       globalFilter,
     },
-    onGlobalFilterChange: setGlobalFilter, // Update globalFilter on change
-    globalFilterFn: (row, filterValue) => {
-      const name = row.getValue("name")?.toString().toLowerCase() || "";
-      return name.includes(filterValue.toLowerCase());
-    },
+    onGlobalFilterChange: setGlobalFilter,
   });
 
   const router = useRouter();
@@ -78,7 +74,7 @@ export function DataTable<TData, TValue>({
           <Button
             className="w-[80px] cursor-pointer"
             variant="default"
-            onClick={() => router.push("/overtime/settings/add")}
+            onClick={() => router.push("/overtime/setting/add")}
           >
             <svg
               width="15"

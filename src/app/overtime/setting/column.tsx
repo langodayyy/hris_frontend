@@ -16,11 +16,14 @@ import {
 } from "@/components/ui/alert-dialog";
 
 type OvertimeSettingsRecord = {
-  id_ovt_setting: string;
+  id: string;
   name: string;
   type: string;
+  category: string;
+  work_day: number;
   calculation: number;
   rate: number;
+  formula: string;
 };
 
 export const OvertimeSettingsColumn = (
@@ -49,18 +52,30 @@ export const OvertimeSettingsColumn = (
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
+    cell: ({ row }) => <div className="text-start">{row.getValue("name")}</div>,
   },
   {
     accessorKey: "type",
     header: "Type",
   },
   {
+    accessorKey: "category",
+    header: "Category",
+  },
+  {
+    accessorKey: "work_day",
+    header: "Working Day",
+    cell: ({getValue}) => {
+      const value = getValue();
+      return value == null ? '-' : `${value} days`;
+    }
+  },
+  {
     accessorKey: "calculation",
     header: "Calculation",
     cell: ({ getValue }) => {
       const value = getValue();
-      return `per ${Number(value ?? 0)} hour`;
+      return value == null ? '-' : `per ${Number(value)} hour`;
     },
   },
   {
@@ -68,7 +83,19 @@ export const OvertimeSettingsColumn = (
     header: "Overtime Rate",
     cell: ({ getValue }) => {
       const value = getValue();
-      return `IDR ${Number(value ?? 0).toLocaleString("id-ID")}`;
+      return value == null ? '-' : `IDR ${Number(value ?? 0).toLocaleString("id-ID")}`;
+    },
+  },
+  {
+    accessorKey: "formula",
+    header: "Formula",
+    cell: ({ getValue }) => {
+      const value = getValue();
+      return (
+        <div style={{ whiteSpace: "pre-line" }}>
+          {value ? String(value) : "-"}
+        </div>
+      );
     },
   },
   {
