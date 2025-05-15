@@ -9,9 +9,9 @@ import { Pie, PieChart } from "recharts";
 
 // fetch data from db here
 const chartDataPieFromDB = [
-  { status_type: "Waiting Approval", value: 275 },
-  { status_type: "Approved", value: 200 },
-  { status_type: "Rejected", value: 187 },
+  { status_type: "Waiting Approval", value: 30 },
+  { status_type: "Approved", value: 10 },
+  { status_type: "Rejected", value: 20 },
 ];
 
 // make a new const variable in addition of fill
@@ -71,9 +71,9 @@ const dataSummary = chartDataPie.reduce((summary, item) => {
   return summary;
 }, {} as Record<string, string>);
 
-export function ApprovalCheckClock() {
+export function OvertimeApprovalToday() {
   return (
-    <Card className="flex flex-col py-0 gap-0 max-h-[251px]">
+    <Card className="flex flex-col py-0 gap-0">
       <CardContent className="flex flex-row w-full pb-0">
         <ChartContainer
           config={chartPieConfig}
@@ -90,9 +90,9 @@ export function ApprovalCheckClock() {
         <div className="py-[20px] w-full">
           <div className="border-b-1 border-b-black pb-[20px]">
             <div className="font-medium text-base text-[#acacac]">
-              Check Clock Statistic
+              Overtime Statistic
             </div>
-            <div className="font-bold text-lg">Approval Status Today</div>
+            <div className="font-bold text-lg">Overtime Approval Today</div>
           </div>
 
           {/* return the data summary */}

@@ -20,6 +20,7 @@ import { YearsofWorks } from "@/components/custom/dashboardChart/YearsofWorks";
 import { CurrentEmployee } from "@/components/custom/dashboardChart/CurrentEmployee";
 import { EmployeeWorkStatus } from "@/components/custom/dashboardChart/EmployeeWorkStatus";
 import { CheckClockListToday } from "@/components/custom/dashboardChart/CheckClockListToday";
+import { OvertimeApprovalToday } from "@/components/custom/dashboardChart/OvertimeApprovalToday";
 
 export default function Dashboard() {
   return (
@@ -171,10 +172,13 @@ export default function Dashboard() {
         </Card>
       </div>
       {/* Chart */}
-      <div className="grid grid-cols-2 gap-[30px]">
-        <div className="cols-span-1 grid gap-[30px]">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-[30px]">
+        <div className="flex flex-col cols-span-1 gap-y-[30px]">
           {/* pie chart checkclock approval  */}
           <ApprovalCheckClock></ApprovalCheckClock>
+
+          {/* pie chart attendance status today */}
+          <AttendaceStatusToday></AttendaceStatusToday>
 
           {/* bar chart horizontal current number of employee (new, active, resigned)*/}
           <CurrentEmployee></CurrentEmployee>
@@ -185,13 +189,15 @@ export default function Dashboard() {
           {/* pie chart maritial status  */}
           <MaritalStatus></MaritalStatus>
 
-          {/* pie chart attendance status today */}
-          <AttendaceStatusToday></AttendaceStatusToday>
-
+          {/* pie chart years of works */}
+          <YearsofWorks></YearsofWorks>
         </div>
-        <div className="cols-span-1 grid gap-[30px]">
+        <div className="flex flex-col cols-span-1 gap-y-[30px]">
           {/* table late, absence, leave employee today  */}
           <CheckClockListToday></CheckClockListToday>
+
+          {/* pie chart overtime approval today  */}
+          <OvertimeApprovalToday></OvertimeApprovalToday>
 
           {/* bar chart vertical employee type status (magang, tetap, pkwt, kontrak) */}
           <EmployeeWorkStatus></EmployeeWorkStatus>
@@ -202,8 +208,6 @@ export default function Dashboard() {
           {/* pie chart religion */}
           <Religion></Religion>
 
-          {/* pie chart years of works */}
-          <YearsofWorks></YearsofWorks>
         </div>
       </div>
     </Sidebar>
