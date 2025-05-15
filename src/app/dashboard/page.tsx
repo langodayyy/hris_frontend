@@ -25,6 +25,9 @@ import { AttendaceStatusToday } from "@/components/custom/dashboardChart/Attenda
 import { Age } from "@/components/custom/dashboardChart/Age";
 import { Religion } from "@/components/custom/dashboardChart/Religion";
 import { YearsofWorks } from "@/components/custom/dashboardChart/YearsofWorks";
+import { CurrentEmployee } from "@/components/custom/dashboardChart/CurrentEmployee";
+import { EmployeeWorkStatus } from "@/components/custom/dashboardChart/EmployeeWorkStatus";
+import { CheckClockListToday } from "@/components/custom/dashboardChart/CheckClockListToday";
 // import RealTimeChart from "@/components/custom/dashboardChart/Chart";
 
 const chartDataPie = [
@@ -224,6 +227,7 @@ export default function Dashboard() {
           <ApprovalCheckClock></ApprovalCheckClock>
 
           {/* bar chart horizontal current number of employee (new, active, resigned)*/}
+          <CurrentEmployee></CurrentEmployee>
 
           {/* pie chart gender */}
           <Gender></Gender>
@@ -237,23 +241,10 @@ export default function Dashboard() {
         </div>
         <div className="cols-span-1 grid gap-[30px]">
           {/* table late, absence, leave employee today  */}
-          {/* <ChartContainer config={chartConfig} className="max-h-[500px] w-full">
-            <BarChart accessibilityLayer data={chartData}>
-              <CartesianGrid vertical={true} />
-              <XAxis
-                dataKey="month"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                tickFormatter={(value) => value.slice(0, 3)}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-              <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
-            </BarChart>
-          </ChartContainer> */}
+          <CheckClockListToday></CheckClockListToday>
 
           {/* bar chart vertical employee type status (magang, tetap, pkwt, kontrak) */}
+          <EmployeeWorkStatus></EmployeeWorkStatus>
 
           {/* pie chart age */}
           <Age></Age>
