@@ -52,7 +52,7 @@ export default function AddOvertimeSetting() {
           item.from_hour === item.to_hour
             ? `${item.from_hour} hour`
             : `${item.from_hour}–${item.to_hour} hour`;
-        return `${hourRange} = ${item.multiplier} x ( basic salary / 173))`;
+        return `${hourRange} = ${item.multiplier} x ( monthly salary / 173))`;
       })
       .join("\n");
 

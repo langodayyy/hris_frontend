@@ -123,7 +123,7 @@ export const overtimeSettingSample= [
     work_day: 5,
     calculation: null,
     rate: null,
-    formula: "Hour 1: 1.5 × (basic salary / 173)\nHour 2 and above: 2 × (basic salary / 173)",
+    formula: "Hour 1: 1.5 × (monthly salary / 173)\nHour 2 and above: 2 × (monthly salary / 173)",
   },
   {
     id: 2,
@@ -134,7 +134,7 @@ export const overtimeSettingSample= [
     calculation: null,
     rate: null,
     formula:
-      "Hour 1–7: 2 × (basic salary / 173)\nHour 8: 3 × (basic salary / 173)\nHour 9–10: 4 × (basic salary / 173)",
+      "Hour 1–7: 2 × (monthly salary / 173)\nHour 8: 3 × (monthly salary / 173)\nHour 9–10: 4 × (monthly salary / 173)",
   },
   {
     id: 3,
@@ -145,7 +145,7 @@ export const overtimeSettingSample= [
     calculation: null,
     rate: null,
     formula:
-      "    Hour 1–5: 2 × (basic salary / 173)\nHour 6: 3 × (basic salary / 173)\nHour 7–8: 4 × (basic salary / 173)",
+      "    Hour 1–5: 2 × (monthly salary / 173)\nHour 6: 3 × (monthly salary / 173)\nHour 7–8: 4 × (monthly salary / 173)",
   },
   {
     id: 4,
@@ -156,7 +156,7 @@ export const overtimeSettingSample= [
     calculation: null,
     rate: null,
     formula:
-      "Hour 1–8: 2 × (basic salary / 173)\nHour 9: 3 × (basic salary / 173)\nHour 10–11: 4 × (basic salary / 173)",
+      "Hour 1–8: 2 × (monthly salary / 173)\nHour 9: 3 × (monthly salary / 173)\nHour 10–11: 4 × (monthly salary / 173)",
   },
   {
     id: 5,
