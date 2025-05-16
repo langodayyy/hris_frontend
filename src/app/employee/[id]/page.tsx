@@ -10,12 +10,12 @@ export default function EmployeeDetails(){
     return (
         <Sidebar title="Employee Details">
             <div className="flex flex-col gap-[30px]">
-                <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
+                {/* <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
                     <div className="w-full mx-[20px] mb-[-10px]">
                             <h2 className="justify-center w-full text-lg font-medium whitespace-nowrap mx-[10px]">Employee Details</h2>
-                    </div>
+                    </div> */}
                     <div>
-                        <Card className="flex-1 mx-[20px] gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
+                        <Card className="flex-1 gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
                        
                             <div className="flex mx-[20px] items-center">
                                 <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -46,7 +46,7 @@ export default function EmployeeDetails(){
 
                         </Card>
                     </div>     
-                </Card>
+                {/* </Card> */}
                 <EmployeeDocuments></EmployeeDocuments>
              </div>
         </Sidebar>

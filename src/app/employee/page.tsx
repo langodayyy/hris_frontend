@@ -29,16 +29,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
-import React, { useState } from "react";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+  } from "@/components/ui/dialog"
+  import { Label } from "@/components/ui/label";
+import React, { useRef, useState } from "react";
 import Link from "next/link";
+import { FileUploader } from "@/components/ui/fileUploader";
+import { randomInt } from "crypto";
 
 const dummyEmployees = Array.from({ length: 1000 }, (_, i) => ({
   no: i + 1,
+  id: `emp-${i + 1}`,
   name: `Employee ${i + 1}`,
   gender: i % 2 === 0 ? "Male" : "Female",
   phone: `6287822742996`,
-  branch: ["Jakarta", "Bandung", "Surabaya", "Medan", "Bali"][i % 5],
+  worktype: ["WFO", "WFH", "Hybrid"][i % 3],
   position: ["CEO", "Manager", "Staff", "Supervisor", "Assistant"][i % 5],
   type: ["Permanent", "Contract", "Intern", "Probationary"][i % 4],
   status: i % 3 === 0 ? "Inactive" : "Active",
@@ -79,6 +92,19 @@ export default function Employee() {
     startPage = Math.max(1, endPage - maxVisiblePages + 1);
   }
 
+
+
+  const formRef = useRef<HTMLFormElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileDrop = (files: File[]) => {
+    // Saat file di-drop, masukkan ke input file manual (untuk FormData)
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(files[0]);
+    if (fileInputRef.current) {
+      fileInputRef.current.files = dataTransfer.files;
+    }
+  };
   return (
     <Sidebar title="Employee Database">
       <div className="w-full">
@@ -174,36 +200,197 @@ export default function Employee() {
 
                     Filters
                   </Button>
-                  <Button className="w-[100px]" variant="outline" size="lg">
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g clipPath="url(#clip0_462_2148)">
-                    <path d="M6.17401 11.3263C6.34814 11.5005 6.55489 11.6387 6.78245 11.733C7.01002 11.8273 7.25393 11.8759 7.50026 11.8759C7.74659 11.8759 7.99051 11.8273 8.21807 11.733C8.44564 11.6387 8.65239 11.5005 8.82651 11.3263L10.8334 9.31938C10.941 9.20037 10.9987 9.04455 10.9946 8.88416C10.9905 8.72378 10.9248 8.57112 10.8113 8.45779C10.6977 8.34447 10.5449 8.27916 10.3845 8.27538C10.2241 8.2716 10.0684 8.32965 9.94964 8.4375L8.12089 10.2669L8.12526 0.625C8.12526 0.45924 8.05941 0.300269 7.9422 0.183058C7.82499 0.065848 7.66602 0 7.50026 0V0C7.3345 0 7.17553 0.065848 7.05832 0.183058C6.94111 0.300269 6.87526 0.45924 6.87526 0.625L6.86964 10.255L5.05089 8.4375C4.93361 8.32031 4.77459 8.2545 4.60879 8.25456C4.443 8.25462 4.28402 8.32054 4.16683 8.43781C4.04963 8.55509 3.98383 8.71412 3.98389 8.87991C3.98395 9.0457 4.04986 9.20468 4.16714 9.32188L6.17401 11.3263Z" fill="currentColor"/>
-                    <path d="M14.375 9.99991C14.2092 9.99991 14.0503 10.0658 13.9331 10.183C13.8158 10.3002 13.75 10.4591 13.75 10.6249V13.1249C13.75 13.2907 13.6842 13.4496 13.5669 13.5668C13.4497 13.6841 13.2908 13.7499 13.125 13.7499H1.875C1.70924 13.7499 1.55027 13.6841 1.43306 13.5668C1.31585 13.4496 1.25 13.2907 1.25 13.1249V10.6249C1.25 10.4591 1.18415 10.3002 1.06694 10.183C0.949732 10.0658 0.79076 9.99991 0.625 9.99991C0.45924 9.99991 0.300269 10.0658 0.183058 10.183C0.065848 10.3002 0 10.4591 0 10.6249L0 13.1249C0 13.6222 0.197544 14.0991 0.549175 14.4507C0.900805 14.8024 1.37772 14.9999 1.875 14.9999H13.125C13.6223 14.9999 14.0992 14.8024 14.4508 14.4507C14.8025 14.0991 15 13.6222 15 13.1249V10.6249C15 10.4591 14.9342 10.3002 14.8169 10.183C14.6997 10.0658 14.5408 9.99991 14.375 9.99991Z" fill="currentColor"/>
-                    </g>
-                    <defs>
-                    <clipPath id="clip0_462_2148">
-                    <rect width="15" height="15" fill="white"/>
-                    </clipPath>
-                    </defs>
-                    </svg>
+                  <Dialog>
+                      <DialogTrigger asChild>
+                        <Button className="w-[100px]" variant="outline" size="lg">
+                          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g clipPath="url(#clip0_462_2148)">
+                          <path d="M6.17401 11.3263C6.34814 11.5005 6.55489 11.6387 6.78245 11.733C7.01002 11.8273 7.25393 11.8759 7.50026 11.8759C7.74659 11.8759 7.99051 11.8273 8.21807 11.733C8.44564 11.6387 8.65239 11.5005 8.82651 11.3263L10.8334 9.31938C10.941 9.20037 10.9987 9.04455 10.9946 8.88416C10.9905 8.72378 10.9248 8.57112 10.8113 8.45779C10.6977 8.34447 10.5449 8.27916 10.3845 8.27538C10.2241 8.2716 10.0684 8.32965 9.94964 8.4375L8.12089 10.2669L8.12526 0.625C8.12526 0.45924 8.05941 0.300269 7.9422 0.183058C7.82499 0.065848 7.66602 0 7.50026 0V0C7.3345 0 7.17553 0.065848 7.05832 0.183058C6.94111 0.300269 6.87526 0.45924 6.87526 0.625L6.86964 10.255L5.05089 8.4375C4.93361 8.32031 4.77459 8.2545 4.60879 8.25456C4.443 8.25462 4.28402 8.32054 4.16683 8.43781C4.04963 8.55509 3.98383 8.71412 3.98389 8.87991C3.98395 9.0457 4.04986 9.20468 4.16714 9.32188L6.17401 11.3263Z" fill="currentColor"/>
+                          <path d="M14.375 9.99991C14.2092 9.99991 14.0503 10.0658 13.9331 10.183C13.8158 10.3002 13.75 10.4591 13.75 10.6249V13.1249C13.75 13.2907 13.6842 13.4496 13.5669 13.5668C13.4497 13.6841 13.2908 13.7499 13.125 13.7499H1.875C1.70924 13.7499 1.55027 13.6841 1.43306 13.5668C1.31585 13.4496 1.25 13.2907 1.25 13.1249V10.6249C1.25 10.4591 1.18415 10.3002 1.06694 10.183C0.949732 10.0658 0.79076 9.99991 0.625 9.99991C0.45924 9.99991 0.300269 10.0658 0.183058 10.183C0.065848 10.3002 0 10.4591 0 10.6249L0 13.1249C0 13.6222 0.197544 14.0991 0.549175 14.4507C0.900805 14.8024 1.37772 14.9999 1.875 14.9999H13.125C13.6223 14.9999 14.0992 14.8024 14.4508 14.4507C14.8025 14.0991 15 13.6222 15 13.1249V10.6249C15 10.4591 14.9342 10.3002 14.8169 10.183C14.6997 10.0658 14.5408 9.99991 14.375 9.99991Z" fill="currentColor"/>
+                          </g>
+                          <defs>
+                          <clipPath id="clip0_462_2148">
+                          <rect width="15" height="15" fill="white"/>
+                          </clipPath>
+                          </defs>
+                          </svg>
 
-                    Export
-                  </Button>
-                  <Button className="w-[100px]" variant="outline" size="lg">
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g clipPath="url(#clip0_462_2152)">
-                    <path d="M13.75 9.99963V13.1246C13.75 13.2904 13.6842 13.4494 13.5669 13.5666C13.4497 13.6838 13.2908 13.7496 13.125 13.7496H1.875C1.70924 13.7496 1.55027 13.6838 1.43306 13.5666C1.31585 13.4494 1.25 13.2904 1.25 13.1246V9.99963H0V13.1246C0 13.6219 0.197544 14.0988 0.549175 14.4505C0.900805 14.8021 1.37772 14.9996 1.875 14.9996H13.125C13.6223 14.9996 14.0992 14.8021 14.4508 14.4505C14.8025 14.0988 15 13.6219 15 13.1246V9.99963H13.75Z" fill="currentColor"/>
-                    <path d="M7.47924 -0.00014548C7.23311 -0.000823982 6.98926 0.0470776 6.76168 0.140814C6.53409 0.23455 6.32725 0.372278 6.15299 0.546105L3.70361 2.99548L4.58736 3.87923L6.85861 1.6086L6.87486 11.8749H8.12486L8.10861 1.61735L10.3705 3.87923L11.2542 2.99548L8.80486 0.546105C8.63072 0.372297 8.42398 0.234576 8.1965 0.140838C7.96902 0.0471004 7.72527 -0.000809992 7.47924 -0.00014548Z" fill="currentColor"/>
-                    </g>
-                    <defs>
-                    <clipPath id="clip0_462_2152">
-                    <rect width="15" height="15" fill="white"/>
-                    </clipPath>
-                    </defs>
-                    </svg>
+                          Export
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="bg-white !max-w-[726px]">
+                          <DialogHeader>
+                              <DialogTitle>Export Employee</DialogTitle>
+                              <DialogDescription>
+                                  
+                                  
+                              </DialogDescription>
+                          </DialogHeader>
+                          <div>
+                              <form action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data">
+                                  <div className="flex flex-col gap-[15px] mt-[15px]">
+                                      <div className="flex gap-[15px]">
+                                        <div className="flex flex-col flex-1 gap-[8px]">
+                                          <Label htmlFor="department">Department</Label>
+                                          <Select defaultValue="semua">
+                                              <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
+                                                  <SelectValue placeholder="Select department" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                  <SelectItem value="semua">Semua</SelectItem>
+                                                  <SelectItem value="department_a">Department A</SelectItem>
+                                                  <SelectItem value="department_b">Department B</SelectItem>
+                                                  <SelectItem value="department_c">Department C</SelectItem>
+                                                  <SelectItem value="department_d">Department D</SelectItem>
+                                              </SelectContent>
+                                          </Select>
+                                        </div>
+                                        <div className="flex flex-col flex-1 gap-[8px]">
+                                          <Label htmlFor="position">Position</Label>
+                                          <Select defaultValue="semua">
+                                              <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
+                                                  <SelectValue placeholder="Select position" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="semua">Semua</SelectItem>
+                                                  <SelectItem value="position_a">Position A</SelectItem>
+                                                  <SelectItem value="position_b">Position B</SelectItem>
+                                                  <SelectItem value="position_c">Position C</SelectItem>
+                                                  <SelectItem value="position_d">Position D</SelectItem>
+                                              </SelectContent>
+                                          </Select>
+                                        </div>
+                                      </div>
+                                      <div className="flex gap-[15px]">
+                                         <div className="flex flex-col flex-1 gap-[8px]">
+                                          <Label htmlFor="type">Type</Label>
+                                          <Select defaultValue="semua">
+                                              <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
+                                                  <SelectValue placeholder="Select Type" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="semua">Semua</SelectItem>
+                                                  <SelectItem value="type_a">Type A</SelectItem>
+                                                  <SelectItem value="type_b">Type B</SelectItem>
+                                                  <SelectItem value="type_c">Type C</SelectItem>
+                                                  <SelectItem value="type_d">Type D</SelectItem>
+                                              </SelectContent>
+                                          </Select>
+                                        </div>
+                                        <div className="flex flex-col flex-1 gap-[8px]">
+                                          <Label htmlFor="status">Status</Label>
+                                          <Select defaultValue="semua">
+                                              <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
+                                                  <SelectValue placeholder="Select Status" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                  <SelectItem value="semua">Semua</SelectItem>
+                                                  <SelectItem value="status_a">Status A</SelectItem>
+                                                  <SelectItem value="status_b">Status B</SelectItem>
+                                                  <SelectItem value="status_c">Status C</SelectItem>
+                                                  <SelectItem value="status_d">Status D</SelectItem>
+                                              </SelectContent>
+                                          </Select>
+                                        </div>
+                                       
+                                      </div>
+                                        
+                                      <div className="flex gap-[10px] justify-end">
+                                          <div>
+                                              <DialogClose asChild>
+                                                  <Button className="w-[80px]" variant="outline" size="lg" type="button">
+                                                      Cancel
+                                                  </Button>
+                                              </DialogClose>
+                                          </div>
+                                          
+                                          <Button className="w-[100px]" variant="default" type="submit">
+                                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <g clipPath="url(#clip0_462_2148)">
+                                            <path d="M6.17401 11.3263C6.34814 11.5005 6.55489 11.6387 6.78245 11.733C7.01002 11.8273 7.25393 11.8759 7.50026 11.8759C7.74659 11.8759 7.99051 11.8273 8.21807 11.733C8.44564 11.6387 8.65239 11.5005 8.82651 11.3263L10.8334 9.31938C10.941 9.20037 10.9987 9.04455 10.9946 8.88416C10.9905 8.72378 10.9248 8.57112 10.8113 8.45779C10.6977 8.34447 10.5449 8.27916 10.3845 8.27538C10.2241 8.2716 10.0684 8.32965 9.94964 8.4375L8.12089 10.2669L8.12526 0.625C8.12526 0.45924 8.05941 0.300269 7.9422 0.183058C7.82499 0.065848 7.66602 0 7.50026 0V0C7.3345 0 7.17553 0.065848 7.05832 0.183058C6.94111 0.300269 6.87526 0.45924 6.87526 0.625L6.86964 10.255L5.05089 8.4375C4.93361 8.32031 4.77459 8.2545 4.60879 8.25456C4.443 8.25462 4.28402 8.32054 4.16683 8.43781C4.04963 8.55509 3.98383 8.71412 3.98389 8.87991C3.98395 9.0457 4.04986 9.20468 4.16714 9.32188L6.17401 11.3263Z" fill="currentColor"/>
+                                            <path d="M14.375 9.99991C14.2092 9.99991 14.0503 10.0658 13.9331 10.183C13.8158 10.3002 13.75 10.4591 13.75 10.6249V13.1249C13.75 13.2907 13.6842 13.4496 13.5669 13.5668C13.4497 13.6841 13.2908 13.7499 13.125 13.7499H1.875C1.70924 13.7499 1.55027 13.6841 1.43306 13.5668C1.31585 13.4496 1.25 13.2907 1.25 13.1249V10.6249C1.25 10.4591 1.18415 10.3002 1.06694 10.183C0.949732 10.0658 0.79076 9.99991 0.625 9.99991C0.45924 9.99991 0.300269 10.0658 0.183058 10.183C0.065848 10.3002 0 10.4591 0 10.6249L0 13.1249C0 13.6222 0.197544 14.0991 0.549175 14.4507C0.900805 14.8024 1.37772 14.9999 1.875 14.9999H13.125C13.6223 14.9999 14.0992 14.8024 14.4508 14.4507C14.8025 14.0991 15 13.6222 15 13.1249V10.6249C15 10.4591 14.9342 10.3002 14.8169 10.183C14.6997 10.0658 14.5408 9.99991 14.375 9.99991Z" fill="currentColor"/>
+                                            </g>
+                                            <defs>
+                                            <clipPath id="clip0_462_2148">
+                                            <rect width="15" height="15" fill="white"/>
+                                            </clipPath>
+                                            </defs>
+                                            </svg>
+                                              Export
+                                          </Button>
+                                      </div>
+                                  </div>
+                              </form>
+                          </div>
+                      </DialogContent>
+                  </Dialog>
+                  <Dialog>
+                        <DialogTrigger asChild>
+                          <Button className="w-[100px]" variant="outline" size="lg">
+                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g clipPath="url(#clip0_462_2152)">
+                            <path d="M13.75 9.99963V13.1246C13.75 13.2904 13.6842 13.4494 13.5669 13.5666C13.4497 13.6838 13.2908 13.7496 13.125 13.7496H1.875C1.70924 13.7496 1.55027 13.6838 1.43306 13.5666C1.31585 13.4494 1.25 13.2904 1.25 13.1246V9.99963H0V13.1246C0 13.6219 0.197544 14.0988 0.549175 14.4505C0.900805 14.8021 1.37772 14.9996 1.875 14.9996H13.125C13.6223 14.9996 14.0992 14.8021 14.4508 14.4505C14.8025 14.0988 15 13.6219 15 13.1246V9.99963H13.75Z" fill="currentColor"/>
+                            <path d="M7.47924 -0.00014548C7.23311 -0.000823982 6.98926 0.0470776 6.76168 0.140814C6.53409 0.23455 6.32725 0.372278 6.15299 0.546105L3.70361 2.99548L4.58736 3.87923L6.85861 1.6086L6.87486 11.8749H8.12486L8.10861 1.61735L10.3705 3.87923L11.2542 2.99548L8.80486 0.546105C8.63072 0.372297 8.42398 0.234576 8.1965 0.140838C7.96902 0.0471004 7.72527 -0.000809992 7.47924 -0.00014548Z" fill="currentColor"/>
+                            </g>
+                            <defs>
+                            <clipPath id="clip0_462_2152">
+                            <rect width="15" height="15" fill="white"/>
+                            </clipPath>
+                            </defs>
+                            </svg>
 
-                    Import
-                  </Button>
+                            Import
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-white !max-w-[726px]">
+                            <DialogHeader>
+                                <DialogTitle>Import Employee</DialogTitle>
+                                <DialogDescription>
+                                    
+                                    
+                                </DialogDescription>
+                            </DialogHeader>
+                            <form
+                              ref={formRef}
+                              action="https://httpbin.org/post"
+                              method="POST"
+                              target="_blank"
+                              encType="multipart/form-data"
+                              className="space-y-4"
+                            >
+                              {/* FileUploader tetap digunakan untuk UI, tapi file dimasukkan ke input tersembunyi */}
+                              <FileUploader
+                                onDrop={handleFileDrop}
+                                accept={{ "text/csv": [".csv"] }}
+                                type="Only support .csv file"
+                                label="Drag your CSV file or"
+                                description="Max 5 MB CSV file is allowed"
+                              />
+
+                              {/* Input file tersembunyi, tetap dibutuhkan untuk form submit */}
+                              <input
+                                type="employee_csv"
+                                name="employee_csv"
+                                accept=".csv"
+                                ref={fileInputRef}
+                                hidden
+                              />
+                                <div className="flex gap-[10px] justify-end">
+                                  <div>
+                                      <DialogClose asChild>
+                                          <Button className="w-[80px]" variant="outline" size="lg" type="button">
+                                              Cancel
+                                          </Button>
+                                      </DialogClose>
+                                  </div>
+                                  <Button className="w-[80px]" variant="default" type="submit">Submit</Button>
+                                </div>
+                            </form>
+
+                        </DialogContent>
+                    </Dialog>
+                  
+                  
                   <Link href="/employee/add">
                     <Button className="w-[80px]" variant="default" >
                       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -214,7 +401,7 @@ export default function Employee() {
                       Add
                     </Button>
                   </Link>
-                 
+                  
                 </div>
               </div>
               <div className="min-w-[1000px]">
@@ -225,10 +412,10 @@ export default function Employee() {
                       <TableHead className="w-[20%] min-w-[200px] !text-left">Employee Name</TableHead>
                       <TableHead className="w-[10%] min-w-[100px]">Gender</TableHead>
                       <TableHead className="w-[15%] min-w-[150px]">Mobile Number</TableHead>
-                      <TableHead className="w-[15%] min-w-[150px]">Branch</TableHead>
                       <TableHead className="w-[15%] min-w-[150px]">Position</TableHead>
                       <TableHead className="w-[10%] min-w-[120px]">Type</TableHead>
                       <TableHead className="w-[10%] min-w-[120px]">Status</TableHead>
+                         <TableHead className="w-[10%] min-w-[150px]">Work Type</TableHead>
                       <TableHead className="rounded-tr-lg w-[10%] min-w-[120px]">Details</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -240,12 +427,12 @@ export default function Employee() {
                         <TableCell className="!text-left">{employee.name}</TableCell>
                         <TableCell>{employee.gender}</TableCell>
                         <TableCell>{employee.phone}</TableCell>
-                        <TableCell>{employee.branch}</TableCell>
                         <TableCell>{employee.position}</TableCell>
                         <TableCell>{employee.type}</TableCell>
                         <TableCell>{employee.status}</TableCell>
+                        <TableCell>{employee.worktype}</TableCell>
                         <TableCell>
-                          <Link href="/employee/details">
+                          <Link href={"/employee/" + employee.id}>
                             <Button variant="outline" size="sm">
                               View
                             </Button>
