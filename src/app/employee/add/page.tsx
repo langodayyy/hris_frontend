@@ -72,7 +72,7 @@ export default function AddEmployee() {
                                 onChange={handleFileChange}
                                 />
                                 {/* Label triggers file input */}
-                                <Button asChild variant="default">
+                                <Button variant="default">
                                     <label htmlFor="avatarInput" className="cursor-pointer">Upload Avatar</label>
                                 </Button>
 

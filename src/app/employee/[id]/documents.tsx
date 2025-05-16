@@ -34,9 +34,13 @@ import {
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
+
+  
 const dummyDocuments = Array.from({ length: 1000 }, (_, i) => ({
     no: i + 1,
+    id: `doc-${i + 1}`,
     name: `Document ${i + 1}`,
     type: i % 2 === 0 ? "Information" : "Identity",
     number: i,
@@ -80,8 +84,10 @@ const EmployeeDocuments = () => {
     startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
-       
+    const params = useParams();
+
     return (
+        
         <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
             <CardContent>
             {/* Header: Title - Search - Button */}
@@ -148,7 +154,7 @@ const EmployeeDocuments = () => {
                         <TableCell>{document.expiry_date}</TableCell>
                         <TableCell>{document.status}</TableCell>
                         <TableCell>
-                        <Link href="">
+                        <Link href={params.id+"/document/"+document.id}>
                         <Button variant="outline" size="sm">
                             View
                         </Button>

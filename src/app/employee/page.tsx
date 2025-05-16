@@ -40,17 +40,18 @@ import {
   DialogClose,
   } from "@/components/ui/dialog"
   import { Label } from "@/components/ui/label";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Link from "next/link";
-import Link from "next/link";
+import { FileUploader } from "@/components/ui/fileUploader";
+import { randomInt } from "crypto";
 
 const dummyEmployees = Array.from({ length: 1000 }, (_, i) => ({
   no: i + 1,
+  id: `emp-${i + 1}`,
   name: `Employee ${i + 1}`,
   gender: i % 2 === 0 ? "Male" : "Female",
   phone: `6287822742996`,
-  phone: `6287822742996`,
-  branch: ["Jakarta", "Bandung", "Surabaya", "Medan", "Bali"][i % 5],
+  worktype: ["WFO", "WFH", "Hybrid"][i % 3],
   position: ["CEO", "Manager", "Staff", "Supervisor", "Assistant"][i % 5],
   type: ["Permanent", "Contract", "Intern", "Probationary"][i % 4],
   status: i % 3 === 0 ? "Inactive" : "Active",
@@ -93,24 +94,18 @@ export default function Employee() {
 
 
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-    if (file.type !== "text/csv" && !file.name.endsWith(".csv")) {
-      alert("Only CSV files are allowed.");
-      return;
+  const handleFileDrop = (files: File[]) => {
+    // Saat file di-drop, masukkan ke input file manual (untuk FormData)
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(files[0]);
+    if (fileInputRef.current) {
+      fileInputRef.current.files = dataTransfer.files;
     }
-
-    setSelectedFile(file);
   };
   return (
-    <Sidebar title="Employee Database">
-      <div className="w-full">
-        <div className="flex flex-wrap justify-center gap-[30px] min-h-[141px] w-full mx-auto">
-          <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
     <Sidebar title="Employee Database">
       <div className="w-full">
         <div className="flex flex-wrap justify-center gap-[30px] min-h-[141px] w-full mx-auto">
@@ -130,7 +125,6 @@ export default function Employee() {
             </div>
           </Card>
           <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
-          <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
           <div className="flex-col mt-[-5px] mx-[10px]">
               <div className="flex w-full h-[44px] items-center gap-[10px] mx-[20px]">
                 <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -141,7 +135,6 @@ export default function Employee() {
               <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{dummyEmployees.length}</p>
             </div>
           </Card>
-          <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
           <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
           <div className="flex-col mt-[-5px] mx-[10px]">
               <div className="flex w-full h-[44px] items-center gap-[10px] mx-[20px]">
@@ -155,7 +148,6 @@ export default function Employee() {
               <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">200</p>
             </div>
           </Card>
-          <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
           <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
           <div className="flex-col mt-[-5px] mx-[10px]">
               <div className="flex w-full h-[44px] items-center gap-[10px] mx-[20px]">
@@ -171,16 +163,12 @@ export default function Employee() {
           </Card>
         </div>
         <div className="mt-[30px] w-full overflow-x-auto">
-        <div className="mt-[30px] w-full overflow-x-auto">
           <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
-            <CardContent className="overflow-x-auto">
             <CardContent className="overflow-x-auto">
               {/* Header: Title - Search - Button */}
               <div className="flex items-center justify-between mb-6 gap-4 min-w-[1000px]">
-              <div className="flex items-center justify-between mb-6 gap-4 min-w-[1000px]">
                 {/* Judul dan Search bar di satu sisi */}
                 <div className="flex items-center gap-4 flex-1">
-                  <h2 className="text-lg font-medium">All Employee Information</h2>
                   <h2 className="text-lg font-medium">All Employee Information</h2>
                   {/* Search input melar */}
                   <div className="flex-1 relative">
@@ -197,13 +185,11 @@ export default function Employee() {
                         setCurrentPage(1);
                       }}
                       className="pl-10 rounded-[8px] bg-[#ff] flex-1 min-w-[300px]"
-                      className="pl-10 rounded-[8px] bg-[#ff] flex-1 min-w-[300px]"
                     />
                   </div>
                 </div>
 
                 {/* Tombol-tombol */}
-                <div className="flex gap-2 min-w-[400px] w-max">
                 <div className="flex gap-2 min-w-[400px] w-max">
                   <Button className="w-[100px]" variant="outline">
                     <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -214,7 +200,6 @@ export default function Employee() {
 
                     Filters
                   </Button>
-        
                   <Dialog>
                       <DialogTrigger asChild>
                         <Button className="w-[100px]" variant="outline" size="lg">
@@ -365,75 +350,46 @@ export default function Employee() {
                                     
                                 </DialogDescription>
                             </DialogHeader>
-                            <div>
-                                <form action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data">
-                                    <div className="flex flex-col gap-[15px] mt-[15px]">
-                                         {/* Input file CSV */}
-                                        
-                                          <Label
-                                            htmlFor="csvFile"
-                                            className="w-full h-40 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center text-gray-500 cursor-pointer hover:border-gray-600"
-                                            onDragOver={(e) => e.preventDefault()}
-                                            onDrop={(e) => {
-                                              e.preventDefault();
-                                              const files = e.dataTransfer.files;
-                                              if (files.length > 1) {
-                                                alert("Only one file can be uploaded.");
-                                                return;
-                                              }
-                                              handleFile(files);
-                                            }}
-                                          >
-                                            <div className="text-center">
-                                              <p className="text-sm">Drag & drop your CSV file here</p>
-                                              <p className="text-sm">or click to browse</p>
-                                              <input
-                                                type="file"
-                                                name="file"
-                                                id="csvFile"
-                                                accept=".csv"
-                                                className="hidden"
-                                                onChange={(e) => {
-                                                  const files = e.target.files;
-                                                  if (files && files.length > 1) {
-                                                    alert("Only one file can be uploaded.");
-                                                    e.target.value = "";
-                                                    return;
-                                                  }
-                                                  handleFile(files);
-                                                }}
-                                                required
-                                              />
-                                            </div>
-                                          </Label>
+                            <form
+                              ref={formRef}
+                              action="https://httpbin.org/post"
+                              method="POST"
+                              target="_blank"
+                              encType="multipart/form-data"
+                              className="space-y-4"
+                            >
+                              {/* FileUploader tetap digunakan untuk UI, tapi file dimasukkan ke input tersembunyi */}
+                              <FileUploader
+                                onDrop={handleFileDrop}
+                                accept={{ "text/csv": [".csv"] }}
+                                type="Only support .csv file"
+                                label="Drag your CSV file or"
+                                description="Max 5 MB CSV file is allowed"
+                              />
 
-                                          {/* File Preview */}
-                                          {selectedFile && (
-                                            <div className="mt-4 text-sm text-gray-700">
-                                              <strong>Selected File:</strong> {selectedFile.name}
-                                            </div>
-                                          )}
-                                    
-                                        
-                                        <div className="flex gap-[10px] justify-end">
-                                            <div>
-                                                <DialogClose asChild>
-                                                    <Button className="w-[80px]" variant="outline" size="lg" type="button">
-                                                        Cancel
-                                                    </Button>
-                                                </DialogClose>
-                                            </div>
-                                            
-                                            <Button className="w-[80px]" variant="default" type="submit">
-                                               
-                                                Next
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
+                              {/* Input file tersembunyi, tetap dibutuhkan untuk form submit */}
+                              <input
+                                type="employee_csv"
+                                name="employee_csv"
+                                accept=".csv"
+                                ref={fileInputRef}
+                                hidden
+                              />
+                                <div className="flex gap-[10px] justify-end">
+                                  <div>
+                                      <DialogClose asChild>
+                                          <Button className="w-[80px]" variant="outline" size="lg" type="button">
+                                              Cancel
+                                          </Button>
+                                      </DialogClose>
+                                  </div>
+                                  <Button className="w-[80px]" variant="default" type="submit">Submit</Button>
+                                </div>
+                            </form>
+
                         </DialogContent>
                     </Dialog>
+                  
                   
                   <Link href="/employee/add">
                     <Button className="w-[80px]" variant="default" >
@@ -450,31 +406,19 @@ export default function Employee() {
               </div>
               <div className="min-w-[1000px]">
                 <Table className="border-separate border-spacing-0 rounded-t-lg table-fixed">
-              <div className="min-w-[1000px]">
-                <Table className="border-separate border-spacing-0 rounded-t-lg table-fixed">
                   <TableHeader className="bg-neutral-50 [&_th]:font-medium [&_th]:text-center [&_th]:p-4 [&_th]:border-b [&_th]:border-r">
                     <TableRow>
                       <TableHead className="rounded-tl-lg w-[5%] min-w-[60px]">No</TableHead>
                       <TableHead className="w-[20%] min-w-[200px] !text-left">Employee Name</TableHead>
                       <TableHead className="w-[10%] min-w-[100px]">Gender</TableHead>
                       <TableHead className="w-[15%] min-w-[150px]">Mobile Number</TableHead>
-                      <TableHead className="w-[15%] min-w-[150px]">Branch</TableHead>
                       <TableHead className="w-[15%] min-w-[150px]">Position</TableHead>
                       <TableHead className="w-[10%] min-w-[120px]">Type</TableHead>
                       <TableHead className="w-[10%] min-w-[120px]">Status</TableHead>
-                      <TableHead className="rounded-tr-lg w-[10%] min-w-[120px]">Details</TableHead>
-                      <TableHead className="rounded-tl-lg w-[5%] min-w-[60px]">No</TableHead>
-                      <TableHead className="w-[20%] min-w-[200px] !text-left">Employee Name</TableHead>
-                      <TableHead className="w-[10%] min-w-[100px]">Gender</TableHead>
-                      <TableHead className="w-[15%] min-w-[150px]">Mobile Number</TableHead>
-                      <TableHead className="w-[15%] min-w-[150px]">Branch</TableHead>
-                      <TableHead className="w-[15%] min-w-[150px]">Position</TableHead>
-                      <TableHead className="w-[10%] min-w-[120px]">Type</TableHead>
-                      <TableHead className="w-[10%] min-w-[120px]">Status</TableHead>
+                         <TableHead className="w-[10%] min-w-[150px]">Work Type</TableHead>
                       <TableHead className="rounded-tr-lg w-[10%] min-w-[120px]">Details</TableHead>
                     </TableRow>
                   </TableHeader>
-
 
                   <TableBody className="[&_td]:text-center">
                     {currentData.map((employee, index) => (
@@ -483,17 +427,12 @@ export default function Employee() {
                         <TableCell className="!text-left">{employee.name}</TableCell>
                         <TableCell>{employee.gender}</TableCell>
                         <TableCell>{employee.phone}</TableCell>
-                        <TableCell>{employee.branch}</TableCell>
                         <TableCell>{employee.position}</TableCell>
                         <TableCell>{employee.type}</TableCell>
                         <TableCell>{employee.status}</TableCell>
+                        <TableCell>{employee.worktype}</TableCell>
                         <TableCell>
-                          <Link href="/employee/details">
-                            <Button variant="outline" size="sm">
-                              View
-                            </Button>
-                          </Link>
-                          <Link href="/employee/details">
+                          <Link href={"/employee/" + employee.id}>
                             <Button variant="outline" size="sm">
                               View
                             </Button>
@@ -504,8 +443,6 @@ export default function Employee() {
                   </TableBody>
                 </Table>
               </div>
-
-              <div className="w-full flex flex-wrap justify-between mt-[10px]">
 
               <div className="w-full flex flex-wrap justify-between mt-[10px]">
                 {/* Select Rows */}
