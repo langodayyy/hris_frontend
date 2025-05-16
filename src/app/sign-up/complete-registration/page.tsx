@@ -1,21 +1,11 @@
 "use client";
 
-import { Metadata } from "next";
-import Sidebar from "../../../components/sidebar";
 import Image from "next/image";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-// import { PhoneInput } from "../../../components/ui/phoneInput";
-import PhoneInput from "../../../components/ui/phoneInput";
-import { Eye, EyeOff } from "lucide-react";
-import { link } from "fs";
 
 import SignupCompleteForm from "@/components/custom/signupCompletion";
 import { useFormContext } from "@/context/FormContext";
 
-export default function SignUp() {
+export default function SignUpCompleteRegistration() {
   const { errors } = useFormContext();
 
   return (
@@ -58,78 +48,6 @@ export default function SignUp() {
             ))}
             
             <SignupCompleteForm></SignupCompleteForm>
-            {/* <form
-              action=""
-              method="post"
-              className="flex flex-col  gap-[25px]"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target as HTMLFormElement);
-                const token = localStorage.getItem("token");
-                const response = await fetch(
-                  "http://localhost:8000/api/completeRegister",
-                  {
-                  method: "POST",
-                  body: formData,
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                  }
-                );
-
-                if (response.ok) {
-                  localStorage.setItem("is_profile_complete", "true");
-                  window.location.href = "/dashboard"; // Redirect to dashboard or another page
-                } 
-                else {
-                  // Handle error response
-                  const errorData = await response.json();
-                    const errorMessages = Object.values(errorData.errors)
-                    .flat()
-                    .join("\n");
-                    
-                    // ⚠️change the format to non alert JS⚠️
-                    alert(`Error:\n${errorMessages}`);
-                }
-              }}
-            >
-              <div className="flex flex-col gap-5 w-full">
-                <div className="flex flex-row gap-5 w-full">
-                  <div className="flex flex-col gap-2 w-full">
-                    <Label htmlFor="firstname">First Name</Label>
-                    <Input
-                      type="text"
-                      name="first_name"
-                      id="firstname"
-                      placeholder="Enter your first name"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2 w-full">
-                    <Label htmlFor="lastname">Last Name</Label>
-                    <Input
-                      type="text"
-                      name="last_name"
-                      id="lastname"
-                      placeholder="Enter your last name"
-                    />
-                  </div>
-                </div>
-
-                <PhoneInput></PhoneInput>
-                <div className="flex flex-col gap-2 w-full">
-                  <Label htmlFor="companyname">Company Name</Label>
-                  <Input
-                    type="text"
-                    name="company_name"
-                    id="companyname"
-                    placeholder="Enter company name"
-                  />
-                </div>
-              </div>
-              <div className="w-full">
-                <Button type="submit">Submit</Button>
-              </div>
-            </form> */}
           </div>
         </div>
       </div>
