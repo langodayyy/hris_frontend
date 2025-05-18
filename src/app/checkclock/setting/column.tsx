@@ -1,20 +1,9 @@
 "use client";
 
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@radix-ui/react-label";
 import { ColumnDef } from "@tanstack/react-table";
-import React, { useState } from "react";
-import CheckclockSettingPage from "./page";
-import { columns } from "../management/columns";
+import React from "react";
+
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -24,9 +13,9 @@ export type checkclockSetting = {
   clockIn?: string;
   clockOut?: string;
   day: string;
-  latidude?: string;
-  longitude?: string;
-  radius?: string;
+  latidude?: number;
+  longitude?: number;
+  radius?: number;
 };
 
 export const wfoColumns: ColumnDef<checkclockSetting>[] = [

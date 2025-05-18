@@ -196,6 +196,8 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
                     <Input
                       defaultValue={selectedRow?.latidude ?? ""}
                       name="latidude"
+                      type="number"
+                      className="no-spinner"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
@@ -203,6 +205,8 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
                     <Input
                       defaultValue={selectedRow?.longitude ?? ""}
                       name="longitude"
+                      type="number"
+                      className="no-spinner"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
@@ -210,6 +214,8 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
                     <Input
                       defaultValue={selectedRow?.radius ?? ""}
                       name="radius"
+                      type="number"
+                      className="no-spinner"
                     />
                   </div>
                 </div>
