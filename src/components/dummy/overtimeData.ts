@@ -1,10 +1,16 @@
 //overtime data dummy
 
 export const employeesSample = [
-  { id_employee: "EMP0001", Name: "Mumtaz", position: "Manager"},
-  { id_employee: "EMP0002", Name: "Kemal", position: "Manager" },
-  { id_employee: "EMP0003", Name: "Lucky", position: "Manager" },
-  { id_employee: "EMP0004", Name: "Silfi", position: "Manager" },
+  { id_emp: "EMP0001", name: "Silfi", position: "Staff", monthly_salary: 3500000},
+  { id_emp: "EMP0002", name: "Dani", position: "Supervisor", monthly_salary:  4200000},
+  { id_emp: "EMP0003", name: "Iqbal", position: "Manager", monthly_salary:  3750000},
+  { id_emp: "EMP0004", name: "Ageng", position: "Staff", monthly_salary:  4055000},
+  { id_emp: "EMP0005", name: "Rina", position: "Supervisor", monthly_salary:  4200000},
+  { id_emp: "EMP0006", name: "Andi", position: "Staff", monthly_salary:  3500000},
+  { id_emp: "EMP0007", name: "Maya", position: "Manager", monthly_salary:  4200000},
+  { id_emp: "EMP0008", name: "Budi", position: "Staff", monthly_salary:  3500000},
+  { id_emp: "EMP0009", name: "Nina", position: "Supervisor", monthly_salary:  4200000},
+  { id_emp: "EMP0010", name: "Eka", position: "Staff", monthly_salary:  3500000},
 ];
 
 export const governmentFormula = [
@@ -113,10 +119,9 @@ export const governmentFormula = [
   },
 ];
 
-
 export const overtimeSettingSample= [
   {
-    id: 1,
+    id: "1",
     name: "Weekday OT Government",
     type: "Government Regulation",
     category: "Regular Weekday",
@@ -126,7 +131,7 @@ export const overtimeSettingSample= [
     formula: "Hour 1: 1.5 × (monthly salary / 173)\nHour 2 and above: 2 × (monthly salary / 173)",
   },
   {
-    id: 2,
+    id: "2",
     name: "Holiday OT Government (6 days)",
     type: "Government Regulation",
     category: "Holiday",
@@ -137,7 +142,7 @@ export const overtimeSettingSample= [
       "Hour 1–7: 2 × (monthly salary / 173)\nHour 8: 3 × (monthly salary / 173)\nHour 9–10: 4 × (monthly salary / 173)",
   },
   {
-    id: 3,
+    id: "3",
     name: "Short Day Holiday OT",
     type: "Government Regulation",
     category: "Shortday Holiday",
@@ -148,7 +153,7 @@ export const overtimeSettingSample= [
       "    Hour 1–5: 2 × (monthly salary / 173)\nHour 6: 3 × (monthly salary / 173)\nHour 7–8: 4 × (monthly salary / 173)",
   },
   {
-    id: 4,
+    id: "4",
     name: "Holiday OT Government (5 days)",
     type: "Government Regulation",
     category: "Holiday",
@@ -159,7 +164,7 @@ export const overtimeSettingSample= [
       "Hour 1–8: 2 × (monthly salary / 173)\nHour 9: 3 × (monthly salary / 173)\nHour 10–11: 4 × (monthly salary / 173)",
   },
   {
-    id: 5,
+    id: "5",
     name: "Weekday OT Flat",
     type: "Flat",
     category: "Regular Weekday",
@@ -169,7 +174,7 @@ export const overtimeSettingSample= [
     formula: "1 hour × IDR 150000",
   },
   {
-    id: 6,
+    id: "6",
     name: "Holiday OT Flat",
     type: "Flat",
     category: "Regular Weekday",
@@ -207,38 +212,145 @@ export const overtimecategory = [
   },
 ];
 
-export function generateDummyOvertimeData(count: number) {
-  const names = ["Mumtaz", "Kemal", "Lucky", "Silfi"];
-  const position = ["Manager", "Staff", "Supervisor", "Admin"];
-  const overtimeTypes = [
-    { name: "Weekday Overtime", rate: 400000 },
-    { name: "Weekend Overtime", rate: 150000 },
-    { name: "Holiday Overtime", rate: 230000 },
-  ];
-
-  const approvalStatus = ["Pending", "Approved", "Rejected"];
-  const data = [];
-
-  for (let i = 1; i <= count; i++) {
-    const randomNameIndex = Math.floor(Math.random() * names.length);
-    const randomPositionIndex = Math.floor(Math.random() * position.length);
-    const randomOT =
-      overtimeTypes[Math.floor(Math.random() * overtimeTypes.length)];
-    const randomHour = (Math.floor(Math.random() * 3) + 1) * 2;
-    const date = new Date(2025, 4, (i % 31) + 1).toLocaleDateString("en-GB");
-    const randomStatus =
-      approvalStatus[Math.floor(Math.random() * approvalStatus.length)];
-
-    data.push({
-      id: `OVT${i.toString().padStart(4, "0")}`,
-      name: names[randomNameIndex],
-      position: position[randomPositionIndex],
-      overtimeName: randomOT.name,
-      date: date,
-      hour: randomHour,
-      ovt_payroll: randomHour * randomOT.rate,
-      approvalStatus: randomStatus,
-    });
-  }
-  return data;
-}
+export const overtimeDummy = [
+  {
+    id: "OVT0001",
+    id_emp: "EMP0001",
+    name: "Silfi",
+    position: "Staff",
+    overtime_name: "Weekday OT Government",
+    overtime_type: "Government Regulation",
+    overtime_category: "Regular Weekday",
+    date: "2025-05-14",
+    hour: 3,
+    monthly_salary: 3500000,
+    ovt_payroll: 60000,
+    approval_status: "Approved",
+  },
+  {
+    id: "OVT0002",
+    id_emp: "EMP0002",
+    name: "Dani",
+    position: "Supervisor",
+    overtime_name: "Holiday OT Flat",
+    overtime_type: "Flat",
+    overtime_category: "Holiday",
+    date: "2025-05-12",
+    hour: 4,
+    monthly_salary:  4200000,
+    ovt_payroll: 100000,
+    approval_status: "Pending",
+  },
+  {
+    id: "OVT0003",
+    id_emp: "EMP0003",
+    name: "Iqbal",
+    position: "Manager",
+    overtime_name: "Weekday OT Government",
+    overtime_type: "Government Regulation",
+    overtime_category: "Regular Weekday",
+    date: "2025-05-11",
+    hour: 2,
+    monthly_salary:  3750000,
+    ovt_payroll: 40000,
+    approval_status: "Approved",
+  },
+  {
+    id: "OVT0004",
+    id_emp: "EMP0004",
+    name: "Ageng",
+    position: "Staff",
+    overtime_name: "Holiday OT Flat",
+    overtime_category: "Holiday",
+    overtime_type: "Flat",
+    date: "2025-05-10",
+    hour: 5,
+    monthly_salary:  4055000,
+    ovt_payroll: 125000,
+    approval_status: "Rejected",
+  },
+  {
+    id: "OVT0005",
+    id_emp: "EMP0005",
+    name: "Rina",
+    position: "Supervisor",
+    overtime_name: "Weekday OT Government",
+    overtime_type: "Government Regulation",
+    overtime_category: "Regular Weekday",
+    date: "2025-05-09",
+    hour: 1,
+    monthly_salary:  4200000,
+    ovt_payroll: 20000,
+    approval_status: "Pending",
+  },
+  {
+    id: "OVT0006",
+    id_emp: "EMP0006",
+    name: "Andi",
+    position: "Staff",
+    overtime_name: "Holiday OT Flat",
+    overtime_category: "Holiday",
+    overtime_type: "Flat",
+    date: "2025-05-08",
+    hour: 6,
+    monthly_salary:  3500000,
+    ovt_payroll: 150000,
+    approval_status: "Approved",
+  },
+  {
+    id: "OVT0007",
+    id_emp: "EMP0007",
+    name: "Maya",
+    position: "Manager",
+    overtime_name: "Weekday OT Government",
+    overtime_type: "Government Regulation",
+    overtime_category: "Regular Weekday",
+    date: "2025-05-07",
+    hour: 2,
+    monthly_salary:  4200000,
+    ovt_payroll: 40000,
+    approval_status: "Approved",
+  },
+  {
+    id: "OVT0008",
+    id_emp: "EMP0008",
+    name: "Budi",
+    position: "Staff",
+    overtime_name: "Holiday OT Flat",
+    overtime_category: "Holiday",
+    overtime_type: "Flat",
+    date: "2025-05-06",
+    hour: 3,
+    monthly_salary:  3500000,
+    ovt_payroll: 75000,
+    approval_status: "Pending",
+  },
+  {
+    id: "OVT0009",
+    id_emp: "EMP0009",
+    name: "Nina",
+    position: "Supervisor",
+    overtime_name: "Weekday OT Government",
+    overtime_type: "Government Regulation",
+    overtime_category: "Regular Weekday",
+    date: "2025-05-05",
+    hour: 4,
+    monthly_salary:  4200000,
+    ovt_payroll: 80000,
+    approval_status: "Rejected",
+  },
+  {
+    id: "OVT0010",
+    id_emp: "EMP0010",
+    name: "Eka",
+    position: "Staff",
+    overtime_name: "Holiday OT Flat",
+    overtime_category: "Holiday",
+    overtime_type: "Flat",
+    date: "2025-05-04",
+    hour: 2,
+    monthly_salary:  3500000,
+    ovt_payroll: 50000,
+    approval_status: "Approved",
+  },
+];

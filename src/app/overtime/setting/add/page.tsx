@@ -27,9 +27,9 @@ export default function AddOvertimeSetting() {
   const router = useRouter();
   const [selectedType, setSelectedType] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [calculation, setCalculation] = useState("");
-  const [rate, setRate] = useState("");
-  const [workWeekDuration, setWorkWeekDuration] = useState<number | null>(null); // null, 5, atau 6
+  const [calculation, setCalculation] = useState<number | null>(null); 
+  const [rate, setRate] = useState<number | null>(null); 
+  const [workWeekDuration, setWorkWeekDuration] = useState<number | null>(null); 
   const [formulaText, setFormulaText] = useState("");
 
   // for government regulation formula filtered by work week duration and category
@@ -88,7 +88,7 @@ export default function AddOvertimeSetting() {
             <div className="flex flex-col w-full gap-[15px]">
               <Label>Overtime Setting Type</Label>
               <RadioGroup
-                defaultValue="default"
+                value={selectedType}
                 className="flex flex-col gap-5"
                 onValueChange={(val) => setSelectedType(val)}
               >
@@ -137,15 +137,14 @@ export default function AddOvertimeSetting() {
                     disabled
                     type="text"
                     value="per"
-                    readOnly
                     className="bg-neutral-100 text-neutral-900 text-center"
                   />
                   <Input
                     type="number"
                     id="ovt_cal"
                     name="ovt_cal"
-                    value={calculation}
-                    onChange={(e) => setCalculation(e.target.value)}
+                    value={calculation || ""}
+                    onChange={(e) => setCalculation(Number(e.target.value))}
                     placeholder="Ex: '1' or '0.5'"
                     required
                   />
@@ -153,7 +152,6 @@ export default function AddOvertimeSetting() {
                     disabled
                     type="text"
                     value="hour"
-                    readOnly
                     className="bg-neutral-100 text-neutral-900 text-center"
                   />
                 </div>
@@ -166,8 +164,8 @@ export default function AddOvertimeSetting() {
                   type="number"
                   id="ovt_rate"
                   name="ovt_rate"
-                  value={rate}
-                  onChange={(e) => setRate(e.target.value)}
+                  value={rate || ""}
+                  onChange={(e) => setRate(Number(e.target.value))}
                   placeholder="Ex: '200000'"
                   required
                 />
@@ -185,7 +183,6 @@ export default function AddOvertimeSetting() {
                       ? `${calculation} hour x IDR ${rate}`
                       : ""
                   }
-                  readOnly
                   disabled
                   className="bg-neutral-100 text-neutral-900"
                 />
@@ -195,11 +192,14 @@ export default function AddOvertimeSetting() {
 
           {/* if type is goverment regulation we must know in 5 days work or 6 */}
           {selectedType === "Government Regulation" &&
-            selectedCategory === "Holiday" && !!selectedCategory &&(
-              <div className="gap-[30px] flex flex-col">
-                {/* overtime calculation */}
+            selectedCategory === "Holiday" &&
+            !!selectedCategory && (
+              <div className="flex flex-col w-full gap-[15px]">
+                {/* weekly work days */}
+                <Label>Weekly Work Days</Label>
                 <RadioGroup
-                  onValueChange={(value) => setWorkWeekDuration(Number(value))}
+                  value={workWeekDuration?.toString() || ""}
+                  onValueChange={(val) => setWorkWeekDuration(Number(val))}
                   className="flex flex-col gap-5"
                 >
                   <div className="flex items-center space-x-2">
@@ -222,7 +222,6 @@ export default function AddOvertimeSetting() {
                   id="ovt_formula"
                   name="ovt_formula"
                   value={formulaText}
-                  readOnly
                   disabled
                   className="bg-neutral-100 text-neutral-900 whitespace-pre-line"
                 />

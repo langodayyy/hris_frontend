@@ -64,7 +64,7 @@ export function DataTable<TData, TValue>({
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4"
           />
           <Input
-            placeholder="Serch overtime settings"
+            placeholder="Serch overtime setting"
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="pl-10"

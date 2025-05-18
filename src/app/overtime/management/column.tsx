@@ -19,20 +19,23 @@ import { ApprovalStatusBadge } from "@/components/ui/approval";
 
 type OvertimeRecord = {
   id: string;
+  id_emp: string;
   name: string;
   position: string;
-  overtimeName: string;
-  date: string;
+  overtime_name: string;
+  overtime_type: string;
+  date: Date;
   hour: number;
   ovt_payroll: number;
-  approvalStatus: string;
+  approval_status: string;
 };
 
 
-export const OvertimeColumn = (onEdit: (id: string) => void):
- ColumnDef<OvertimeRecord>[] => [
+export const OvertimeColumn = (
+  onEdit: (id: string) => void
+): ColumnDef<OvertimeRecord>[] => [
   {
-    accessorKey: "id",
+    id: "no",
     enableSorting: true,
     header: ({ column }) => {
       return (
@@ -40,12 +43,29 @@ export const OvertimeColumn = (onEdit: (id: string) => void):
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          ID
+          No
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("id")}</div>,
+    cell: ({ row }) => row.index + 1, // Tampilkan nomor urut
+    accessorFn: (_, index) => index, // Untuk keperluan sorting
+  },
+  {
+    accessorKey: "id_emp",
+    enableSorting: true,
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Emloyee ID
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div>{row.getValue("id_emp")}</div>,
   },
   {
     accessorKey: "name",
@@ -62,14 +82,18 @@ export const OvertimeColumn = (onEdit: (id: string) => void):
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
+    cell: ({ row }) => <div className="text-start">{row.getValue("name")}</div>,
   },
   {
     accessorKey: "position",
     header: "Position",
   },
   {
-    accessorKey: "overtimeName",
+    accessorKey: "overtime_name",
+    header: "Overtime Name",
+  },
+  {
+    accessorKey: "overtime_type",
     header: "Overtime Type",
   },
   {
@@ -86,7 +110,7 @@ export const OvertimeColumn = (onEdit: (id: string) => void):
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("date")}</div>,
+    cell: ({ row }) => <div>{row.getValue("date")}</div>,
   },
   {
     accessorKey: "hour",
@@ -101,12 +125,12 @@ export const OvertimeColumn = (onEdit: (id: string) => void):
     },
   },
   {
-    accessorKey: "approvalStatus",
+    accessorKey: "approval_status",
     header: "Action",
     cell: ({ row }) => {
       const status = row.getValue(
-        "approvalStatus"
-      ) as OvertimeRecord["approvalStatus"];
+        "approval_status"
+      ) as OvertimeRecord["approval_status"];
 
       if (status === "Pending") {
         return <ApprovalStatusBadge status="Pending" />;
