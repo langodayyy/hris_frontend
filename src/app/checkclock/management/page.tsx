@@ -104,7 +104,7 @@ export default function CheckclockOverviewPage() {
 
   return (
     <Sidebar title="Checkclock">
-      <div className="min-h-screen bg-white rounded-[15px] p-[20px] flex flex-col gap-[10px]">
+      <div className="min-h-screen bg-white rounded-[15px] p-5 flex flex-col gap-[10px]">
         <div className="container mx-auto">
           <DataTable columns={columns} data={data} />
         </div>

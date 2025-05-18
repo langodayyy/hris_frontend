@@ -157,7 +157,7 @@ export function DataTable<TData, TValue>({
   };
 
   return (
-    <div className="">
+   <>
       <div className="flex items-center py-4 gap-6">
         <span className="w-[187px] text-lg flex-none">Checkclock Overview</span>
         <Input
@@ -492,6 +492,7 @@ export function DataTable<TData, TValue>({
           </Pagination>
         </div>
       </div>
-    </div>
+    
+   </>
   );
 }

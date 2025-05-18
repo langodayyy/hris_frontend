@@ -84,8 +84,6 @@ export default function AddCheckclockPage() {
   const selectedEmployee = employeesSample.find(
     (employee) => employee.Name === valueEmployee
   );
-  const selectedWorkType = selectedEmployee ? selectedEmployee.workType : "";
-  const currentDate = new Date();
   const validateAttendanceType =
     valueAttendanceType === "Anual Leave" ||
     valueAttendanceType === "Sick Leave";

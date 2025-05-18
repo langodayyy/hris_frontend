@@ -114,7 +114,7 @@ function NavItem({
                   <Link
                     href={item.href}
                     className={`block px-4 py-2 rounded-lg font-medium text-base${
-                      pathname === item.href
+                      pathname.startsWith(item.href)
                         ? " bg-primary-900 text-white "
                         : "text-neutral-900 hover:bg-primary-950 hover:text-white"
                     }`}

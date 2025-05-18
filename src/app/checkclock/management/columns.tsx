@@ -239,7 +239,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
       return <div className="text-center">Details</div>;
     },
     cell: ({ row }) => {
-      const employeeId = row.getValue("id") as string;
+      // const employeeId = row.getValue("id") as string;
       const [selectedRow, setSelectedRow] = useState<CheckclockOverview | null>(
         null
       );
@@ -381,11 +381,11 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>
-                                      Proove of Leave
+                                      Proof of Leave
                                     </AlertDialogTitle>
                                     <AlertDialogDescription className="max-h-96 overflow-auto">
                                       <img
-                                        src="/images/proove-of-leave.jpg"
+                                        src="/images/proof-of-leave.jpg"
                                         alt="Proof of Leave"
                                       />
                                     </AlertDialogDescription>
@@ -399,8 +399,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                               <DownloadButton
                               // fileUrl={`/images/bukti-absen-${selectedRow?.employeeName}.jpg`}
 
-                                fileUrl="/images/proove-of-levave.jpg"
-                                fileName={`proove of leave ${selectedRow?.employeeName}.jpg`}
+                                fileUrl="/images/proof-of-levave.jpg"
+                                fileName={`proof of leave ${selectedRow?.employeeName}.jpg`}
                               />
                             </div>
                           </div>
@@ -748,11 +748,11 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>
-                                      Proove of Leave
+                                      Proof of Leave
                                     </AlertDialogTitle>
                                     <AlertDialogDescription className="max-h-96 overflow-auto">
                                       <img
-                                        src="/images/proove-of-leave.jpg"
+                                        src="/images/proof-of-leave.jpg"
                                         alt="Proof of Leave"
                                       />
                                     </AlertDialogDescription>
@@ -766,8 +766,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                              <DownloadButton
                               // fileUrl={`/images/bukti-absen-${selectedRow?.employeeName}.jpg`}
 
-                                fileUrl="/images/proove-of-leave.jpg"
-                                fileName={`proove of leave ${selectedRow?.employeeName}.jpg`}
+                                fileUrl="/images/proof-of-leave.jpg"
+                                fileName={`proof of leave ${selectedRow?.employeeName}.jpg`}
                               />
                             </div>
                           </div>
@@ -862,11 +862,11 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>
-                                      Proove of Leave
+                                      Proof of Leave
                                     </AlertDialogTitle>
                                     <AlertDialogDescription className="max-h-96 overflow-auto">
                                       <img
-                                        src="/images/proove-of-attendance.jpg"
+                                        src="/images/proof-of-attendance.jpg"
                                         alt="Proof of attendance"
                                       />
                                     </AlertDialogDescription>
@@ -880,8 +880,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                               <DownloadButton
                               // fileUrl={`/images/bukti-absen-${selectedRow?.employeeName}.jpg`}
 
-                                fileUrl="/images/proove-of-attendance.jpg"
-                                fileName={`proove of attendance ${selectedRow?.employeeName}.jpg`}
+                                fileUrl="/images/proof-of-attendance.jpg"
+                                fileName={`proof of attendance ${selectedRow?.employeeName}.jpg`}
                               />
                             </div>
                           </div>
