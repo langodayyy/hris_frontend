@@ -862,7 +862,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>
-                                      Proof of Leave
+                                      Proof of Attendance
                                     </AlertDialogTitle>
                                     <AlertDialogDescription className="max-h-96 overflow-auto">
                                       <img
