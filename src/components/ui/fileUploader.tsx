@@ -74,14 +74,35 @@ export function FileUploader({
               <p className="text-sm text-gray-600">{uploadedFile.name}</p>
             </div>
           ) : (
+            <div className="w-full flex flex-col justify-center items-center gap-4">
             <img
               src={URL.createObjectURL(uploadedFile)}
               alt="Uploaded file"
               className="w-32 h-32 object-cover rounded-md"
             />
+
+          <Button
+            onClick={() => {
+              const input = document.createElement("input");
+              input.type = "file";
+              input.accept = Object.keys(accept).join(",");
+              input.onchange = (event) => {
+                const file = (event.target as HTMLInputElement).files?.[0];
+                if (file) {
+                  setUploadedFile(file);
+                  onDrop([file]);
+                }
+              };
+              input.click();
+            }}
+            variant={"outline"}
+            size={"sm"}
+            className="w-auto"
+          >
+            Change file
+          </Button>
+          </div>
           )}
-          <Button onClick={() => setUploadedFile(null)} variant={"outline"} size={"sm"}> Change file</Button>
-          
         </div>
       ) : (
         <Card
