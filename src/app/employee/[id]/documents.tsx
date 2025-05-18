@@ -84,7 +84,8 @@ const EmployeeDocuments = () => {
     startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
-    const params = useParams();
+    const params = useParams<{ id: string }>();
+    const employeeId = params.id;
 
     return (
         
@@ -113,7 +114,7 @@ const EmployeeDocuments = () => {
                         />
                     </div>
                 </div>
-                <Link href="/documents/add">
+                <Link href={`/employee/${employeeId}/document/add`}>
                     <Button className="w-full" variant="default" >
                     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M7.5 3.125V11.875" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
