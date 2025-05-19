@@ -37,10 +37,12 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [globalFilter, setGlobalFilter] = React.useState(""); // Add the globalFilter state
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [date, setDate] = React.useState<DateRange | undefined>(undefined); // <-- Pindahkan ke atas
+  const [open, setOpen] = React.useState(false);
+  const router = useRouter();
+
   const table = useReactTable({
     data,
     columns,
@@ -50,21 +52,10 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     state: {
       columnFilters,
-      globalFilter, 
+      globalFilter,
     },
-    onGlobalFilterChange: setGlobalFilter, // Update globalFilter on change
-    globalFilterFn: (row, columnId, filterValue) => {
-      const name = row.getValue("name")?.toString().toLowerCase() || ""; 
-      const id = row.getValue("id")?.toString().toLowerCase() || "";
-      return (
-        name.includes(filterValue.toLowerCase()) ||
-        id.includes(filterValue.toLowerCase())
-      );
-    },
+    onGlobalFilterChange: setGlobalFilter,
   });
-
-  const [date, setDate] = React.useState<DateRange | undefined>(undefined);
-  const router = useRouter();
 
   return (
     <div className="flex flex-col gap-[10px]">
@@ -78,14 +69,16 @@ export function DataTable<TData, TValue>({
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4"
           />
           <Input
-            placeholder="Filter employee by name or ID"
+            placeholder="Search overtime employee"
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="pl-10"
           />
         </div>
+
+    {/* FILTER DATE RANGENYA BELUM :( */}
         <div className="flex gap-2">
-          <Popover>
+          <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
                 id="date"
@@ -171,10 +164,10 @@ export function DataTable<TData, TValue>({
                 )}
               >
                 {date?.from && date?.to ? (
-                  <>
-                    {format(date.from, "dd/MM/yyyy")} -{" "}
-                    {format(date.to, "dd/MM/yyyy")}
-                  </>
+                  `${format(date.from, "yyyy/MM/dd")} - ${format(
+                    date.to,
+                    "yyyy/MM/dd"
+                  )}`
                 ) : (
                   <span className="text-neutral-300">Pick a date range</span>
                 )}

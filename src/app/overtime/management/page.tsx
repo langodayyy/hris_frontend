@@ -9,18 +9,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { generateDummyOvertimeData } from "@/components/dummy/overtimeData";
+import { overtimeDummy } from "@/components/dummy/overtimeData";
 
 
 export default function OvertimeManagement(){
-  const overtimeDisplay = useMemo(() => generateDummyOvertimeData(25), []);
+  const overtimeDisplay = useMemo(() => overtimeDummy, []);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10); 
   const totalPages = Math.ceil(overtimeDisplay.length / rowsPerPage);
   const router = useRouter();
 
   const handleEdit = (id: string) => {
-    router.push(`/overtime/edit/${id}`);
+    router.push(`management/edit/${id}`);
   };
 
   const column = OvertimeColumn(handleEdit);

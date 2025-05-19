@@ -33,7 +33,7 @@ export default function OvertimeSettingsManagement() {
   const router = useRouter();
 
   const handleEdit = (id: string) => {
-    router.push(`/overtime/settings/edit/${id}`);
+    router.push(`/overtime/setting/edit/${id}`);
   };
 
   const column = OvertimeSettingsColumn(handleEdit);

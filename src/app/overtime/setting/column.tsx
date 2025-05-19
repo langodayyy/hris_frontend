@@ -30,12 +30,21 @@ export const OvertimeSettingsColumn = (
   onEdit: (id: string) => void
 ): ColumnDef<OvertimeSettingsRecord>[] => [
   {
-    accessorKey: "no",
-    header: "No",
+    id: "no",
     enableSorting: true,
-    cell: ({ row }) => {
-      return <div className="text-center">{row.index + 1}</div>;
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          No
+          <ArrowUpDown />
+        </Button>
+      );
     },
+    cell: ({ row }) => row.index + 1, // Tampilkan nomor urut
+    accessorFn: (_, index) => index, // Untuk keperluan sorting
   },
   {
     accessorKey: "name",
@@ -65,17 +74,17 @@ export const OvertimeSettingsColumn = (
   {
     accessorKey: "work_day",
     header: "Working Day",
-    cell: ({getValue}) => {
+    cell: ({ getValue }) => {
       const value = getValue();
-      return value == null ? '-' : `${value} days`;
-    }
+      return value == null ? "-" : `${value} days`;
+    },
   },
   {
     accessorKey: "calculation",
     header: "Calculation",
     cell: ({ getValue }) => {
       const value = getValue();
-      return value == null ? '-' : `per ${Number(value)} hour`;
+      return value == null ? "-" : `per ${Number(value)} hour`;
     },
   },
   {
@@ -83,7 +92,9 @@ export const OvertimeSettingsColumn = (
     header: "Overtime Rate",
     cell: ({ getValue }) => {
       const value = getValue();
-      return value == null ? '-' : `IDR ${Number(value ?? 0).toLocaleString("id-ID")}`;
+      return value == null
+        ? "-"
+        : `IDR ${Number(value ?? 0).toLocaleString("id-ID")}`;
     },
   },
   {
@@ -107,7 +118,7 @@ export const OvertimeSettingsColumn = (
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onEdit(row.original.id_ovt_setting)}
+            onClick={() => onEdit(row.original.id)}
             className="p-1 h-auto w-auto"
             icon={
               <svg
