@@ -24,7 +24,7 @@ type OvertimeRecord = {
   position: string;
   overtime_name: string;
   overtime_type: string;
-  date: Date;
+  date: string;
   hour: number;
   ovt_payroll: number;
   approval_status: string;

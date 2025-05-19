@@ -23,44 +23,76 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function EditOvertimeSetting() {
-    const { id } = useParams();
-    const router = useRouter();
+  const { id } = useParams();
+  const router = useRouter();
 
-    const [selectedType, setSelectedType] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("");
-    const [calculation, setCalculation] = useState<number | null>(null);
-    const [rate, setRate] = useState<number | null>(null);
-    const [workWeekDuration, setWorkWeekDuration] = useState<number | null>(
-      null
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [calculation, setCalculation] = useState<number | null>(null);
+  const [rate, setRate] = useState<number | null>(null);
+  const [workWeekDuration, setWorkWeekDuration] = useState<number | null>(
+    null
+  );
+  const [formulaText, setFormulaText] = useState("");
+  const [name, setName] = useState("");
+
+  const handleSave = () => {
+    //idonow
+    // const payload = {
+    //   overtimeName,
+    //   type: selectedType,
+    //   category: selectedCategory,
+    //   calculation,
+    //   rate,
+    //   workWeekDuration,
+    //   formulaText,
+    //   employeeId: selectedEmployeeId,
+    //   overtimeId: selectedOvertimeName,
+    //   date: selectedDate,
+    //   totalHours: inputTotalHour,
+    //   overtimePay: calculatedPay,
+    // };
+
+    // console.log("Data yang dikirim:", payload);
+
+    // Contoh fetch untuk POST data
+    // fetch('/api/overtime', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(payload),
+    // }).then(() => {
+    //   router.push("/overtime/setting");
+    // });
+
+    // Untuk sementara redirect setelah submit:
+    router.push("/overtime/setting");
+  };
+
+  // Ambil data overtime berdasarkan id dari database/API 
+  useEffect(() => {
+    const dummyData = overtimeSettingSample.find(
+      (item) => item.id.toString() === id
     );
-    const [formulaText, setFormulaText] = useState("");
-    const [name, setName] = useState("");
 
-    // Ambil data overtime berdasarkan id dari database/API (dummy)
-    useEffect(() => {
-      const dummyData = overtimeSettingSample.find(
-        (item) => item.id.toString() === id
-      );
+    if (!dummyData) return;
 
-      if (!dummyData) return;
+    const typeChoosen = overtimeType.find(
+      (item) => item.name === dummyData.type
+    );
 
-      const typeChoosen = overtimeType.find(
-        (item) => item.name === dummyData.type
-      );
+    const categoryChoosen = overtimecategory.find(
+      (item) => item.name === dummyData.category
+    );
 
-      const categoryChoosen = overtimecategory.find(
-        (item) => item.name === dummyData.category
-      );
-
-      setSelectedType(typeChoosen?.name ?? "");
-      setSelectedCategory(categoryChoosen?.name ?? "");
-      setCalculation(dummyData.calculation);
-      setRate(dummyData.rate);
-      setName(dummyData.name ?? "");
-      if (dummyData.work_day) {
-        setWorkWeekDuration(dummyData.work_day);
-      }
-    }, [id]);
+    setSelectedType(typeChoosen?.name ?? "");
+    setSelectedCategory(categoryChoosen?.name ?? "");
+    setCalculation(dummyData.calculation);
+    setRate(dummyData.rate);
+    setName(dummyData.name ?? "");
+    if (dummyData.work_day) {
+      setWorkWeekDuration(dummyData.work_day);
+    }
+  }, [id]);
 
   // Hitung formula jika perlu
   useEffect(() => {
@@ -69,22 +101,22 @@ export default function EditOvertimeSetting() {
       return;
     }
 
-    const filteredFormula = governmentFormula.filter(
-      (item) =>
-        item.category === selectedCategory &&
-        (item.work_week_duration === null ||
-          item.work_week_duration === workWeekDuration)
-    );
+  const filteredFormula = governmentFormula.filter(
+    (item) =>
+      item.category === selectedCategory &&
+      (item.work_week_duration === null ||
+        item.work_week_duration === workWeekDuration)
+  );
 
-    const result = filteredFormula
-      .map((item) => {
-        const hourRange =
-          item.from_hour === item.to_hour
-            ? `${item.from_hour} hour`
-            : `${item.from_hour}–${item.to_hour} hour`;
-        return `${hourRange} = ${item.multiplier} x ( monthly salary / 173))`;
-      })
-      .join("\n");
+  const result = filteredFormula
+    .map((item) => {
+      const hourRange =
+        item.from_hour === item.to_hour
+          ? `${item.from_hour} hour`
+          : `${item.from_hour}–${item.to_hour} hour`;
+      return `${hourRange} = ${item.multiplier} x ( monthly salary / 173))`;
+    })
+    .join("\n");
 
     setFormulaText(result);
   }, [selectedCategory, workWeekDuration]);
@@ -246,7 +278,7 @@ export default function EditOvertimeSetting() {
           >
             Cancel
           </Button>
-          <Button type="submit" variant="default" className="w-[98px]">
+          <Button type="submit" variant="default" className="w-[98px]" onClick={handleSave}>
             Update
           </Button>
         </div>

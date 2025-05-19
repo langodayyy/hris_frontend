@@ -39,12 +39,30 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [date, setDate] = React.useState<DateRange | undefined>(undefined); // <-- Pindahkan ke atas
+  const [date, setDate] = React.useState<DateRange | undefined>(undefined); 
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
 
+  const filteredData = React.useMemo(() => {
+    if (!date?.from || !date?.to) {
+      return data;
+    }
+
+    return data.filter((item: any) => {
+      const itemDate = new Date(item.date);
+      // Pastikan itemDate valid dan masuk rentang
+      return (
+        itemDate instanceof Date &&
+        !isNaN(itemDate.getTime()) &&
+        itemDate >= date.from! &&
+        itemDate <= date.to!
+      );
+    });
+  }, [data, date]);
+  
+
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onColumnFiltersChange: setColumnFilters,
@@ -56,6 +74,7 @@ export function DataTable<TData, TValue>({
     },
     onGlobalFilterChange: setGlobalFilter,
   });
+
 
   return (
     <div className="flex flex-col gap-[10px]">
@@ -76,7 +95,6 @@ export function DataTable<TData, TValue>({
           />
         </div>
 
-    {/* FILTER DATE RANGENYA BELUM :( */}
         <div className="flex gap-2">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -184,6 +202,7 @@ export function DataTable<TData, TValue>({
               />
             </PopoverContent>
           </Popover>
+          {/* EXPORT BELUM */}
           <Button
             className="w-[100px]"
             type="submit"
