@@ -32,6 +32,38 @@ export default function AddOvertimeSetting() {
   const [workWeekDuration, setWorkWeekDuration] = useState<number | null>(null); 
   const [formulaText, setFormulaText] = useState("");
 
+  const handleSubmit = () => {
+    //idonow
+    // const payload = {
+    //   overtimeName,
+    //   type: selectedType,
+    //   category: selectedCategory,
+    //   calculation,
+    //   rate,
+    //   workWeekDuration,
+    //   formulaText,
+    //   employeeId: selectedEmployeeId,
+    //   overtimeId: selectedOvertimeName,
+    //   date: selectedDate,
+    //   totalHours: inputTotalHour,
+    //   overtimePay: calculatedPay,
+    // };
+
+    // console.log("Data yang dikirim:", payload);
+
+    // Contoh fetch untuk POST data
+    // fetch('/api/overtime', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(payload),
+    // }).then(() => {
+    //   router.push("/overtime/setting");
+    // });
+
+    // Untuk sementara redirect setelah submit:
+    router.push("/overtime/setting");
+  };
+
   // for government regulation formula filtered by work week duration and category
   useEffect(() => {
     if (!selectedCategory) {
@@ -239,7 +271,7 @@ export default function AddOvertimeSetting() {
           >
             Cancel
           </Button>
-          <Button type="submit" variant="default" className="w-[98px]">
+          <Button type="submit" variant="default" className="w-[98px]" onClick={handleSubmit}>
             Save
           </Button>
         </div>

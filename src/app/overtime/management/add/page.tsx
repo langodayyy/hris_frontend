@@ -32,6 +32,7 @@ import {
 import { Label } from "@/components/ui/label";
 import {
   employeesSample,
+  governmentFormula,
   overtimeSettingSample,
 } from "@/components/dummy/overtimeData";
 import { useRouter } from "next/navigation";
@@ -43,7 +44,6 @@ export default function AddOvertimeEmployees() {
   const [selectedOvertimeName, setSelectedOvertimeName] = useState("");
   const [inputTotalHour, setInputTotalHour] = useState("");
 
-// belum ditambahin batas yang government
   const handleHourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputVal = e.target.value;
 
@@ -55,18 +55,46 @@ export default function AddOvertimeEmployees() {
     const val = parseInt(inputVal);
     if (isNaN(val)) return;
 
-    if (
-      selectedOvertime &&
-      selectedOvertime.type === "Flat" &&
-      selectedOvertime.calculation !== null
-    ) {
-      const calc = selectedOvertime.calculation;
-      if (val % calc === 0) {
+    if (selectedOvertime) {
+      if (
+        selectedOvertime.type === "Flat" &&
+        selectedOvertime.calculation !== null
+      ) {
+        const calc = selectedOvertime.calculation;
+        if (val % calc === 0) {
+          setInputTotalHour(inputVal);
+        }
+        // Jika tidak kelipatan calc, ignore input (tidak update state)
+      } else if (selectedOvertime.type === "Government Regulation") {
+        const filteredFormula = governmentFormula.filter(
+          (item) => item.category === selectedOvertime.category
+        );
+        const maxHour = filteredFormula.reduce(
+          (max, item) => (item.to_hour > max ? item.to_hour : max),
+          0
+        );
+
+        if (maxHour > 0 && val <= maxHour) {
+          setInputTotalHour(inputVal);
+        }
+        // Jika val > maxHour, ignore input (tidak update state)
+      } else {
         setInputTotalHour(inputVal);
       }
-    } else {
-      setInputTotalHour(inputVal);
     }
+  };
+  
+  const handleSubmit = () => {
+    const payload = {
+      employeeId: selectedEmployeeId,
+      overtimeId: selectedOvertimeName,
+      date: selectedDate,
+      totalHours: inputTotalHour,
+      overtimePay: calculatedPay,
+    };
+
+    console.log("Data yang dikirim:", payload);
+    // nanti bisa ditambahkan: fetch('/api/overtime', { method: 'POST', body: JSON.stringify(payload) })
   };
   
 
@@ -76,22 +104,67 @@ export default function AddOvertimeEmployees() {
     label: emp.name,
   }));
 
+  // Ambil data karyawan yang dipilih
+  const selectedEmployee = employeesSample.find(
+    (emp) => emp.id_emp.toLowerCase() === selectedEmployeeId
+  );
+
+  // Ambil data overtime yang dipilih
   const selectedOvertime = overtimeSettingSample.find(
     (ot) => ot.id === selectedOvertimeName
   );
 
-  // belum ditambahin perhitungan yang ditampilkan :(
-  // sample perhitungan type flat
-  // const calculatedPay =
-  //   selectedOvertime && totalHour
-  //     ? selectedOvertime.type === "Flat" &&
-  //       selectedOvertime.calculation !== null
-  //       ? `IDR ${
-  //           (parseInt(totalHour) / selectedOvertime.calculation) *
-  //           selectedOvertime.rate
-  //         }`
-  //       : ""
-  //     : "";
+  function calculateGovernmentRegulationOvertime(
+    category: string,
+    work_day: number,
+    totalHours: number,
+    hourly_salary: number
+  ) {
+    let totalPay = 0;
+
+    for (let i = 1; i <= totalHours; i++) {
+      let multiplier = 0;
+
+      if (category === "Regular Weekday") {
+        multiplier = i === 1 ? 1.5 : 2;
+      } else if (category === "Holiday" && work_day === 6) {
+        if (i <= 7) multiplier = 2;
+        else if (i === 8) multiplier = 3;
+        else if (i <= 10) multiplier = 4;
+      } else if (category === "Shortday Holiday" && work_day === 6) {
+        if (i <= 5) multiplier = 2;
+        else if (i === 6) multiplier = 3;
+        else if (i <= 8) multiplier = 4;
+      } else if (category === "Holiday" && work_day === 5) {
+        if (i <= 8) multiplier = 2;
+        else if (i === 9) multiplier = 3;
+        else if (i <= 11) multiplier = 4;
+      }
+
+      totalPay += multiplier * hourly_salary;
+    }
+
+    return Math.round(totalPay);
+  }
+
+  // Hitung gaji lembur sesuai tipe
+  const calculatedPay =
+    selectedOvertime && inputTotalHour && selectedEmployee
+      ? selectedOvertime.type === "Flat" &&
+        selectedOvertime.calculation !== null
+        ? `IDR ${(
+            (parseInt(inputTotalHour) / selectedOvertime.calculation) *
+            selectedOvertime.rate
+          ).toLocaleString()}`
+        : selectedOvertime.type === "Government Regulation"
+        ? `IDR ${calculateGovernmentRegulationOvertime(
+            selectedOvertime.category,
+            selectedOvertime.work_day || (0),
+            parseInt(inputTotalHour),
+            (1 / 173) * selectedEmployee.monthly_salary
+          ).toLocaleString("id-ID")}`
+        : ""
+      : "";
 
   const router = useRouter();
   return (
@@ -102,6 +175,7 @@ export default function AddOvertimeEmployees() {
             Add Overtime Employee
           </p>
         </div>
+
         <Card className="p-[20px] gap-[30px] flex flex-col">
           {/* Employee Selection */}
           <div className="flex flex-row gap-[30px]">
@@ -236,7 +310,22 @@ export default function AddOvertimeEmployees() {
               {selectedOvertime?.type === "Flat" && (
                 <p className="text-neutral-400 text-sm pl-1">
                   Overtime hours must be a multiple of{" "}
-                  {selectedOvertime?.calculation}
+                  {selectedOvertime.calculation}
+                </p>
+              )}
+
+              {selectedOvertime?.type === "Government Regulation" && (
+                <p className="text-neutral-400 text-sm pl-1">
+                  Maximum allowed overtime hours is{" "}
+                  {governmentFormula
+                    .filter(
+                      (item) => item.category === selectedOvertime.category
+                    )
+                    .reduce(
+                      (max, item) => (item.to_hour > max ? item.to_hour : max),
+                      0
+                    )}{" "}
+                  hour
                 </p>
               )}
             </div>
@@ -248,7 +337,7 @@ export default function AddOvertimeEmployees() {
             <Input
               disabled
               type="text"
-              value="IDR 000000"
+              value={calculatedPay}
               readOnly
               className="bg-neutral-100"
             />
@@ -264,7 +353,7 @@ export default function AddOvertimeEmployees() {
           >
             Cancel
           </Button>
-          <Button type="submit" variant="default" className="w-[98px]">
+          <Button type="submit" variant="default" className="w-[98px]" onClick={handleSubmit}>
             Save
           </Button>
         </div>
