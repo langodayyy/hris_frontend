@@ -16,7 +16,7 @@ const SwitchMenu = ({ activeMenu, onChange }: SwitchMenuProps) => {
           activeMenu === 'seat' && 'translate-x-[104px]'
         )}
       />
-      <div className="relative flex space-x-2 z-10">
+      <div className="relative flex space-x-2">
         <Button
           variant="ghost"
           className={clsx(

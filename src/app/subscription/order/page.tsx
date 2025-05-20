@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 
 export default function Order() {
     return (
-        <Sidebar title="">
+        <Sidebar title="Payment">
             <div className="flex gap-[30px] justify-center">
 
             <div className="flex justify-center gap-[30px]">

@@ -5,7 +5,7 @@ import CheckIcon from "./checkicon";
 const Package = () => {
     return (
         <div className="flex w-full my-[60px] gap-[40px] justify-center">
-            <Card className="py-[0] w-[370px] gap-[15px] rounded-[15px] border border-black/15 bg-primary-200 shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden transition-transform duration-300 ease-in-out hover:scale-115">
+            <Card className="py-[0] w-[370px] gap-[15px] rounded-[15px] border border-black/15 bg-primary-200 shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105">
                 <div className="flex flex-col py-[20px] gap-[20px]">
                     <p className="text-5xl font-bold text-secondary-900 text-center">Essential</p>
                     <p className="font-normal text-base text-neutral-500 text-center">Ideal for small businesses</p>
@@ -46,7 +46,7 @@ const Package = () => {
                 </div>
 
             </Card>
-            <Card className="py-[0] w-[370px] gap-[15px] rounded-[15px] border border-black/15 bg-primary-100 shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden transition-transform duration-300 ease-in-out hover:scale-115">
+            <Card className="py-[0] w-[370px] gap-[15px] rounded-[15px] border border-black/15 bg-primary-100 shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105">
                 <div className="flex flex-col py-[20px] gap-[20px]">
                     <p className="text-5xl font-bold text-secondary-900 text-center">Professional</p>
                     <p className="font-normal text-base text-neutral-500 text-center">Suitable for medium sized businesses</p>
@@ -87,7 +87,7 @@ const Package = () => {
                 </div>
 
             </Card>
-            <Card className="py-[0] w-[370px] gap-[15px] rounded-[15px] border border-black/15 bg-neutral-50 shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hiddentransition-transform duration-300 ease-in-out hover:scale-115">
+            <Card className="py-[0] w-[370px] gap-[15px] rounded-[15px] border border-black/15 bg-neutral-50 shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hiddentransition-transform duration-300 ease-in-out hover:scale-105">
                 <div className="flex flex-col py-[20px] gap-[20px]">
                     <p className="text-5xl font-bold text-secondary-900 text-center">Enterprise</p>
                     <p className="font-normal text-base text-neutral-500 text-center">Suitable for large enterprises</p>
