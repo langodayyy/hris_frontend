@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: hris_app
+    build: .
+    volumes:
+      - .:/var/www/html/backend
+    expose:
+      - "3000"
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /home/$USER/conf/nginx.conf:/etc/nginx/nginx.conf
+      - /home/$USER/conf/sites-available/hris.my.id:/etc/nginx/sites-available/hris.my.id
+      - /home/$USER/conf/sites-enabled/hris.my.id:/etc/nginx/sites-enabled/hris.my.id
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - app
+
+volumes:
+  pgdata:
