@@ -54,6 +54,7 @@ export const OvertimeColumn = (
   {
     accessorKey: "id_emp",
     enableSorting: true,
+    enableColumnFilter: true,
     header: ({ column }) => {
       return (
         <Button
