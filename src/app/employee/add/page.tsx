@@ -214,13 +214,13 @@ export default function AddEmployee() {
                                     <SelectValue placeholder="Select employee religion" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                    <SelectItem value="islam">Islam</SelectItem>
-                                    <SelectItem value="protestant">Christian Protestant</SelectItem>
-                                    <SelectItem value="catholic">Catholic</SelectItem>
-                                    <SelectItem value="hindu">Hindu</SelectItem>
-                                    <SelectItem value="buddha">Buddha</SelectItem>
-                                    <SelectItem value="confucianism">Confucianism</SelectItem>
-                                    <SelectItem value="other">Other</SelectItem>
+                                    <SelectItem value="Islam">Islam</SelectItem>
+                                    <SelectItem value="Protestant">Christian Protestant</SelectItem>
+                                    <SelectItem value="Catholic">Catholic</SelectItem>
+                                    <SelectItem value="Hindu">Hindu</SelectItem>
+                                    <SelectItem value="Buddha">Buddha</SelectItem>
+                                    <SelectItem value="Confucianism">Confucianism</SelectItem>
+                                    <SelectItem value="Other">Other</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
