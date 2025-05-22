@@ -1,36 +1,36 @@
 "use client";
-import type { Metadata } from "next";
+// import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { FormProvider } from "@/context/FormContext";
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import { AuthProvider } from "@/context/AuthContext";
-import AuthGate from "@/components/custom/authGate";
-import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Router,
-  Routes,
-} from "react-router-dom";
-import PublicRoute from "@/components/PublicRoute";
-import Dashboard from "./dashboard/page";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import SignIn from "./sign-in/page";
-import SignInAsEmployee from "./sign-in/as-employee/page";
-import CheckEmail from "./sign-in/check-email/page";
-import ForgotPassword from "./sign-in/forgot-password/page";
-import LinkExpired from "./sign-in/link-expired/page";
-import SetNewPassword from "./sign-in/set-new-password/page";
-import SuccessSetPassword from "./sign-in/success-set-password/page";
-import SignUp from "./sign-up/page";
-import SignupCompleteForm from "@/components/custom/signupCompletion";
-import SignUpCompleteRegistration from "./sign-up/complete-registration/page";
-import Employee from "./employee/page";
-import OvertimeManagement from "./overtime/page";
-import CheckclockOverviewPage from "./checkclock/checkclock-management/page";
-import NotFound from "@/components/custom/NotFound";
+// import { GoogleOAuthProvider } from "@react-oauth/google";
+// import { AuthProvider } from "@/context/AuthContext";
+// import AuthGate from "@/components/custom/authGate";
+// import {
+//   BrowserRouter,
+//   Navigate,
+//   Route,
+//   Router,
+//   Routes,
+// } from "react-router-dom";
+// import PublicRoute from "@/components/PublicRoute";
+// import Dashboard from "./dashboard/page";
+// import ProtectedRoute from "@/components/ProtectedRoute";
+// import SignIn from "./sign-in/page";
+// import SignInAsEmployee from "./sign-in/as-employee/page";
+// import CheckEmail from "./sign-in/check-email/page";
+// import ForgotPassword from "./sign-in/forgot-password/page";
+// import LinkExpired from "./sign-in/link-expired/page";
+// import SetNewPassword from "./sign-in/set-new-password/page";
+// import SuccessSetPassword from "./sign-in/success-set-password/page";
+// import SignUp from "./sign-up/page";
+// import SignupCompleteForm from "@/components/custom/signupCompletion";
+// import SignUpCompleteRegistration from "./sign-up/complete-registration/page";
+// import Employee from "./employee/page";
+// import OvertimeManagement from "./overtime/page";
+// import CheckclockOverviewPage from "./checkclock/checkclock-management/page";
+// import NotFound from "@/components/custom/NotFound";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

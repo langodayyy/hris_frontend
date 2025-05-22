@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar"; // Pastikan Anda memiliki komponen Calendar
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 
 import {
   Command,
@@ -27,7 +28,14 @@ import { TimeInput } from "@/components/ui/timeInput";
 import { DateRange } from "react-day-picker";
 import { FileUploader } from "@/components/ui/fileUploader";
 import { SelectPopover } from "@/components/ui/selectPopover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Route } from "react-router-dom";
 
 const employeesSample = [
   {
@@ -77,6 +85,7 @@ const workType = [
 ];
 
 export default function AddCheckclockPage() {
+  const router = useRouter();
   const [OpenAttendanceType, setOpenAttendanceType] = React.useState(false);
   const [valueEmployee, setValueEmployee] = React.useState("");
   const [valueAttendanceType, setValueAttendanceType] = React.useState("");
@@ -413,7 +422,9 @@ export default function AddCheckclockPage() {
           </form>
           <div className="flex w-full gap-[15px] justify-end">
             <div className="w-[93px]">
-              <Button variant={"outline"}>Cancel</Button>
+              <Button variant={"outline"} onClick={() => router.back()}>
+                Cancel
+              </Button>
             </div>
             <div className="w-[93px]">
               <Button type="submit">Save</Button>
