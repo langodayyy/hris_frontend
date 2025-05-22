@@ -3,7 +3,6 @@
     import { useState, useRef } from "react"
     import Sidebar from "@/components/sidebar";
     import { EmploymentContractForm, EmploymentContractForm2 } from "./template/surat";
-    import Tiptap from "@/components/ui/tiptap";
     import { Card } from "@/components/ui/card";
     import { Label } from "@/components/ui/label";
     import Link from 'next/link';
@@ -19,14 +18,19 @@
     import { DialogClose } from "@/components/ui/dialog";
     import { Input } from "@/components/ui/input";
     import { useParams } from "next/navigation";
-
-
-
+    import dynamic from "next/dynamic";
+    import { useRouter } from "next/navigation";
 
     export default function AddDocument() {
-        const [selectedTemplate, setSelectedTemplate] = useState("employment")
-        const [mode, setMode] = useState("template")
-        const [documentType, setDocumentType] = useState("");
+        const [selectedTemplate, setSelectedTemplate] = useState("")
+        const [mode, setMode] = useState("upload")
+        // const [documentType, setDocumentType] = useState("");
+        const [loading, setLoading] = useState(false);
+        const [success, setSuccess] = useState(false);
+        const [error, setError] = useState(false);
+        const router = useRouter();
+        
+        const documentTypeRef = useRef<HTMLInputElement>(null);
 
         const templates: Record<string, () => string> = {
             employment: EmploymentContractForm,
@@ -46,32 +50,69 @@
 
         const params = useParams<{ id: string }>();
         const employeeId = params.id;
+
+        const QuillEditor = dynamic(() => import('@/components/ui/quill'), {
+            ssr: false,
+        });
+
+
+        const quillRef = useRef<{ getPdfBlob: () => Promise<Blob | null> }>(null);
+        const timestamp = () => {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hour = String(now.getHours()).padStart(2, '0');
+            const minute = String(now.getMinutes()).padStart(2, '0');
+
+            return `${year}${month}${day}${hour}${minute}`;
+        };
+
+        const handleSubmitFormManual = async (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            setLoading(true);
+            setError(false);
+            setSuccess(false);
+
+            try {
+                if (!formRef.current) return;
+
+                const formData = new FormData(formRef.current);
+
+                if (mode === "template" && quillRef.current) {
+                    const blob = await quillRef.current.getPdfBlob();
+                    if (!blob) throw new Error("Gagal membuat PDF");
+
+                    formData.delete("document"); // pastikan tidak ada file lain
+                    formData.append("document", new File([blob], `document${timestamp()}.pdf`, { type: "application/pdf" }));
+                }
+
+                const response = await fetch("https://httpbin.org/post", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!response.ok) throw new Error("Gagal submit");
+
+                setSuccess(true);
+                setTimeout(() => {
+                    router.push(`/employee/${employeeId}`); // redirect setelah sukses
+                }, 1500);
+            } catch (err) {
+                console.error(err);
+                setError(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         return (
             <Sidebar title="Add Document">
                 <div className="flex flex-col">
                     <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden p-6">
                         <div className="flex flex-col gap-[6px]">
-                            <span className="text-base text-neutral-900">Select Template or Upload a Document</span>
+                            <span className="text-base text-neutral-900">Upload Document or Select Template</span>
                             <div className="flex gap-[8px]">
-                            
-                                <div className="flex flex-col gap-[8px]">
-                                    {/* <Label htmlFor="template">Select Template</Label> */}
-                                    <Select
-                                        value={selectedTemplate}
-                                        onValueChange={(value) => {
-                                            setSelectedTemplate(value);
-                                            setMode("template");
-                                        }}
-                                    >
-                                        <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-600">
-                                            <SelectValue placeholder="Select document template" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="employment">Employment Contract</SelectItem>
-                                            <SelectItem value="employment2">Employment Contract 2</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
                                 <div className="flex flex-col justify-end gap-[8px]">
                                     
                                     <Button className="!h-[46px]" variant={"calendar"}
@@ -95,105 +136,155 @@
                                         Upload Document
                                     </Button>
                                 </div>
+                                <div className="flex flex-col gap-[8px]">
+                                    {/* <Label htmlFor="template">Select Template</Label> */}
+                                    <Select
+                                        value={selectedTemplate}
+                                        onValueChange={(value) => {
+                                            setSelectedTemplate(value);
+                                            setMode("template");
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-600">
+                                            <SelectValue placeholder="Select document template" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="employment">Employment Contract</SelectItem>
+                                            <SelectItem value="employment2">Employment Contract 2</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                               
                             </div>
                         </div>
                         
-                        {/* <form action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data"> */}
-                        <div className="flex gap-6 justify-between">
+                        {/* <form  ref={formRef} action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data"  onSubmit={handleInsertPdfBeforeSubmit}> */}
+                        <form
+                        ref={formRef}
+                        onSubmit={handleSubmitFormManual}
+                        encType="multipart/form-data"
+                        >
+
+                            <div className="flex gap-6 justify-between flex-col lg:flex-row">
                         
-                        <div className="flex flex-col gap-[8px] flex-1">
-                            <div className="flex flex-col gap-[5px]">
-                                <Label htmlFor="Document Name">Document Name</Label>
+                            <div className="flex flex-col gap-[8px] w-full lg:w-1/3">
+                                <div className="flex flex-col gap-[5px]">
+                                    <Label htmlFor="Document Name">Document Name</Label>
+                                    <Input
+                                        type="text"
+                                        id="document_name"
+                                        name="document_name"
+                                        placeholder="Enter document name"
+                                        
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-[8px]">
+                                    <Label htmlFor="documentType">Document Type</Label>
+
+                                    <Select
+                                        onValueChange={(value) => {
+                                        if (documentTypeRef.current) {
+                                            documentTypeRef.current.value = value;
+                                        }
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-600">
+                                        <SelectValue placeholder="Select document type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                        <SelectItem value="information">Information</SelectItem>
+                                        <SelectItem value="document">Document</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    <input type="hidden" name="document_type" ref={documentTypeRef} />
+                                </div>
+
+
+                                <div className="flex flex-col gap-[8px]">
+                                <Label htmlFor="Issue darte">Issue Date</Label>
                                 <Input
-                                    type="text"
-                                    id="document_name"
-                                    name="document_name"
-                                    placeholder="Enter document name"
-                                />
-                            </div>
-                            <div className="flex flex-col gap-[8px]">
-                            <Label htmlFor="documentType">Document Type</Label>
-                            <Select value={documentType} onValueChange={setDocumentType}>
-                                <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-600">
-                                <SelectValue placeholder="Select document type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                <SelectItem value="information">Information</SelectItem>
-                                <SelectItem value="document">Document</SelectItem>
-                                </SelectContent>
-                            </Select>
-
-                            {/* Ini penting: agar masuk ke form submission */}
-                            <input type="hidden" name="document_type" value={documentType} />
-                            </div>
-
-                            <div className="flex flex-col gap-[8px]">
-                            <Label htmlFor="Issue darte">Issue Date</Label>
-                            <Input
-                                type="date"
-                                id="issue_date"
-                                name="issue_date"
-                                placeholder="Enter employee issue date"
-                            />
-                            </div>
-                            <div className="flex flex-col gap-[8px]">
-                            <Label htmlFor="Expiry darte">Expiry Date</Label>
-                            <Input
-                                type="date"
-                                id="expiry_date"
-                                name="expiry_date"
-                                placeholder="Enter employee expiry date"
-                            />
-                            </div>
-                        </div>
-                        {mode === "template" ? (
-                            <Tiptap template={templates[selectedTemplate]()} />
-                        ) : (
-                            <div className="w-3/4">
-                                <FileUploader
-                                    onDrop={handleFileDrop}
-                                    accept={{
-                                    "image/png": [],
-                                    "image/jpeg": [],
-                                    "image/jpg": [],
-                                    "application/pdf" : []
-                                    }}
-                                    type="Only support image/pdf file"
-                                    label="Drag your document file or"
-                                    description="Max 5 MB CSV file is allowed"
-                                />
-                                <input
-                                    type="file"
-                                    name="employee_csv"
-                                    accept=".csv"
-                                    ref={fileInputRef}
-                                    hidden
-                                />
-                                <div className="flex gap-[10px] justify-end">
-                                    <Link href={`/employee/${employeeId}`}>
-                                        <Button className="w-[80px]" variant="outline" size="lg" type="button">
-                                            Cancel
-                                        </Button>
-                                    </Link>
-                                    
+                                    type="date"
+                                    id="issue_date"
+                                    name="issue_date"
+                                    placeholder="Enter employee issue date"
                                 
-                                    <Button className="w-[80px]" variant="default" type="submit"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M17 21V13H7V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M7 3V8H15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                    Save
-                                    </Button>
+                                />
+                                </div>
+                                <div className="flex flex-col gap-[8px]">
+                                <Label htmlFor="Expiry darte">Expiry Date</Label>
+                                <Input
+                                    type="date"
+                                    id="expiry_date"
+                                    name="expiry_date"
+                                    placeholder="Enter employee expiry date"
+                                
+                                />
+                                </div>
+                            </div>
+                            {mode === "template" ? (
+                                // <Tiptap template={templates[selectedTemplate]()} />
+                                // <Tiptap></Tiptap>
+                                <div className="w-full lg:w-2/3">
+                                    <QuillEditor ref={quillRef} template={templates[selectedTemplate]()}></QuillEditor>
                                 </div>
                             
+                            ) : (
+                                <div className="w-3/4">
+                                    <FileUploader
+                                        onDrop={handleFileDrop}
+                                        accept={{
+                                        "image/png": [],
+                                        "image/jpeg": [],
+                                        "image/jpg": [],
+                                        "application/pdf" : []
+                                        }}
+                                        type="Only support image/pdf file"
+                                        label="Drag your document file or"
+                                        description="Max 5 MB CSV file is allowed"
+                                    />
+                                    <input
+                                        type="file"
+                                        name="document"
+                                        // accept=".csv"
+                                        ref={fileInputRef}
+                                    
+                                        hidden
+                                    />
+                                </div>
+                            )}
+                        
+                            </div>
+                            <div className="flex gap-[10px] justify-end">
+                                <Link href={`/employee/${employeeId}`}>
+                                    <Button className="w-[80px]" variant="outline" size="lg" type="button">
+                                        Cancel
+                                    </Button>
+                                </Link>
+                                
+                            
+                                <Button className="w-[80px]" variant="default" type="submit">
+                                    
+                                Submit
+                                
+
+                                </Button>
+                                {loading && <div className="flex items-center gap-2 text-blue-600 mt-2">
+                                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                    </svg>
+                                    <span>Submitting...</span>
+                                    </div>
+                                    }
+                                {success && <p className="text-green-600 mt-2">Document submitted successfully! Redirecting...</p>}
+                                {error && <p className="text-red-600 mt-2">There was an error submitting the form.</p>}
                             </div>
                             
-                        )}
-                        
-                        </div>
-                        {/* </form> */}
+                        </form>
                     </Card>
                 </div>
             </Sidebar>
         );
     }
+

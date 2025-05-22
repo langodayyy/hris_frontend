@@ -1,18 +1,14 @@
 function EmploymentContractForm() {
-  return `
-    <p>This Employment Contract is made and entered into on <strong>{{contractDate}}</strong> between <strong>{{companyName}}</strong> and <strong>{{employeeName}}</strong>.</p>
-    <p>Job Title: <strong>{{jobTitle}}</strong></p>
-    <p>Start Date: <strong>{{startDate}}</strong></p>
-    <p>Salary: <strong>{{salary}}</strong></p>
-  `
+  return `This Employment Contract is made and entered into on ... between ... and ...
+Job Title: ...
+Start Date: ...
+Salary: ...`
 }
 
 function EmploymentContractForm2() {
-  return `
-    <p>This is another type of contract for <strong>{{employeeName}}</strong> working at <strong>{{companyName}}</strong>.</p>
-    <p>Contract starts on <strong>{{startDate}}</strong> with a monthly wage of <strong>{{salary}}</strong>.</p>
-    <p>This contract ends on <strong>{{endDate}}</strong>.</p>
-  `
+  return `This is another type of contract for ... working at ...
+Contract starts on ... with a monthly wage of ...
+This contract ends on ...`
 }
 
 // Ekspor semua fungsi template
