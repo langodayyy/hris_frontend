@@ -39,7 +39,7 @@ export default function SigninEmployeeForm() {
       setLoading(true);
       const formData = new FormData();
       Object.entries(values).forEach(([key, value]) => {
-        formData.append(key, value);
+        formData.append(key, String(value));
       });
       const response = await loginUser(formData);
 
@@ -101,7 +101,7 @@ export default function SigninEmployeeForm() {
 
 export async function loginUser(formData: FormData) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login-employee`, {
       method: "POST",
       body: formData,
     });
