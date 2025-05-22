@@ -73,6 +73,14 @@ export function DataTable<TData, TValue>({
       globalFilter,
     },
     onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: (row, columnId, filterValue) => {
+      const name = row.getValue("name")?.toString().toLowerCase() || "";
+      const id = row.getValue("id_emp")?.toString().toLowerCase() || "";
+      return (
+        name.includes(filterValue.toLowerCase()) ||
+        id.includes(filterValue.toLowerCase())
+      );
+    },
   });
 
 

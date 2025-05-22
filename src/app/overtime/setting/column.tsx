@@ -20,9 +20,9 @@ type OvertimeSettingsRecord = {
   name: string;
   type: string;
   category: string;
-  work_day: number;
-  calculation: number;
-  rate: number;
+  work_day: number | null;
+  calculation: number | null;
+  rate: number | null;
   formula: string;
 };
 
