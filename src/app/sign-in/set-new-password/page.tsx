@@ -6,6 +6,7 @@ import {
   ResetPassProvider,
   useResetPassContext,
 } from "@/context/ResetTokenContext";
+import { Suspense } from "react";
 
 function SetNewPasswordContent() {
   const { isLoading } = useResetPassContext();
@@ -41,6 +42,7 @@ function SetNewPasswordContent() {
       ))}
 
       <SetNewPassForm />
+
       <div className="flex items-center justify-center w-full text-sm gap-[10px]">
         <img src="/arrow-left.svg" alt="left arrow Icon" />
         <a href="/sign-in" className="text-info-500 hover:underline">
@@ -53,19 +55,21 @@ function SetNewPasswordContent() {
 
 export default function SetNewPassword() {
   return (
-    <ResetPassProvider>
-      <div className="flex h-screen w-screen bg-white p-[23px]">
-        <SetNewPasswordContent />
+    <Suspense fallback={<Spinner size="small" />}>
+      <ResetPassProvider>
+        <div className="flex h-screen w-screen bg-white p-[23px]">
+          <SetNewPasswordContent />
 
-        {/* image */}
-        <div className="w-1/2">
-          <img
-            className="h-full w-full object-cover rounded-[10px]"
-            src="/images/signin signup.png"
-            alt="cover.png"
-          />
+          {/* image */}
+          <div className="w-1/2">
+            <img
+              className="h-full w-full object-cover rounded-[10px]"
+              src="/images/signin signup.png"
+              alt="cover.png"
+            />
+          </div>
         </div>
-      </div>
-    </ResetPassProvider>
+      </ResetPassProvider>
+    </Suspense>
   );
 }
