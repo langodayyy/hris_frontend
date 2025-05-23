@@ -14,12 +14,22 @@
         SelectTrigger,
         SelectValue,
     } from "@/components/ui/select"
+    import {
+        Dialog,
+        DialogTrigger,
+        DialogContent,
+        DialogHeader,
+        DialogTitle,
+        DialogFooter,
+        DialogClose,
+    } from "@/components/ui/dialog";
+
     import { FileUploader } from "@/components/ui/fileUploader";
-    import { DialogClose } from "@/components/ui/dialog";
     import { Input } from "@/components/ui/input";
     import { useParams } from "next/navigation";
     import dynamic from "next/dynamic";
     import { useRouter } from "next/navigation";
+    import { Spinner } from "@/components/ui/spinner";
 
     export default function AddDocument() {
         const [selectedTemplate, setSelectedTemplate] = useState("")
@@ -29,6 +39,7 @@
         const [success, setSuccess] = useState(false);
         const [error, setError] = useState(false);
         const router = useRouter();
+        const [preventRedirect, setPreventRedirect] = useState(false);
         
         const documentTypeRef = useRef<HTMLInputElement>(null);
 
@@ -95,9 +106,9 @@
                 if (!response.ok) throw new Error("Gagal submit");
 
                 setSuccess(true);
-                setTimeout(() => {
-                    router.push(`/employee/${employeeId}`); // redirect setelah sukses
-                }, 1500);
+                // setTimeout(() => {
+                //     router.push(`/employee/${employeeId}`); // redirect setelah sukses
+                // }, 1500);
             } catch (err) {
                 console.error(err);
                 setError(true);
@@ -257,29 +268,74 @@
                             </div>
                             <div className="flex gap-[10px] justify-end">
                                 <Link href={`/employee/${employeeId}`}>
-                                    <Button className="w-[80px]" variant="outline" size="lg" type="button">
+                                    <Button className="w-[80px] h-[40px]" variant="outline" size="lg" type="button">
                                         Cancel
                                     </Button>
                                 </Link>
                                 
                             
-                                <Button className="w-[80px]" variant="default" type="submit">
-                                    
-                                Submit
-                                
-
+                                <Button className="w-[80px] h-[40px]" variant="default" type="submit" disabled={loading}>
+                                      {!loading ? 'Submit' : <Spinner size="small"/>}
                                 </Button>
-                                {loading && <div className="flex items-center gap-2 text-blue-600 mt-2">
-                                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                    </svg>
-                                    <span>Submitting...</span>
-                                    </div>
-                                    }
-                                {success && <p className="text-green-600 mt-2">Document submitted successfully! Redirecting...</p>}
-                                {error && <p className="text-red-600 mt-2">There was an error submitting the form.</p>}
+                               
                             </div>
+                                 <Dialog
+                                    open={success || error}
+                                    onOpenChange={(open) => {
+                                        if (!open) {
+                                        setSuccess(false);
+                                        setError(false);
+
+                                        if (!preventRedirect) {
+                                            // Jika bukan karena tombol Add Another Document, redirect
+                                            router.push(`/employee/${employeeId}`);
+                                        } else {
+                                            // reset flag supaya dialog bisa redirect normal di lain waktu
+                                            setPreventRedirect(false);
+                                        }
+                                        }
+                                    }}
+                                    >
+                                    <DialogContent className="bg-white max-w-sm mx-auto">
+                                        <DialogHeader>
+                                        <DialogTitle>{success ? "Success!" : "Error"}</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="mt-2">
+                                        {success && <p className="text-green-700">Document submitted successfully!</p>}
+                                        {error && <p className="text-red-600">There was an error submitting the form.</p>}
+                                        </div>
+                                        <DialogFooter className="mt-4 flex gap-2 justify-end">
+                                        {success && (
+                                            <div className="flex gap-2 justify-end w-full">
+                                            <Button
+                                                variant="outline"
+                                                className="max-w-[180px] whitespace-nowrap"
+                                                onClick={() => {
+                                                // Reset form & close popup
+                                                formRef.current?.reset();
+                                                setSuccess(false);
+                                                setSelectedTemplate("");
+                                                setMode("upload");
+
+                                                setPreventRedirect(true); // cegah redirect saat dialog close
+                                                }}
+                                            >
+                                                Add Another Document
+                                            </Button>
+                                            <DialogClose asChild>
+                                                <Button variant="default" className="max-w-[180px] whitespace-nowrap">Close</Button>
+                                            </DialogClose>
+                                            </div>
+                                        )}
+                                        {error && (
+                                            <DialogClose asChild>
+                                            <Button variant="default" className="max-w-[180px] whitespace-nowrap">OK</Button>
+                                            </DialogClose>
+                                        )}
+                                        </DialogFooter>
+                                    </DialogContent>
+                                    </Dialog>
+
                             
                         </form>
                     </Card>
