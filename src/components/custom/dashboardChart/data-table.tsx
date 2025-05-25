@@ -6,6 +6,7 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
@@ -18,8 +19,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import React from "react";
-import { useRouter } from "next/navigation";
+
+import { Select } from "@radix-ui/react-select";
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+import React, { useState } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -33,22 +51,57 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [globalFilter, setGlobalFilter] = React.useState(""); 
+  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     state: {
       columnFilters,
       globalFilter,
+      pagination: {
+        pageIndex: currentPage - 1, // React Table menggunakan 0-based index
+        pageSize: rowsPerPage,
+      },
     },
     onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: (updater) => {
+      const newPagination =
+        typeof updater === "function"
+          ? updater(table.getState().pagination)
+          : updater;
+      setCurrentPage(newPagination.pageIndex + 1); // Perbarui halaman (1-based index)
+      setRowsPerPage(newPagination.pageSize); // Perbarui jumlah baris per halaman
+    },
   });
 
-  const router = useRouter();
+  const handleRowsChange = (value: string) => {
+    setRowsPerPage(Number(value));
+    setCurrentPage(1); // reset ke halaman 1
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+
+  const maxVisiblePages = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  let endPage = startPage + maxVisiblePages - 1;
+
+  if (endPage > totalPages) {
+    endPage = totalPages;
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
 
   return (
     <div className="flex flex-col gap-[10px]">
@@ -76,14 +129,11 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="text-center">
+                    <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -104,6 +154,106 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="w-full flex justify-between mt-[10px]">
+        {/* Select Rows */}
+        <div className="flex items-center gap-[10px]">
+          <p className="text-base font-medium">Showing</p>
+          <Select
+            onValueChange={handleRowsChange}
+            defaultValue={rowsPerPage.toString()}
+          >
+            <SelectTrigger className="w-[72px]">
+              <SelectValue placeholder="" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="5">5</SelectItem>
+              <SelectItem value="10">10</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+                  className="mx-[4px] w-[24px] h-[26px] !py-[6px] !px-[6px] border text-primary-900 bg-[#F5F5F5] shadow-xs hover:bg-primary-950 hover:text-white dark:bg-input/30 dark:border-input dark:hover:bg-input/50"
+                />
+              </PaginationItem>
+              {startPage > 1 && (
+                <>
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={() => handlePageChange(1)}
+                    >
+                      1
+                    </PaginationLink>
+                  </PaginationItem>
+                  {startPage > 2 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+                </>
+              )}
+
+              {Array.from({ length: endPage - startPage + 1 }).map((_, i) => {
+                const page = startPage + i;
+                return (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      href="#"
+                      isActive={page === currentPage}
+                      onClick={() => handlePageChange(page)}
+                      className={`inline-flex items-center justify-center mx-[4px] w-[24px] h-[26px] !py-[6px] !px-[6px] border text-primary-900 bg-[#F5F5F5] shadow-xs 
+                                      ${
+                                        page === currentPage
+                                          ? "bg-primary-950 text-white"
+                                          : "hover:bg-primary-950 hover:text-white"
+                                      }
+                                      dark:bg-input/30 dark:border-input dark:hover:bg-input/50`}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              })}
+
+              {endPage < totalPages && (
+                <>
+                  {endPage < totalPages - 1 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={() => handlePageChange(totalPages)}
+                    >
+                      {totalPages}
+                    </PaginationLink>
+                  </PaginationItem>
+                </>
+              )}
+
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={() =>
+                    handlePageChange(Math.min(currentPage + 1, totalPages))
+                  }
+                  className="mx-[4px] w-[24px] h-[26px] !py-[6px] !px-[6px] border text-primary-900 bg-[#F5F5F5] shadow-xs hover:bg-primary-950 hover:text-white dark:bg-input/30 dark:border-input dark:hover:bg-input/50"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </div>
     </div>
   );
