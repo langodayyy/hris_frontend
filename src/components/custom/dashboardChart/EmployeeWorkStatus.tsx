@@ -24,21 +24,21 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
-const chartData = [
-  { name: "Permanent", value: 120 },
-  { name: "Internship", value: 12 },
-  { name: "Part-time", value: 5 },
-  { name: "Outsource", value: 21 },
-];
-
-const chartConfig = {
-  employee: {
-    label: "employee",
-    color: "#1E3A5F",
-  },
-} satisfies ChartConfig;
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { Spinner } from "@/components/ui/spinner";
+import { getBarChartData } from "@/utils/getBarChartData";
 
 export function EmployeeWorkStatus() {
+  const { dashboardData, loading } = useDashboardData();
+    if (loading || !dashboardData)
+      return (
+        <Card className="flex flex-col py-0 gap-0 h-[251px] justify-center items-center">
+          <Spinner size="small" />
+        </Card>
+      );
+  
+    const { chartData, chartConfig } = getBarChartData(dashboardData.employeeWorkStatus[0]);
+
   return (
     <Card>
       <CardHeader>

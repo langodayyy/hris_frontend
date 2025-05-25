@@ -17,6 +17,9 @@ import {
   DropdownMenuRadioGroup,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
+import { getTableChartData } from "@/utils/getTableChartData";
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { Spinner } from "@/components/ui/spinner";
 
 const chartData: CheckClockListRecord[] = [
   { id: "1", name: "Mumtaz", time: "10:00", position: "CEO" },
@@ -27,6 +30,17 @@ const chartData: CheckClockListRecord[] = [
 export function CheckClockListToday() {
   const column = CheckClockList();
   const [position, setPosition] = useState("sick")
+
+  const { dashboardData, loading } = useDashboardData();
+    
+      if (loading || !dashboardData)
+        return (
+          <Card className="flex flex-col py-0 gap-0 h-[251px] justify-center items-center">
+            <Spinner size="small" />
+          </Card>
+        );
+    
+      const { chartData } = getTableChartData(dashboardData.lateEmployee);
 
   return (
     <Card>
