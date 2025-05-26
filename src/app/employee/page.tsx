@@ -92,7 +92,7 @@ export default function Employee() {
         <div className="mt-[30px] w-full overflow-x-auto">
           <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
             <CardContent className="overflow-x-auto">
-
+              
                 <DataTable columns={columns} data={employees} />
               
             </CardContent>
