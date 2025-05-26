@@ -69,46 +69,46 @@ export function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
-      const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-        []
-      );
-      const [filters, setFilters] = useState({
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+    );
+    const [filters, setFilters] = useState({
         position: [] as string[],
         workType: [] as string[],
         type: [] as string[],
         gender: [] as string[],
         status: [] as string[],
-      });
-      const [tempFilters, setTempFilters] = useState(filters);
-      const applyClickedRef = useRef(false);
-      const [rowsPerPage, setRowsPerPage] = useState(10);
-      const [currentPage, setCurrentPage] = useState(1);
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      sorting,
-      columnFilters,
-      pagination: {
-        pageIndex: currentPage - 1, // React Table menggunakan 0-based index
-        pageSize: rowsPerPage,
-      },
-    },
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onPaginationChange: (updater) => {
-      const newPagination =
-        typeof updater === "function"
-          ? updater(table.getState().pagination)
-          : updater;
-      setCurrentPage(newPagination.pageIndex + 1); // Perbarui halaman (1-based index)
-      setRowsPerPage(newPagination.pageSize); // Perbarui jumlah baris per halaman
-    },
-  })
+    });
+    const [tempFilters, setTempFilters] = useState(filters);
+    const applyClickedRef = useRef(false);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
+    const table = useReactTable({
+        data,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        state: {
+        sorting,
+        columnFilters,
+        pagination: {
+            pageIndex: currentPage - 1, // React Table menggunakan 0-based index
+            pageSize: rowsPerPage,
+        },
+        },
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        onPaginationChange: (updater) => {
+        const newPagination =
+            typeof updater === "function"
+            ? updater(table.getState().pagination)
+            : updater;
+        setCurrentPage(newPagination.pageIndex + 1); // Perbarui halaman (1-based index)
+        setRowsPerPage(newPagination.pageSize); // Perbarui jumlah baris per halaman
+        },
+    })
     const handleRowsChange = (value: string) => {
         setRowsPerPage(Number(value));
         setCurrentPage(1); // reset ke halaman 1
@@ -118,10 +118,9 @@ export function DataTable<TData, TValue>({
         setCurrentPage(page);
     };
 
-    const totalPages = Math.ceil(data.length / rowsPerPage);
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    const currentData = data.slice(startIndex, endIndex);
+    // const totalPages = Math.ceil(data.length / rowsPerPage);
+    const totalPages = Math.ceil(table.getFilteredRowModel().rows.length / rowsPerPage);
+ 
 
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
@@ -132,27 +131,6 @@ export function DataTable<TData, TValue>({
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
-    const handleFilterChange = (key: keyof typeof filters, value: string) => {
-        setFilters((prev) => {
-        const isSelected = prev[key].includes(value);
-        const updatedValues = isSelected
-            ? prev[key].filter((item) => item !== value) // Remove if already selected
-            : [...prev[key], value]; // Add if not selected
-
-        // Update column filters
-        table.setColumnFilters([
-            ...columnFilters.filter((filter) => filter.id !== key), // Remove existing filter for the column
-            ...(updatedValues.length > 0
-            ? [{ id: key, value: updatedValues }] // Pass array of values
-            : []), // Clear filter if no values
-        ]);
-
-        return {
-            ...prev,
-            [key]: updatedValues,
-        };
-        });
-    };
     const formRef = useRef<HTMLFormElement>(null);
       const fileInputRef = useRef<HTMLInputElement>(null);
     
@@ -186,7 +164,7 @@ export function DataTable<TData, TValue>({
         </svg>}
         value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
         onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
-        className="w-full" />
+        className="w-full min-w-[200px]" />
     <div className="w-fit">
         <DropdownMenu
             onOpenChange={(open) => {
@@ -345,7 +323,7 @@ export function DataTable<TData, TValue>({
                 ))}
                 <DropdownMenuSeparator />
                 {/* Clear Filters Button */}
-                <div className="px-2 py-1">
+                <div className="flex flex-col px-2 py-1 gap-[10px]">
                     <Button
                         variant="default"
                         className="w-full"
@@ -605,7 +583,7 @@ export function DataTable<TData, TValue>({
             Add
         </Button>
     </div>
-    </div><div className="rounded-md border">
+    </div><div className="rounded-md border min-w-[815px]">
         <Table>
             <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -652,21 +630,28 @@ export function DataTable<TData, TValue>({
          <div className="w-full flex justify-between mt-[10px]">
         {/* Select Rows */}
         <div className="flex items-center gap-[10px]">
-          <p className="text-base font-medium">Showing</p>
-          <Select
-            onValueChange={handleRowsChange}
-            defaultValue={rowsPerPage.toString()}
-          >
-            <SelectTrigger className="w-[72px]">
-              <SelectValue placeholder="" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-            </SelectContent>
-          </Select>
+            <p className="text-base font-medium">Showing</p>
+            <Select
+                onValueChange={handleRowsChange}
+                defaultValue={rowsPerPage.toString()}
+                >
+                <SelectTrigger className="w-[72px]">
+                    <SelectValue placeholder="" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    {table.getFilteredRowModel().rows.length > 10 && (
+                    <SelectItem value="25">25</SelectItem>
+                    )}
+                    {table.getFilteredRowModel().rows.length > 25 && (
+                    <SelectItem value="50">50</SelectItem>
+                    )}
+                    {table.getFilteredRowModel().rows.length > 50 && (
+                    <SelectItem value="100">100</SelectItem>
+                    )}
+                </SelectContent>
+            </Select>
+
         </div>
 
         {/* Pagination */}
@@ -707,12 +692,12 @@ export function DataTable<TData, TValue>({
                       isActive={page === currentPage}
                       onClick={() => handlePageChange(page)}
                       className={`inline-flex items-center justify-center mx-[4px] w-[24px] h-[26px] !py-[6px] !px-[6px] border text-primary-900 bg-[#F5F5F5] shadow-xs 
-                                      ${
-                                        page === currentPage
-                                          ? "bg-primary-950 text-white"
-                                          : "hover:bg-primary-950 hover:text-white"
-                                      }
-                                      dark:bg-input/30 dark:border-input dark:hover:bg-input/50`}
+                        ${
+                        page === currentPage
+                            ? "bg-primary-950 text-white"
+                            : "hover:bg-primary-950 hover:text-white"
+                        }
+                        dark:bg-input/30 dark:border-input dark:hover:bg-input/50`}
                     >
                       {page}
                     </PaginationLink>
