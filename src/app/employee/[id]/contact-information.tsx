@@ -14,6 +14,7 @@ import {
     DialogFooter,
     DialogClose,
     } from "@/components/ui/dialog"
+import PhoneInput from "@/components/ui/phoneInput";
 
 
 const ContactInformation = () => {
@@ -44,13 +45,9 @@ const ContactInformation = () => {
                                     <div className="flex flex-col gap-[15px] mt-[15px]">
                                         <div className="flex gap-[10px]">
                                             <div className="flex flex-col flex-1 gap-[8px]">
-                                                <Label htmlFor="phone_number">Phone Number</Label>
-                                                <Input
-                                                    type="number"
-                                                    id="phone"
-                                                    name="phone"
-                                                    placeholder="Enter employee phone number"
-                                                />
+                                                 <PhoneInput
+                                                                                    placeholder="Enter employee phone number"
+                                                                                />
                                             </div>
                                             <div className="flex flex-col flex-1 gap-[8px]">
                                                 <Label htmlFor="email">Email</Label>
@@ -97,14 +94,17 @@ const ContactInformation = () => {
                     <Label>Phone Number</Label>
                     <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">6212345678909</span> 
                 </div>
-
-            </div>
-            <div className="flex mx-[20px] gap-[10px]">
                 <div className="flex flex-col flex-1 gap-[8px]">
                     <Label>Email</Label>
                     <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">johnmarston@gmail.com</span> 
                 </div>
             </div>
+            {/* <div className="flex mx-[20px] gap-[10px]">
+                <div className="flex flex-col flex-1 gap-[8px]">
+                    <Label>Email</Label>
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">johnmarston@gmail.com</span> 
+                </div>
+            </div> */}
         </Card> 
         
     );

@@ -21,7 +21,7 @@ import React, { useState } from 'react';
 
 export default function AddEmployee() {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-
+    const [contractType, setContractType] = useState("permanent");
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -99,11 +99,7 @@ export default function AddEmployee() {
                             </div>
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
-                            <div className="flex flex-col flex-1 gap-[8px]">
-                                <PhoneInput 
-                                    placeholder="Enter employee phone number"
-                                />
-                            </div>
+                           
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="NIK">NIK</Label>
                                 <Input
@@ -113,8 +109,6 @@ export default function AddEmployee() {
                                     placeholder="Enter employee NIK"
                                 />
                             </div>
-                        </div>
-                        <div className="flex mx-[20px] gap-[10px]">
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="gender">Gender</Label>
                                 <Select>
@@ -127,24 +121,8 @@ export default function AddEmployee() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="flex flex-col flex-1 gap-[8px]">
-                                <Label htmlFor="Education">Education</Label>
-                                <Select>
-                                    <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
-                                        <SelectValue placeholder="Select employee education" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="sd">SD</SelectItem>
-                                        <SelectItem value="smp">SMP</SelectItem>
-                                        <SelectItem value="sma">SMA</SelectItem>
-                                        <SelectItem value="d3">D3</SelectItem>
-                                        <SelectItem value="s1">S1</SelectItem>
-                                        <SelectItem value="s2">S2</SelectItem>
-                                        <SelectItem value="s3">S3</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
                         </div>
+                        
                         <div className="flex mx-[20px] gap-[10px]">
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="birth place">Birth Place</Label>
@@ -166,6 +144,24 @@ export default function AddEmployee() {
                             </div>
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
+                            
+                            <div className="flex flex-col flex-1 gap-[8px]">
+                                <Label htmlFor="Education">Education</Label>
+                                <Select>
+                                    <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
+                                        <SelectValue placeholder="Select employee education" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="sd">SD</SelectItem>
+                                        <SelectItem value="smp">SMP</SelectItem>
+                                        <SelectItem value="sma">SMA</SelectItem>
+                                        <SelectItem value="d3">D3</SelectItem>
+                                        <SelectItem value="s1">S1</SelectItem>
+                                        <SelectItem value="s2">S2</SelectItem>
+                                        <SelectItem value="s3">S3</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="blood-type">Blood Type</Label>
                                 <Select>
@@ -181,7 +177,17 @@ export default function AddEmployee() {
                                     </SelectContent>
                                 </Select>
                             </div>
-
+                        </div>
+                        <div className="flex mx-[20px] gap-[10px]">
+                            <div className="flex flex-col flex-1 gap-[8px]">
+                                <Label htmlFor="address">Address</Label>
+                                <Input
+                                    type="text"
+                                    id="address"
+                                    name="address"
+                                    placeholder="Enter employee address"
+                                />
+                            </div>
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="citizenship">Citizenship</Label>
                                 <Input
@@ -193,7 +199,7 @@ export default function AddEmployee() {
                             </div>
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
-                            <div className="flex flex-col flex-1 gap-[8px]">
+                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="maritial-_status">Maritial Status</Label>
                                 <Select>
                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
@@ -225,29 +231,10 @@ export default function AddEmployee() {
                                 </Select>
                             </div>
                         </div>
-                        <div className="flex mx-[20px] gap-[10px]">
-                            <div className="flex flex-col flex-1 gap-[8px]">
-                                <Label htmlFor="position">Position</Label>
-                                <Input
-                                    type="text"
-                                    id="position"
-                                    name="position"
-                                    placeholder="Enter employee position"
-                                />
-                            </div>
-                            <div className="flex flex-col flex-1 gap-[8px]">
-                                <Label htmlFor="branch">Branch</Label>
-                                <Input
-                                    type="text"
-                                    id="branch"
-                                    name="branch"
-                                    placeholder="Enter employee branch"
-                                />
-                            </div>
-                        </div>
+                      
                         <div className="flex mx-[20px] py-[12px]">
-                            <Label htmlFor="position">Contract Type</Label>
-                            <RadioGroup defaultValue="option-one" className="flex ml-[50px]">
+                            <Label htmlFor="contract">Contract Type</Label>
+                            <RadioGroup defaultValue="permanent" className="flex ml-[50px]">
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="permanent" id="permanent" />
                                     <Label htmlFor="contract">Permanent</Label>
@@ -260,11 +247,57 @@ export default function AddEmployee() {
                                     <RadioGroupItem value="intern" id="intern" />
                                     <Label htmlFor="intern">Intern</Label>
                                 </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="part-time" id="part-time" />
+                                    <Label htmlFor="part-time">Part-time</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="outsource" id="outsource" />
+                                    <Label htmlFor="outsource">Outsource</Label>
+                                </div>
                             </RadioGroup>
+                            <input type="hidden" name="contractType" value={contractType} />
+                        </div>
+                        <div className="flex mx-[20px] gap-[10px]">
+                           
+                            <div className="flex flex-col flex-1 gap-[8px]">
+                                <Label htmlFor="department">Department</Label>
+                                <Input
+                                    type="text"
+                                    id="department"
+                                    name="department"
+                                    placeholder="Enter employee department"
+                                />
+                            </div>
+                             <div className="flex flex-col flex-1 gap-[8px]">
+                                <Label htmlFor="position">Position</Label>
+                                <Input
+                                    type="text"
+                                    id="position"
+                                    name="position"
+                                    placeholder="Enter employee position"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex mx-[20px] gap-[10px]">
+                            <div className="flex flex-col flex-1 gap-[8px]">
+                                <PhoneInput 
+                                    placeholder="Enter employee phone number"
+                                />
+                            </div>
+                            <div className="flex flex-col flex-1 gap-[8px]">
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                    type="text"
+                                    id="email"
+                                    name="email"
+                                    placeholder="Enter employee email"
+                                />
+                            </div>
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
                             
-                            <div className="flex flex-col flex-1 gap-[8px]">
+                            {/* <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="bank">Bank</Label>
                                 <Select>
                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
@@ -288,6 +321,15 @@ export default function AddEmployee() {
                                     </SelectContent>
 
                                 </Select>
+                            </div> */}
+                            <div className="flex flex-col flex-1 gap-[8px]">
+                                <Label htmlFor="bank">Bank</Label>
+                                <Input
+                                    type="text"
+                                    id="bank"
+                                    name="bank"
+                                    placeholder="Enter employee bank"
+                                />
                             </div>
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="Account_Number">Account Number</Label>
@@ -301,7 +343,7 @@ export default function AddEmployee() {
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
                             
-                            <PasswordInput id="password" name="password" placeholder="Enter password for employee"></PasswordInput>
+                            <PasswordInput id="password" name="password" placeholder="Enter employee password or leave blank for default"></PasswordInput>
                             
                         </div>
                     </Card>

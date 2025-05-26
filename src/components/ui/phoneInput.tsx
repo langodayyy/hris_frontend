@@ -11,7 +11,7 @@ export default function PhoneInput({ placeholder = "Enter your phone number" }: 
     <div className="flex flex-col gap-2 w-full">
       <Label htmlFor="phone">Phone Number</Label>
       <div className="flex border border-neutral-300 rounded-md overflow-hidden">
-        <div className="px-4 py-3 text-base text-neutral-700 bg-white border-r border-neutral-300">
+        <div className="px-4 flex items-center text-base text-neutral-700 bg-white border-r border-neutral-300">
           +62
         </div>
         <Input
