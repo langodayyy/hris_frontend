@@ -109,12 +109,21 @@ const EmploymentOverview = () => {
                                         </div>
                                         <div className="flex gap-[10px]">
                                             <div className="flex flex-col flex-1 gap-[8px]">
-                                                <Label htmlFor="branch">Branch</Label>
+                                                <Label htmlFor="bank">Bank</Label>
                                                 <Input
                                                     type="text"
-                                                    id="branch"
-                                                    name="branch"
-                                                    placeholder="Enter employee branch"
+                                                    id="bank"
+                                                    name="bank"
+                                                    placeholder="Enter employee bank"
+                                                />
+                                            </div>                                           
+                                            <div className="flex flex-col flex-1 gap-[8px]">
+                                                <Label htmlFor="Account_Number">Account Number</Label>
+                                                <Input
+                                                    type="number"
+                                                    id="account_number"
+                                                    name="account_number"
+                                                    placeholder="Enter employee Account Number"
                                                 />
                                             </div>
                                         </div>
@@ -158,11 +167,21 @@ const EmploymentOverview = () => {
             </div>
             <div className="flex mx-[20px] gap-[10px]">
                 <div className="flex flex-col flex-1 gap-[8px]">
+                    <Label>Bank</Label>
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">BRI</span> 
+                </div>
+                <div className="flex flex-col flex-1 gap-[8px]">
+                    <Label>Account Number</Label>
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">123455666565656</span> 
+                </div>
+            </div>
+            <div className="flex mx-[20px] gap-[10px]">
+                <div className="flex flex-col flex-1 gap-[8px]">
                     <Label>Salary</Label>
                     <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">IDR 10.000.000</span> 
                 </div>
                 <div className="flex flex-col flex-1 gap-[8px]">
-                    <Label>Status</Label>
+                    <Label>Contract Type</Label>
                     <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">Permanent</span> 
                 </div>
             </div>
