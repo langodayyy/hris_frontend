@@ -5,31 +5,40 @@ import { Employees, columns } from "./column";
 import { DataTable } from "./data-table"
 import { Card, CardContent } from "@/components/ui/card";
 import React, { useRef, useState, useEffect } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
-const dummyEmployees: Employees[] = Array.from({ length: 1000 }, (_, i) => ({
-  id: `emp-${i + 1}`,
-  name: `Employee ${i + 1}`,
-  gender: i % 2 === 0 ? "Male" : "Female",
-  phone: `6287822742996`,
-  workType: ["WFO", "WFH", "Hybrid"][i % 3] as Employees["workType"],
-  position: ["CEO", "Manager", "Staff", "Supervisor", "Assistant"][i % 5],
-  type: ["Permanent", "Contract", "Intern", "Part-time", "Outsource"][i % 5] as Employees["type"],
-  status: i % 3 === 0 ? "Inactive" : "Active",
-}))
-
-export async function getEmployees(): Promise<Employees[]> {
-  // Simulasi fetch data
-  return dummyEmployees
-}
 
 export default function Employee() {
   const [employees, setEmployees] = useState<Employees[]>([])
+  const [summary, setSummary] = useState<{ "Total Employee": number; "Total New Hire": number; "Active Employee": number } | null>(null);
+  const [periode, setPeriode] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchData() {
-      const data = await getEmployees()
-      setEmployees(data)
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const token = localStorage.getItem("token") // pastikan token sudah disimpan di login
+        const res = await fetch("http://127.0.0.1:8000/api/employee", {
+          headers: {
+            "Authorization": `Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a`,
+            "Content-Type": "application/json"
+          }
+        })
+
+        if (!res.ok) throw new Error("Failed to fetch employees")
+
+        const data = await res.json()
+        setEmployees(data.employees)
+        setSummary(data.summary)
+        setPeriode(data.periode)
+      } catch (error) {
+        console.error("Error fetching data:", error)
+      } finally {
+        setIsLoading(false);
+      }
     }
+
     fetchData()
   }, [])
   return (
@@ -48,7 +57,10 @@ export default function Employee() {
                 </svg>
                 <p className="justify-center w-full text-base font-medium whitespace-nowrap">Periode</p>
               </div>
-              <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">May 2025</p>
+              {isLoading ? (
+                <Spinner className="w-full mx-[20px] my-[10px]" size="medium" />
+              ) : (<p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{periode}</p>)}
+              
             </div>
           </Card>
           <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
@@ -59,7 +71,9 @@ export default function Employee() {
                 </svg>
                 <p className="justify-center w-full text-base font-medium whitespace-nowrap">Total Employee</p>
               </div>
-              <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{dummyEmployees.length}</p>
+              {isLoading ? (
+                <Spinner className="w-full mx-[20px] my-[10px]" size="medium" />
+              ) : (<p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{summary?.["Total Employee"]}</p>)}
             </div>
           </Card>
           <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
@@ -72,7 +86,9 @@ export default function Employee() {
                 </svg>
                 <p className="justify-center w-full text-base font-medium whitespace-nowrap">Total New Hire</p>
               </div>
-              <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">200</p>
+              {isLoading ? (
+                <Spinner className="w-full mx-[20px] my-[10px]" size="medium" />
+              ) : (<p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{summary?.["Total New Hire"]}</p>)}
             </div>
           </Card>
           <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
@@ -83,17 +99,19 @@ export default function Employee() {
                   <path d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
 
-                <p className="justify-center w-full text-base font-medium whitespace-nowrap">Full Time Employee</p>
+                <p className="justify-center w-full text-base font-medium whitespace-nowrap">Active Employee</p>
               </div>
-              <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">30</p>
+              {isLoading ? (
+                <Spinner className="w-full mx-[20px] my-[10px]" size="medium" />
+              ) : (<p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{summary?.["Active Employee"]}</p>)}
             </div>
           </Card>
         </div>
         <div className="mt-[30px] w-full overflow-x-auto">
           <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
             <CardContent className="overflow-x-auto">
-              
-                <DataTable columns={columns} data={employees} />
+                
+                <DataTable columns={columns} data={employees} isLoading={isLoading}/>
               
             </CardContent>
           </Card>
