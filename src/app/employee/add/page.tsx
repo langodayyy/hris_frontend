@@ -13,15 +13,33 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
-
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import PasswordInput from "@/components/ui/passwordInput";
 import { Button } from "@/components/ui/button";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function AddEmployee() {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-    const [contractType, setContractType] = useState("permanent");
+    const [contractType, setContractType] = useState("Permanent");
+    const [gender, setGender] = useState("");
+    const [education, setEducation] = useState("");
+    const [bloodType, setBloodType] = useState("");
+    const [maritalStatus, setMaritalStatus] = useState("");
+    const [religion, setReligion] = useState("");
+
+
+
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState(false);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -29,11 +47,120 @@ export default function AddEmployee() {
             setAvatarPreview(URL.createObjectURL(file));
         }
     };
+
     
+    const [openBank, setOpenBank] = useState(false)
+    const [openDep, setOpenDep] = useState(false)
+    const [openPos, setOpenPos] = useState(false)
+    const [selectedBank, setSelectedBank] = useState<string | null>(null);
+
+    const [bank, setBank] = useState<{ name: string; code: string }[] | null>(null);
+
+    const [depPosData, setDepPosData] = useState<DepartmentPosition[]>([]);
+    const [departments, setDepartments] = useState<string[]>([]);
+    const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
+    const [positions, setPositions] = useState<DepartmentPosition[]>([]);
+    const [selectedPosition, setSelectedPosition] = useState<DepartmentPosition | null>(null);
+
+    type DepartmentPosition = {
+        id_department: number;
+        Department: string;
+        id_position: number;
+        Position: string;
+    };
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const token = "1|05bKC39wsT9TrhQRrpkar8o3j9nJJy4kP21u3Zutc4facf8d" // pastikan token sudah disimpan di login
+            const resBank = await fetch("http://127.0.0.1:8000/api/bank", {
+              headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+              }
+            })
+            const resDepPos = await fetch("http://127.0.0.1:8000/api/department-position", {
+              headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+              }
+            })
+    
+            if (!resBank.ok) throw new Error("Failed to fetch bank")
+            const dataBank = await resBank.json()
+            setBank(dataBank)
+
+            if (!resDepPos.ok) throw new Error("Failed to fetch Department & Position")
+            const dataDepPos: DepartmentPosition[] = await resDepPos.json();
+
+            setDepPosData(dataDepPos);
+            const uniqueDepartments = [...new Set(dataDepPos.map(item => item.Department))];
+            setDepartments(uniqueDepartments);
+
+          } catch (error) {
+            console.error("Error fetching data:", error)
+          }
+        }
+    
+        fetchData()
+      }, []
+    )
+
+    const handleSelectDepartment = (dep: string) => {
+        setSelectedDepartment(dep);
+        setPositions(depPosData.filter(d => d.Department === dep));
+        setSelectedPosition(null); // reset position
+    };
+
+    const handleSubmitForm = async () => {
+        setLoading(true);
+        setError(false);
+        setSuccess(false);
+
+        try {
+            const form = document.getElementById("employeeForm") as HTMLFormElement;
+            const formData = new FormData(form);
+
+            if (selectedBank) formData.append("bank_code", selectedBank);
+            if (selectedPosition?.id_position)
+            formData.append("position_id", selectedPosition.id_position.toString());
+        
+            console.log("Submitting data:", Object.fromEntries(formData.entries()));   
+
+            const response = await fetch("http://127.0.0.1:8000/api/employee", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer 1|05bKC39wsT9TrhQRrpkar8o3j9nJJy4kP21u3Zutc4facf8d",
+                        // Jangan tambahkan Content-Type manual di sini!
+                    },
+                    body: formData,
+            });
+
+            const responseData = await response.json();
+            console.log("Response:", responseData);
+
+            if (!response.ok) throw new Error("Gagal submit");
+
+            setSuccess(true);
+        } catch (err) {
+            console.error("Submit error:", err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+        };
+
+
+
   return (
     <Sidebar title="Employee Database">
         <div className="w-full">
-            <form action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data">
+            {/* <form action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data"> */}
+            <form id="employeeForm" onSubmit={(e) => {
+                e.preventDefault(); // mencegah reload halaman
+                handleSubmitForm();
+            }}>
             <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
                 <div className="w-full mx-[20px] mb-[-10px]">
                     <h2 className="justify-center w-full text-base font-medium whitespace-nowrap mx-[10px]">Add New Employee</h2>
@@ -65,15 +192,15 @@ export default function AddEmployee() {
                                 {/* File Input Hidden */}
                                 <input
                                 type="file"
-                                name="avatar"
+                                name="employee_photo"
                                 accept="image/*"
-                                id="avatarInput"
+                                id="employee_photo"
                                 className="hidden"
                                 onChange={handleFileChange}
                                 />
                                 {/* Label triggers file input */}
-                                <Button variant="default">
-                                    <label htmlFor="avatarInput" className="cursor-pointer">Upload Avatar</label>
+                                <Button type="button" variant="default">
+                                    <label htmlFor="employee_photo" className="cursor-pointer">Upload Avatar</label>
                                 </Button>
 
                             </div>
@@ -111,16 +238,18 @@ export default function AddEmployee() {
                             </div>
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="gender">Gender</Label>
-                                <Select>
+                                <Select value={gender} onValueChange={setGender}>
                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
                                         <SelectValue placeholder="Select employee gender" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="male">Male</SelectItem>
-                                        <SelectItem value="female">Female</SelectItem>
+                                        <SelectItem value="Male">Male</SelectItem>
+                                        <SelectItem value="Female">Female</SelectItem>
                                     </SelectContent>
                                 </Select>
+                                <input type="hidden" name="gender" value={gender} />
                             </div>
+                         
                         </div>
                         
                         <div className="flex mx-[20px] gap-[10px]">
@@ -147,35 +276,37 @@ export default function AddEmployee() {
                             
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="Education">Education</Label>
-                                <Select>
+                                <Select value={education} onValueChange={setEducation}>
                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
                                         <SelectValue placeholder="Select employee education" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="sd">SD</SelectItem>
-                                        <SelectItem value="smp">SMP</SelectItem>
-                                        <SelectItem value="sma">SMA</SelectItem>
-                                        <SelectItem value="d3">D3</SelectItem>
-                                        <SelectItem value="s1">S1</SelectItem>
-                                        <SelectItem value="s2">S2</SelectItem>
-                                        <SelectItem value="s3">S3</SelectItem>
+                                        <SelectItem value="SD">SD</SelectItem>
+                                        <SelectItem value="SMP">SMP</SelectItem>
+                                        <SelectItem value="SMA">SMA</SelectItem>
+                                        <SelectItem value="D3">D3</SelectItem>
+                                        <SelectItem value="S1">S1</SelectItem>
+                                        <SelectItem value="S2">S2</SelectItem>
+                                        <SelectItem value="S3">S3</SelectItem>
                                     </SelectContent>
                                 </Select>
+                                   <input type="hidden" name="education" value={education} />
                             </div>
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="blood-type">Blood Type</Label>
-                                <Select>
+                                <Select value={bloodType} onValueChange={setBloodType}>
                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
                                     <SelectValue placeholder="Select employee blood type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                    <SelectItem value="a">A</SelectItem>
-                                    <SelectItem value="b">B</SelectItem>
-                                    <SelectItem value="ab">AB</SelectItem>
-                                    <SelectItem value="o">O</SelectItem>
+                                    <SelectItem value="A">A</SelectItem>
+                                    <SelectItem value="B">B</SelectItem>
+                                    <SelectItem value="AB">AB</SelectItem>
+                                    <SelectItem value="O">O</SelectItem>
                                     <SelectItem value="unknown">Unknown</SelectItem>
                                     </SelectContent>
                                 </Select>
+                                <input type="hidden" name="blood_type" value={bloodType}/>
                             </div>
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
@@ -200,22 +331,23 @@ export default function AddEmployee() {
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
                              <div className="flex flex-col flex-1 gap-[8px]">
-                                <Label htmlFor="maritial-_status">Maritial Status</Label>
-                                <Select>
+                                <Label htmlFor="maritial-status">Maritial Status</Label>
+                                <Select value={maritalStatus} onValueChange={setMaritalStatus}>
                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
                                         <SelectValue placeholder="Select employee maritial status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="single">Single</SelectItem>
-                                        <SelectItem value="married">Married</SelectItem>
-                                        <SelectItem value="divorced">Divorced</SelectItem>
-                                        <SelectItem value="widowed">Widowed</SelectItem>
+                                        <SelectItem value="Single">Single</SelectItem>
+                                        <SelectItem value="Married">Married</SelectItem>
+                                        <SelectItem value="Divorced">Divorced</SelectItem>
+                                        <SelectItem value="Widowed">Widowed</SelectItem>
                                     </SelectContent>
                                 </Select>
+                                <input type="hidden" name="marital_status" value={maritalStatus} />
                             </div>
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="religion">Religion</Label>
-                                <Select>
+                                <Select value={religion} onValueChange={setReligion}>
                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
                                     <SelectValue placeholder="Select employee religion" />
                                     </SelectTrigger>
@@ -229,55 +361,105 @@ export default function AddEmployee() {
                                     <SelectItem value="Other">Other</SelectItem>
                                     </SelectContent>
                                 </Select>
+                                <input type="hidden" name="religion" value={religion} />
                             </div>
                         </div>
                       
                         <div className="flex mx-[20px] py-[12px]">
                             <Label htmlFor="contract">Contract Type</Label>
-                            <RadioGroup defaultValue="permanent" className="flex ml-[50px]">
+                            <RadioGroup defaultValue="permanent" className="flex ml-[50px]" value={contractType} onValueChange={setContractType}>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="permanent" id="permanent" />
-                                    <Label htmlFor="contract">Permanent</Label>
+                                    <RadioGroupItem value="Permanent" id="permanent" />
+                                    <Label htmlFor="permanent">Permanent</Label>
                                 </div> 
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="contract" id="contract" />
+                                    <RadioGroupItem value="Contract" id="contract" />
                                     <Label htmlFor="contract">Contract</Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="intern" id="intern" />
+                                    <RadioGroupItem value="Intern" id="intern" />
                                     <Label htmlFor="intern">Intern</Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="part-time" id="part-time" />
+                                    <RadioGroupItem value="Part-time" id="part-time" />
                                     <Label htmlFor="part-time">Part-time</Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="outsource" id="outsource" />
+                                    <RadioGroupItem value="Outsource" id="outsource" />
                                     <Label htmlFor="outsource">Outsource</Label>
                                 </div>
                             </RadioGroup>
-                            <input type="hidden" name="contractType" value={contractType} />
+                            <input type="hidden" name="contract_type" value={contractType} />
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
-                           
-                            <div className="flex flex-col flex-1 gap-[8px]">
-                                <Label htmlFor="department">Department</Label>
-                                <Input
-                                    type="text"
-                                    id="department"
-                                    name="department"
-                                    placeholder="Enter employee department"
+                            {/* DEPARTMENT DROPDOWN */}
+                            <Popover open={openDep} onOpenChange={setOpenDep}>
+                            <PopoverTrigger asChild>
+                                <button className="file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
+                                {selectedDepartment ?? "Select department"}
+                                </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0">
+                                <Command>
+                                <CommandInput placeholder="Search department..." />
+                                <CommandList>
+                                    <CommandEmpty>No department found.</CommandEmpty>
+                                    {departments.map(dep => (
+                                    <CommandItem
+                                        key={dep}
+                                        onSelect={() => {
+                                        handleSelectDepartment(dep);
+                                        setOpenDep(false);
+                                        }}
+                                    >
+                                        {dep}
+                                    </CommandItem>
+                                    ))}
+                                </CommandList>
+                                </Command>
+                            </PopoverContent>
+                            </Popover>
+
+                            {/* POSITION DROPDOWN - always visible but disabled if no department selected */}
+                            <Popover open={openPos} onOpenChange={setOpenPos}>
+
+                            <PopoverTrigger asChild>
+                                <button
+                                className={`file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm`}
+                                disabled={!selectedDepartment}
+                                >
+                                {selectedPosition?.Position ?? "Select position"}
+                                </button>
+                            </PopoverTrigger>
+
+                            <PopoverContent className="w-full p-0">
+                                <Command>
+                                <CommandInput
+                                    placeholder="Search position..."
+                                    disabled={!selectedDepartment}
+                                    className={!selectedDepartment ? "opacity-50 pointer-events-none" : ""}
                                 />
-                            </div>
-                             <div className="flex flex-col flex-1 gap-[8px]">
-                                <Label htmlFor="position">Position</Label>
-                                <Input
-                                    type="text"
-                                    id="position"
-                                    name="position"
-                                    placeholder="Enter employee position"
-                                />
-                            </div>
+                                <CommandList>
+                                    <CommandEmpty>No position found.</CommandEmpty>
+                                    {positions.map((pos) => (
+                                    <CommandItem
+                                        key={pos.id_position}
+                                        onSelect={() => {
+                                        if (!selectedDepartment) return; // safety guard
+                                        setSelectedPosition(pos);
+                                        setOpenPos(false);
+                                        }}
+                                        className={!selectedDepartment ? "opacity-50 pointer-events-none" : ""}
+                                    >
+                                        {pos.Position}
+                                    </CommandItem>
+                                    ))}
+                                </CommandList>
+                                </Command>
+                            </PopoverContent>
+                            </Popover>
+
+
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
                             <div className="flex flex-col flex-1 gap-[8px]">
@@ -296,33 +478,56 @@ export default function AddEmployee() {
                             </div>
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
-                            
+                            <div className="flex flex-col flex-1 gap-[8px]">
+                                <Label htmlFor="bank">Bank</Label>
+                                <Popover open={openBank} onOpenChange={setOpenBank}>
+                                    <PopoverTrigger asChild>
+                                    <button
+                                        className="file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                                    >
+                                        {selectedBank
+                                        ? bank?.find((b) => b.code === selectedBank)?.name
+                                        : "Select employee bank"}
+                                    </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-full p-0">
+                                    <Command>
+                                        <CommandInput placeholder="Search bank..." />
+                                        <CommandList>
+                                        <CommandEmpty>No bank found.</CommandEmpty>
+                                        {bank?.map((b) => (
+                                            <CommandItem
+                                            key={b.code}
+                                            onSelect={() => {
+                                                setSelectedBank(b.code)
+                                                setOpenBank(false)
+                                            }}
+                                            >
+                                            {b.name}
+                                            </CommandItem>
+                                        ))}
+                                        </CommandList>
+                                    </Command>
+                                    </PopoverContent>
+                                </Popover>
+                                </div>
                             {/* <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="bank">Bank</Label>
-                                <Select>
+                                <Select onValueChange={(value) => setSelectedBank(value)}>
                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
-                                        <SelectValue placeholder="Select employee bank" />
+                                    <SelectValue placeholder="Select employee bank" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="bca">Bank Central Asia (BCA)</SelectItem>
-                                        <SelectItem value="bni">Bank Negara Indonesia (BNI)</SelectItem>
-                                        <SelectItem value="bri">Bank Rakyat Indonesia (BRI)</SelectItem>
-                                        <SelectItem value="mandiri">Bank Mandiri</SelectItem>
-                                        <SelectItem value="btn">Bank Tabungan Negara (BTN)</SelectItem>
-                                        <SelectItem value="cimb">CIMB Niaga</SelectItem>
-                                        <SelectItem value="danamon">Bank Danamon</SelectItem>
-                                        <SelectItem value="permata">Bank Permata</SelectItem>
-                                        <SelectItem value="panin">Bank Panin</SelectItem>
-                                        <SelectItem value="bsi">Bank Syariah Indonesia (BSI)</SelectItem>
-                                        <SelectItem value="ocbc">OCBC NISP</SelectItem>
-                                        <SelectItem value="mega">Bank Mega</SelectItem>
-                                        <SelectItem value="uob">UOB Indonesia</SelectItem>
-                                        <SelectItem value="maybank">Maybank Indonesia</SelectItem>
+                                    {bank?.map((b) => (
+                                        <SelectItem key={b.code} value={b.code}>
+                                            {b.name}
+                                        </SelectItem>
+                                    ))}
                                     </SelectContent>
-
                                 </Select>
                             </div> */}
-                            <div className="flex flex-col flex-1 gap-[8px]">
+
+                            {/* <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="bank">Bank</Label>
                                 <Input
                                     type="text"
@@ -330,7 +535,7 @@ export default function AddEmployee() {
                                     name="bank"
                                     placeholder="Enter employee bank"
                                 />
-                            </div>
+                            </div> */}
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="Account_Number">Account Number</Label>
                                 <Input

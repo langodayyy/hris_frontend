@@ -58,15 +58,18 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FileUploader } from "@/components/ui/fileUploader";
+import { Spinner } from "@/components/ui/spinner";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isLoading?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isLoading,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -147,7 +150,7 @@ export function DataTable<TData, TValue>({
     <div className="flex items-center py-4 gap-[10px]">
     <span className="w-[187px] text-lg flex-none">Employee Overview</span>
     <Input
-        placeholder="Search Employee"
+        placeholder="Search Employee Name"
         icon={<svg
             width="20"
             height="21"
@@ -583,7 +586,12 @@ export function DataTable<TData, TValue>({
             Add
         </Button>
     </div>
-    </div><div className="rounded-md border min-w-[815px]">
+    </div>
+    {isLoading ? (
+        <Spinner size="large" />
+    ) : (
+    <div className="rounded-md border min-w-[815px]">
+        
         <Table>
             <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -626,8 +634,8 @@ export function DataTable<TData, TValue>({
                 )}
             </TableBody>
         </Table>
-    </div>
-         <div className="w-full flex justify-between mt-[10px]">
+    </div>)}
+    <div className="w-full flex justify-between mt-[10px]">
         {/* Select Rows */}
         <div className="flex items-center gap-[10px]">
             <p className="text-base font-medium">Showing</p>

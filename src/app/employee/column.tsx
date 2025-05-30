@@ -19,9 +19,9 @@ export type Employees = {
 
 export const columns: ColumnDef<Employees>[] = [
   {
-  id: "rowNumber",
-  header: () => <div className="text-center">No</div>,
-  cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
+    accessorKey: "id",
+    header: () => <div className="text-left">ID</div>,
+    cell: ({ row }) => <div className="text-left">{row.getValue("id")}</div>,
   },
 
   {
@@ -61,12 +61,12 @@ export const columns: ColumnDef<Employees>[] = [
     },
   },
   {
-   accessorKey: "type",
+   accessorKey: "contract_type",
     header: ({ column }) => {
-      return <div className="text-center">Type</div>;
+      return <div className="text-center">Contract Type</div>;
     },
     cell: ({ row }) => (
-      <div className="text-center">{row.getValue("type")}</div>
+      <div className="text-center">{row.getValue("contract_type")}</div>
     ),
     filterFn: (row, columnId, filterValue) => {
       return filterValue.includes(row.getValue(columnId));
