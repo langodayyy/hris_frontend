@@ -20,7 +20,64 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-const PersonalInformation = () => {
+import { EmployeeResponse } from "@/types/employee";
+import { useEffect, useState } from "react";
+
+type Props = {
+  employeeData?: EmployeeResponse;
+};
+
+const PersonalInformation = ({ employeeData }: Props) => {
+    const [gender, setGender] = useState("");
+    const [education, setEducation] = useState("");
+    const [bloodType, setBloodType] = useState("");
+    const [maritalStatus, setMaritalStatus] = useState("");
+    const [religion, setReligion] = useState("");
+
+    useEffect(() => {
+    if (employeeData?.employee) {
+        if (employeeData.employee.gender) setGender(employeeData.employee.gender);
+        if (employeeData.employee.education) setEducation(employeeData.employee.education);
+        if (employeeData.employee.blood_type) setBloodType(employeeData.employee.blood_type);
+        if (employeeData.employee.marital_status) setMaritalStatus(employeeData.employee.marital_status);
+        if (employeeData.employee.religion) setReligion(employeeData.employee.religion);
+    }
+    }, [employeeData?.employee]);
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState(false);
+    const handleSubmitForm = async () => {
+        setLoading(true);
+        setError(false);
+        setSuccess(false);
+
+        try {
+            const form = document.getElementById("employeeForm") as HTMLFormElement;
+            const formData = new FormData(form);
+
+            const response = await fetch(`http://127.0.0.1:8000/api/employee/${employeeData?.employee.employee_id}?_method=PATCH`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer 1|05bKC39wsT9TrhQRrpkar8o3j9nJJy4kP21u3Zutc4facf8d",
+                        // Jangan tambahkan Content-Type manual di sini!
+                    },
+                    body: formData,
+            });
+
+            const responseData = await response.json();
+            console.log("Response:", responseData);
+
+            if (!response.ok) throw new Error("Gagal submit");
+
+            setSuccess(true);
+        } catch (err) {
+            console.error("Submit error:", err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <Card className="flex-1 h-full ml-[20px] gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
             <div className="flex mx-[20px] justify-between">
@@ -44,7 +101,11 @@ const PersonalInformation = () => {
                                 </DialogDescription>
                             </DialogHeader>
                             <div>
-                                <form action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data">
+                                {/* <form action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data"> */}
+                                <form id="employeeForm" onSubmit={(e) => {
+                                    e.preventDefault(); // mencegah reload halaman
+                                    handleSubmitForm();
+                                }}>
                                     <div className="flex flex-col gap-[15px] mt-[15px]">
                                         <div className="flex gap-[10px]">
                                             <div className="flex flex-col flex-1 gap-[8px]">
@@ -54,6 +115,7 @@ const PersonalInformation = () => {
                                                     id="first_name"
                                                     name="first_name"
                                                     placeholder="Enter employee first name"
+                                                    defaultValue={employeeData?.employee.first_name??""}
                                                 />
                                             </div>
                                             <div className="flex flex-col flex-1 gap-[8px]">
@@ -63,6 +125,7 @@ const PersonalInformation = () => {
                                                     id="last_name"
                                                     name="last_name"
                                                     placeholder="Enter employee last name"
+                                                    defaultValue={employeeData?.employee.last_name??""}
                                                 />
                                             </div>
                                         </div>
@@ -74,19 +137,21 @@ const PersonalInformation = () => {
                                                     id="nik"
                                                     name="nik"
                                                     placeholder="Enter employee NIK"
+                                                    defaultValue={employeeData?.employee.nik??""}
                                                 />
                                             </div>
-                                                <div className="flex flex-col flex-1 gap-[8px]">
+                                            <div className="flex flex-col flex-1 gap-[8px]">
                                                 <Label htmlFor="gender">Gender</Label>
-                                                <Select name="gender">
+                                                <Select value={gender} onValueChange={setGender}>
                                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
                                                         <SelectValue placeholder="Select employee gender" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="male">Male</SelectItem>
-                                                        <SelectItem value="female">Female</SelectItem>
+                                                        <SelectItem value="Male">Male</SelectItem>
+                                                        <SelectItem value="Female">Female</SelectItem>
                                                     </SelectContent>
                                                 </Select>
+                                                <input type="hidden" name="gender" value={gender} />
                                             </div>
                                         </div>
                                         <div className="flex gap-[10px]">
@@ -97,6 +162,7 @@ const PersonalInformation = () => {
                                                     id="birth_place"
                                                     name="birth_place"
                                                     placeholder="Enter employee birth place"
+                                                    defaultValue={employeeData?.employee.birth_place??""}
                                                 />
                                             </div>
                                             <div className="flex flex-col flex-1 gap-[8px]">
@@ -106,6 +172,7 @@ const PersonalInformation = () => {
                                                     id="birth_date"
                                                     name="birth_date"
                                                     placeholder="Enter employee birth date"
+                                                    defaultValue={employeeData?.employee.birth_date??""}
                                                 />
                                             </div>
                                         
@@ -113,68 +180,72 @@ const PersonalInformation = () => {
                                         <div className="flex gap-[10px]">
                                                 <div className="flex flex-col flex-1 gap-[8px]">
                                                 <Label htmlFor="Education">Education</Label>
-                                                <Select name="education">
+                                                <Select value={education} onValueChange={setEducation}>
                                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
                                                         <SelectValue placeholder="Select employee education" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="sd">SD</SelectItem>
-                                                        <SelectItem value="smp">SMP</SelectItem>
-                                                        <SelectItem value="sma">SMA</SelectItem>
-                                                        <SelectItem value="d3">D3</SelectItem>
-                                                        <SelectItem value="s1">S1</SelectItem>
-                                                        <SelectItem value="s2">S2</SelectItem>
-                                                        <SelectItem value="s3">S3</SelectItem>
+                                                        <SelectItem value="SD">SD</SelectItem>
+                                                        <SelectItem value="SMP">SMP</SelectItem>
+                                                        <SelectItem value="SMA">SMA</SelectItem>
+                                                        <SelectItem value="D3">D3</SelectItem>
+                                                        <SelectItem value="S1">S1</SelectItem>
+                                                        <SelectItem value="S2">S2</SelectItem>
+                                                        <SelectItem value="S3">S3</SelectItem>
                                                     </SelectContent>
                                                 </Select>
+                                                <input type="hidden" name="education" value={education} />
                                             </div>
                                             <div className="flex flex-col flex-1 gap-[8px]">
                                                 <Label htmlFor="blood-type">Blood Type</Label>
-                                                <Select name="blood_type">
+                                                <Select value={bloodType} onValueChange={setBloodType}>
                                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
                                                     <SelectValue placeholder="Select employee blood type" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                    <SelectItem value="a">A</SelectItem>
-                                                    <SelectItem value="b">B</SelectItem>
-                                                    <SelectItem value="ab">AB</SelectItem>
-                                                    <SelectItem value="o">O</SelectItem>
-                                                    <SelectItem value="unknown">Unknown</SelectItem>
+                                                        <SelectItem value="A">A</SelectItem>
+                                                        <SelectItem value="B">B</SelectItem>
+                                                        <SelectItem value="AB">AB</SelectItem>
+                                                        <SelectItem value="O">O</SelectItem>
+                                                        <SelectItem value="unknown">Unknown</SelectItem>
                                                     </SelectContent>
                                                 </Select>
+                                                <input type="hidden" name="blood_type" value={bloodType}/>
                                             </div>
                                         </div>
                                         <div className="flex gap-[10px]">
                                             <div className="flex flex-col flex-1 gap-[8px]">
                                                 <Label htmlFor="maritial-_status">Maritial Status</Label>
-                                                <Select name="maritial_status">
+                                                <Select value={maritalStatus} onValueChange={setMaritalStatus}>
                                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
                                                         <SelectValue placeholder="Select employee maritial status" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="single">Single</SelectItem>
-                                                        <SelectItem value="married">Married</SelectItem>
-                                                        <SelectItem value="divorced">Divorced</SelectItem>
-                                                        <SelectItem value="widowed">Widowed</SelectItem>
+                                                        <SelectItem value="Single">Single</SelectItem>
+                                                        <SelectItem value="Married">Married</SelectItem>
+                                                        <SelectItem value="Divorced">Divorced</SelectItem>
+                                                        <SelectItem value="Widowed">Widowed</SelectItem>
                                                     </SelectContent>
                                                 </Select>
+                                                <input type="hidden" name="marital_status" value={maritalStatus} />
                                             </div>
                                             <div className="flex flex-col flex-1 gap-[8px]">
                                                 <Label htmlFor="religion">Religion</Label>
-                                                <Select name="religion">
+                                                <Select value={religion} onValueChange={setReligion}>
                                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
                                                     <SelectValue placeholder="Select employee religion" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                    <SelectItem value="islam">Islam</SelectItem>
-                                                    <SelectItem value="protestant">Christian Protestant</SelectItem>
-                                                    <SelectItem value="catholic">Catholic</SelectItem>
-                                                    <SelectItem value="hindu">Hindu</SelectItem>
-                                                    <SelectItem value="buddha">Buddha</SelectItem>
-                                                    <SelectItem value="confucianism">Confucianism</SelectItem>
-                                                    <SelectItem value="other">Other</SelectItem>
+                                                    <SelectItem value="Islam">Islam</SelectItem>
+                                                    <SelectItem value="Protestant">Christian Protestant</SelectItem>
+                                                    <SelectItem value="Catholic">Catholic</SelectItem>
+                                                    <SelectItem value="Hindu">Hindu</SelectItem>
+                                                    <SelectItem value="Buddha">Buddha</SelectItem>
+                                                    <SelectItem value="Confucianism">Confucianism</SelectItem>
+                                                    <SelectItem value="Other">Other</SelectItem>
                                                     </SelectContent>
                                                 </Select>
+                                                <input type="hidden" name="religion" value={religion} />
                                             </div>
                                         </div>
                                         <div className="flex gap-[10px]">
@@ -185,6 +256,7 @@ const PersonalInformation = () => {
                                                     id="citizenship"
                                                     name="citizenship"
                                                     placeholder="Enter employee citizenship"
+                                                    defaultValue={employeeData?.employee.citizenship??""}
                                                 />
                                             </div>
                                             <div className="flex flex-col flex-1 gap-[8px]">
@@ -194,6 +266,7 @@ const PersonalInformation = () => {
                                                     id="address"
                                                     name="address"
                                                     placeholder="Enter employee address"
+                                                    defaultValue={employeeData?.employee.address??""}
                                                 />
                                             </div>
                                         </div>
@@ -227,57 +300,57 @@ const PersonalInformation = () => {
             <div className="flex mx-[20px] gap-[10px]">
                 <div className="flex flex-col flex-1 gap-[8px] overflow-hidden">
                     <Label>Full Name</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">John Marston</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">{[employeeData?.employee.first_name, employeeData?.employee.last_name].filter(Boolean).join(" ") || "-"}</span>
                 </div>
                 <div className="flex flex-col flex-1 gap-[8px] overflow-hidden">
                     <Label>NIK</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">3500000000000000</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">{employeeData?.employee.nik ?? "-"}</span> 
                 </div>
             </div>
             <div className="flex mx-[20px] gap-[10px]">
                 <div className="flex flex-col flex-1 gap-[8px] overflow-hidden">
                     <Label>Gender</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">Male</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">{employeeData?.employee.gender ?? "-"}</span> 
                 </div>
                 <div className="flex flex-col flex-1 gap-[8px] overflow-hidden">
                     <Label>Education</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">S1</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">{employeeData?.employee.education ?? "-"}</span> 
                 </div>
             </div>
             <div className="flex mx-[20px] gap-[10px]">
                 <div className="flex flex-col flex-1 gap-[8px] overflow-hidden">
                     <Label>Birth Place</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">Malang</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">{employeeData?.employee.birth_place ?? "-"}</span> 
                 </div>
                 <div className="flex flex-col flex-1 gap-[8px] overflow-hidden">
                     <Label>Birth Date</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">1 May 1989</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">{employeeData?.employee.birth_date ?? "-"}</span> 
                 </div>
             </div>
             <div className="flex mx-[20px] gap-[10px]">
                 <div className="flex flex-col flex-1 gap-[8px] overflow-hidden">
                     <Label>Citizenship</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">Malang</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">{employeeData?.employee.citizenship ?? "-"}</span> 
                 </div>
                 <div className="flex flex-col flex-1 gap-[8px] overflow-hidden">
                     <Label>Marital Status</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">Single</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">{employeeData?.employee.marital_status ?? "-"}</span> 
                 </div>
             </div>
             <div className="flex mx-[20px] gap-[10px]">
                 <div className="flex flex-col flex-1 gap-[8px] overflow-hidden">
                     <Label>Religion</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">Islam</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">{employeeData?.employee.religion ?? "-"}</span> 
                 </div>
                 <div className="flex flex-col flex-1 gap-[8px] overflow-hidden">
                     <Label>Blood Type</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">A</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">{employeeData?.employee.blood_type ?? "-"}</span> 
                 </div>
             </div>
             <div className="flex mx-[20px] gap-[10px]">
                 <div className="flex flex-col flex-1 gap-[8px] overflow-hidden">
                     <Label>Address</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">Jl. Soekarno Hatta No.9, Jatimulyo, Kec. Lowokwaru, Kota Malang, Jawa Timur 65141</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3">{employeeData?.employee.address ?? "-"}</span> 
                 </div>
             </div>
 

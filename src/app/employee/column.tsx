@@ -104,7 +104,7 @@ export const columns: ColumnDef<Employees>[] = [
 
       return (
         <div className="text-center">
-          <Link href={`/employee/${employee.id}`}>
+          <Link href={`/employee/${employee.id}`} prefetch={false}>
             <Button variant="outline" size="sm">
               View
             </Button>

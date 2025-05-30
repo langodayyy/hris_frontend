@@ -149,7 +149,7 @@ export default function AddEmployee() {
         } finally {
             setLoading(false);
         }
-        };
+    };
 
 
 
@@ -470,7 +470,7 @@ export default function AddEmployee() {
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
-                                    type="text"
+                                    type="email"
                                     id="email"
                                     name="email"
                                     placeholder="Enter employee email"

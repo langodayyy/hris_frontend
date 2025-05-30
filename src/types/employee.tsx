@@ -1,0 +1,39 @@
+export type Employee = {
+  id: number | null;
+  user_id: number | null;
+  ck_setting_id: number | null;
+  employee_id: string | null;
+  nik: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  position_id: number | null;
+  department_id: number | null;
+  address: string | null;
+  email: string | null;
+  phone: number | null;
+  birth_place: string | null;
+  birth_date: string | null;
+  education: string | null;
+  religion: string | null;
+  marital_status: string | null;
+  citizenship: string | null;
+  gender: string | null;
+  blood_type: string | null;
+  salary: number | null;
+  contract_type: string | null;
+  bank_code: string | null;
+  account_number: string | null;
+  join_date: string | null;
+  resign_date: string | null | null;
+  employee_photo: string | null;
+  employee_status: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
+export type EmployeeResponse = {
+  employee: Employee;
+  position_name: string | null;
+  department_name: string | null;
+  bank_name: string | null;
+};

@@ -7,19 +7,53 @@ import EmployeeDocuments from "./documents";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useParams } from "next/navigation";
+import { EmployeeResponse } from "@/types/employee";
+import { Spinner } from "@/components/ui/spinner";
+
 
 export default function EmployeeDetails(){
     const [status, setStatus] = useState("Active");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+    
     const handleChangeStatus = () => {
         setIsDialogOpen(true);
     };
+    const params = useParams();
+    const id = params.id;
+    const [employeeData, setEmployeeData] = useState<EmployeeResponse | undefined>(undefined);
+    const [isLoading, setIsLoading] = useState(true);
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            setIsLoading(true);
+            const token = localStorage.getItem("token") // pastikan token sudah disimpan di login
+            const res = await fetch(`http://127.0.0.1:8000/api/employee/${id}`, {
+              headers: {
+                "Authorization": `Bearer 1|05bKC39wsT9TrhQRrpkar8o3j9nJJy4kP21u3Zutc4facf8d`,
+                "Content-Type": "application/json"
+              }
+            })
+    
+            if (!res.ok) throw new Error("Failed to fetch employee")
+    
+            const data: EmployeeResponse = await res.json()
+            setEmployeeData(data)
+
+          } catch (error) {
+            console.error("Error fetching data:", error)
+          } finally {
+            setIsLoading(false);
+          }
+        }
+    
+        fetchData()
+      }, [])
     return (
         <Sidebar title="Employee Details">
             <div className="flex flex-col gap-[30px]">
@@ -27,6 +61,11 @@ export default function EmployeeDetails(){
                     <div className="w-full mx-[20px] mb-[-10px]">
                             <h2 className="justify-center w-full text-lg font-medium whitespace-nowrap mx-[10px]">Employee Details</h2>
                     </div> */}
+                    {isLoading ? ( 
+                        <Card className="flex-1 gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
+                                    <Spinner className="w-full mx-[20px] my-[10px]" size="medium" />
+                                    </Card>
+                                  ) : (
                     <div>
                         <Card className="flex-1 gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
                        
@@ -42,8 +81,8 @@ export default function EmployeeDetails(){
                                 </svg>
                              
                                 <div className="flex flex-col ml-[15px] gap-[10px]">
-                                    <p className="font-medium text-base text-black">Employee Name</p>
-                                    <p className="font-normal text-base text-black/52">Employee ID</p>
+                                    <p className="font-medium text-base text-black">{employeeData?.employee.first_name} {employeeData?.employee.last_name}</p>
+                                    <p className="font-normal text-base text-black/52">{employeeData?.employee.employee_id}</p>
                                 </div>
                                 <div className="flex gap-[20px] ml-auto items-center">
                                     
@@ -122,17 +161,17 @@ export default function EmployeeDetails(){
                             </div>
                             <div className="flex gap-[15px]">
                                 <div className="w-6/10">
-                                    <PersonalInformation></PersonalInformation>
+                                    <PersonalInformation employeeData={employeeData}></PersonalInformation>
                                 </div>
                                 <div className="flex flex-col w-4/10 gap-[15px]">
-                                    <ContactInformation></ContactInformation>
-                                    <EmploymentOverview></EmploymentOverview>
+                                    <ContactInformation employeeData={employeeData}></ContactInformation>
+                                    <EmploymentOverview employeeData={employeeData}></EmploymentOverview>
                                 </div>
                             
                             </div>
 
                         </Card>
-                    </div>     
+                    </div>   )}  
                 {/* </Card> */}
                 <EmployeeDocuments></EmployeeDocuments>
              </div>

@@ -15,9 +15,47 @@ import {
     DialogClose,
     } from "@/components/ui/dialog"
 import PhoneInput from "@/components/ui/phoneInput";
+import { EmployeeResponse } from "@/types/employee";
+import { useState } from "react";
+type Props = {
+  employeeData?: EmployeeResponse;
+};
 
+const ContactInformation = ({ employeeData }: Props) => {
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState(false);
+    const handleSubmitForm = async () => {
+        setLoading(true);
+        setError(false);
+        setSuccess(false);
 
-const ContactInformation = () => {
+        try {
+            const form = document.getElementById("employeeForm") as HTMLFormElement;
+            const formData = new FormData(form);
+
+            const response = await fetch(`http://127.0.0.1:8000/api/employee/${employeeData?.employee.employee_id}?_method=PATCH`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer 1|05bKC39wsT9TrhQRrpkar8o3j9nJJy4kP21u3Zutc4facf8d",
+                        // Jangan tambahkan Content-Type manual di sini!
+                    },
+                    body: formData,
+            });
+
+            const responseData = await response.json();
+            console.log("Response:", responseData);
+
+            if (!response.ok) throw new Error("Gagal submit");
+
+            setSuccess(true);
+        } catch (err) {
+            console.error("Submit error:", err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <Card className="mr-[20px] gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
             <div className="flex mx-[20px] justify-between">
@@ -41,13 +79,16 @@ const ContactInformation = () => {
                                 </DialogDescription>
                             </DialogHeader>
                             <div>
-                                <form action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data">
+                                <form id="employeeForm" onSubmit={(e) => {
+                                    e.preventDefault(); // mencegah reload halaman
+                                    handleSubmitForm();
+                                }}>
                                     <div className="flex flex-col gap-[15px] mt-[15px]">
                                         <div className="flex gap-[10px]">
                                             <div className="flex flex-col flex-1 gap-[8px]">
-                                                 <PhoneInput
-                                                                                    placeholder="Enter employee phone number"
-                                                                                />
+                                                    <PhoneInput
+                                                        placeholder="Enter employee phone number"
+                                                    />
                                             </div>
                                             <div className="flex flex-col flex-1 gap-[8px]">
                                                 <Label htmlFor="email">Email</Label>
@@ -56,6 +97,7 @@ const ContactInformation = () => {
                                                     id="email"
                                                     name="email"
                                                     placeholder="Enter employee email"
+                                                    defaultValue={employeeData?.employee.email??""}
                                                 />
                                             </div>
                                         </div>
@@ -92,11 +134,11 @@ const ContactInformation = () => {
                 
                 <div className="flex flex-col flex-1 gap-[8px]">
                     <Label>Phone Number</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">6212345678909</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.employee.phone ?? "-"}</span> 
                 </div>
                 <div className="flex flex-col flex-1 gap-[8px]">
                     <Label>Email</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">johnmarston@gmail.com</span> 
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.employee.email ?? "-"}</span> 
                 </div>
             </div>
             {/* <div className="flex mx-[20px] gap-[10px]">
