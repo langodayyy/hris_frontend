@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useEffect, useState } from "react";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,41 +19,87 @@ import { Spinner } from "@/components/ui/spinner";
 
 export default function EmployeeDetails(){
     const [status, setStatus] = useState("Active");
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    // const [isDialogOpen, setIsDialogOpen] = useState(false);
     
-    const handleChangeStatus = () => {
-        setIsDialogOpen(true);
-    };
+    // const handleChangeStatus = () => {
+    //     setIsDialogOpen(true);
+    // };
     const params = useParams();
     const id = params.id;
     const [employeeData, setEmployeeData] = useState<EmployeeResponse | undefined>(undefined);
     const [isLoading, setIsLoading] = useState(true);
-    useEffect(() => {
-        const fetchData = async () => {
-          try {
+    const fetchData = async () => {
+        try {
             setIsLoading(true);
-            const token = localStorage.getItem("token") // pastikan token sudah disimpan di login
+            const token = localStorage.getItem("token");
             const res = await fetch(`http://127.0.0.1:8000/api/employee/${id}`, {
-              headers: {
-                "Authorization": `Bearer 1|05bKC39wsT9TrhQRrpkar8o3j9nJJy4kP21u3Zutc4facf8d`,
+            headers: {
+                "Authorization": `Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a`,
                 "Content-Type": "application/json"
-              }
-            })
-    
-            if (!res.ok) throw new Error("Failed to fetch employee")
-    
-            const data: EmployeeResponse = await res.json()
-            setEmployeeData(data)
+            }
+            });
 
-          } catch (error) {
-            console.error("Error fetching data:", error)
-          } finally {
+            if (!res.ok) throw new Error("Failed to fetch employee");
+
+            const data: EmployeeResponse = await res.json();
+            setEmployeeData(data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
             setIsLoading(false);
-          }
         }
-    
+    };
+
+    useEffect(() => {
+    fetchData();
+    }, []);
+
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState(false);
+    const handleSubmitForm = async () => {
+        setLoading(true);
+        setError(false);
+        setSuccess(false);
+
+        try {
+            const form = document.getElementById("employeeForm") as HTMLFormElement;
+            const formData = new FormData(form);
+
+            const response = await fetch(`http://127.0.0.1:8000/api/employee/${employeeData?.employee.employee_id}?_method=PATCH`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
+                        // Jangan tambahkan Content-Type manual di sini!
+                    },
+                    body: formData,
+            });
+
+            const responseData = await response.json();
+            console.log("Response:", responseData);
+
+            if (!response.ok) throw new Error("Gagal submit");
+
+            setSuccess(true);
+        } catch (err) {
+            console.error("Submit error:", err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const [isDialogAOpen, setDialogAOpen] = useState(false);
+    const handleOkClick = async () => {
         fetchData()
-      }, [])
+        setDialogAOpen(false)
+        setSuccess(false); // reset state jika perlu
+
+    };
+    const handleChangeStatus = () => {
+        setDialogAOpen(true);
+    };
+
     return (
         <Sidebar title="Employee Details">
             <div className="flex flex-col gap-[30px]">
@@ -86,6 +132,26 @@ export default function EmployeeDetails(){
                                 </div>
                                 <div className="flex gap-[20px] ml-auto items-center">
                                     
+                                    
+                                        <div
+                                            className={`flex items-center gap-2 px-3 py-1 w-fit rounded-2xl text-sm font-medium ${
+                                            employeeData?.employee.employee_status === 'Active'
+                                                ? 'bg-green-100 text-success-700'
+                                                : 'bg-red-100 text-danger-700'
+                                            }`}
+                                        >
+                                            <span
+                                            className={`w-2 h-2 rounded-full ${
+                                                employeeData?.employee.employee_status === 'Active'
+                                                ? 'bg-success-700'
+                                                : 'bg-danger-700'
+                                            }`}
+                                            ></span>
+                                            <span>{employeeData?.employee.employee_status}</span>
+                                        </div>
+                                   
+
+
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button className="w-fit" size="icon" variant="link">
@@ -102,7 +168,7 @@ export default function EmployeeDetails(){
                                             {/* <DropdownMenuItem>Option 3</DropdownMenuItem> */}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
-                                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                    <Dialog open={isDialogAOpen} onOpenChange={setDialogAOpen}>
                                         <DialogContent className="bg-white">
                                             <DialogHeader>
                                                 <DialogTitle>Change Employee Status</DialogTitle>
@@ -112,7 +178,10 @@ export default function EmployeeDetails(){
                                                 </DialogDescription>
                                             </DialogHeader>
                                             <div>
-                                                <form action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data">
+                                                <form id="employeeForm" onSubmit={(e) => {
+                                                    e.preventDefault(); // mencegah reload halaman
+                                                    handleSubmitForm();
+                                                }}>
                                                     <div className="flex flex-col gap-[15px] mt-[15px]">
                                                         <div className="flex gap-[10px]">
                                                             
@@ -143,14 +212,55 @@ export default function EmployeeDetails(){
                                                                 </DialogClose>
                                                             </div>
                                                             
-                                                            <Button className="w-[80px]" variant="default" type="submit">
-                                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                                <path d="M17 21V13H7V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                                <path d="M7 3V8H15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                                </svg>
-                                                                Save
-                                                            </Button>
+                                                             <Button className="w-[80px] h-[40px]" variant="default" type="submit" disabled={loading}>
+                                                                {!loading ? (
+                                                                    <>
+                                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                        <path d="M17 21V13H7V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                        <path d="M7 3V8H15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                    </svg>
+                                                                    <span className="ml-1">Save</span>
+                                                                    </>
+                                                                ) : (
+                                                                    <Spinner size="small" />
+                                                                )}
+                                                                </Button>
+                                                                <Dialog
+                                                                open={success || error}
+                                                                onOpenChange={(open) => {
+                                                                    if (!open) {
+                                                                    setSuccess(false);
+                                                                    setError(false);
+                                                                    handleOkClick();
+
+                                                                    }
+                                                                }}
+                                                                >
+                                                                <DialogContent className="bg-white max-w-sm mx-auto">
+                                                                    <DialogHeader>
+                                                                    <DialogTitle>{success ? "Success!" : "Error"}</DialogTitle>
+                                                                    </DialogHeader>
+                                                                    <div className="mt-2">
+                                                                    {success && <p className="text-green-700">Successfully!</p>}
+                                                                    {error && <p className="text-red-600">There was an error submitting the form.</p>}
+                                                                    </div>
+                                                                    <DialogFooter className="mt-4 flex gap-2 justify-end">
+                                                                    {success && (
+                                                                        <div className="flex gap-2 justify-end w-full">
+                                                                        <DialogClose asChild>
+                                                                            <Button onClick={handleOkClick} variant="default" className="max-w-[180px] whitespace-nowrap">Ok</Button>
+                                                                        </DialogClose>
+                                                                        </div>
+                                                                    )}
+                                                                    {error && (
+                                                                        <DialogClose asChild>
+                                                                            <Button onClick={handleOkClick} variant="default" className="max-w-[180px] whitespace-nowrap">OK</Button>
+                                                                        </DialogClose>
+                                                                    )}
+                                                                    </DialogFooter>
+                                                                </DialogContent>
+                                                                </Dialog>
                                                         </div>
                                                     </div>
                                                 </form>
@@ -161,11 +271,11 @@ export default function EmployeeDetails(){
                             </div>
                             <div className="flex gap-[15px]">
                                 <div className="w-6/10">
-                                    <PersonalInformation employeeData={employeeData}></PersonalInformation>
+                                    <PersonalInformation employeeData={employeeData} onUpdate={fetchData}></PersonalInformation>
                                 </div>
                                 <div className="flex flex-col w-4/10 gap-[15px]">
-                                    <ContactInformation employeeData={employeeData}></ContactInformation>
-                                    <EmploymentOverview employeeData={employeeData}></EmploymentOverview>
+                                    <ContactInformation employeeData={employeeData} onUpdate={fetchData}></ContactInformation>
+                                    <EmploymentOverview employeeData={employeeData} onUpdate={fetchData}></EmploymentOverview>
                                 </div>
                             
                             </div>

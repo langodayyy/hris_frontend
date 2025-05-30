@@ -24,19 +24,23 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import PasswordInput from "@/components/ui/passwordInput";
 import { Button } from "@/components/ui/button";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function AddEmployee() {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-    const [contractType, setContractType] = useState("Permanent");
+    const [contractType, setContractType] = useState("");
     const [gender, setGender] = useState("");
     const [education, setEducation] = useState("");
     const [bloodType, setBloodType] = useState("");
     const [maritalStatus, setMaritalStatus] = useState("");
     const [religion, setReligion] = useState("");
 
-
-
+    const router = useRouter();
+    const formRef = useRef<HTMLFormElement>(null);
+    const [preventRedirect, setPreventRedirect] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
@@ -73,7 +77,7 @@ export default function AddEmployee() {
     useEffect(() => {
         const fetchData = async () => {
           try {
-            const token = "1|05bKC39wsT9TrhQRrpkar8o3j9nJJy4kP21u3Zutc4facf8d" // pastikan token sudah disimpan di login
+            const token = "1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a" // pastikan token sudah disimpan di login
             const resBank = await fetch("http://127.0.0.1:8000/api/bank", {
               headers: {
                 "Authorization": `Bearer ${token}`,
@@ -125,13 +129,14 @@ export default function AddEmployee() {
             if (selectedBank) formData.append("bank_code", selectedBank);
             if (selectedPosition?.id_position)
             formData.append("position_id", selectedPosition.id_position.toString());
+            
         
             console.log("Submitting data:", Object.fromEntries(formData.entries()));   
 
             const response = await fetch("http://127.0.0.1:8000/api/employee", {
                     method: "POST",
                     headers: {
-                        "Authorization": "Bearer 1|05bKC39wsT9TrhQRrpkar8o3j9nJJy4kP21u3Zutc4facf8d",
+                        "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
                         // Jangan tambahkan Content-Type manual di sini!
                     },
                     body: formData,
@@ -150,6 +155,12 @@ export default function AddEmployee() {
             setLoading(false);
         }
     };
+    React.useEffect(() => {
+        if (error) {
+            setPreventRedirect(true);
+        }
+    }, [error]);
+
 
 
 
@@ -157,7 +168,7 @@ export default function AddEmployee() {
     <Sidebar title="Employee Database">
         <div className="w-full">
             {/* <form action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data"> */}
-            <form id="employeeForm" onSubmit={(e) => {
+            <form id="employeeForm" ref={formRef} onSubmit={(e) => {
                 e.preventDefault(); // mencegah reload halaman
                 handleSubmitForm();
             }}>
@@ -392,72 +403,77 @@ export default function AddEmployee() {
                             <input type="hidden" name="contract_type" value={contractType} />
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
-                            {/* DEPARTMENT DROPDOWN */}
-                            <Popover open={openDep} onOpenChange={setOpenDep}>
-                            <PopoverTrigger asChild>
-                                <button className="file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
-                                {selectedDepartment ?? "Select department"}
-                                </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-full p-0">
-                                <Command>
-                                <CommandInput placeholder="Search department..." />
-                                <CommandList>
-                                    <CommandEmpty>No department found.</CommandEmpty>
-                                    {departments.map(dep => (
-                                    <CommandItem
-                                        key={dep}
-                                        onSelect={() => {
-                                        handleSelectDepartment(dep);
-                                        setOpenDep(false);
-                                        }}
-                                    >
-                                        {dep}
-                                    </CommandItem>
-                                    ))}
-                                </CommandList>
-                                </Command>
-                            </PopoverContent>
-                            </Popover>
+                            <div className="flex flex-col flex-1 gap-[8px]">
+                                <Label htmlFor="department">Department</Label>
+                                <Popover open={openDep} onOpenChange={setOpenDep}>
+                                <PopoverTrigger asChild>
+                                    <button className="file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
+                                    {selectedDepartment ?? "Select department"}
+                                    </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-0">
+                                    <Command>
+                                    <CommandInput placeholder="Search department..." />
+                                    <CommandList>
+                                        <CommandEmpty>No department found.</CommandEmpty>
+                                        {departments.map(dep => (
+                                        <CommandItem
+                                            key={dep}
+                                            onSelect={() => {
+                                            handleSelectDepartment(dep);
+                                            setOpenDep(false);
+                                            }}
+                                        >
+                                            {dep}
+                                        </CommandItem>
+                                        ))}
+                                    </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                                </Popover>
+                            </div>
+                            
+                            <div className="flex flex-col flex-1 gap-[8px]">
+                                <Label htmlFor="position">Position</Label>
+                                <Popover open={openPos} onOpenChange={setOpenPos}>
 
-                            {/* POSITION DROPDOWN - always visible but disabled if no department selected */}
-                            <Popover open={openPos} onOpenChange={setOpenPos}>
-
-                            <PopoverTrigger asChild>
-                                <button
-                                className={`file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm`}
-                                disabled={!selectedDepartment}
-                                >
-                                {selectedPosition?.Position ?? "Select position"}
-                                </button>
-                            </PopoverTrigger>
-
-                            <PopoverContent className="w-full p-0">
-                                <Command>
-                                <CommandInput
-                                    placeholder="Search position..."
+                                <PopoverTrigger asChild>
+                                    <button
+                                    className={`file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm`}
                                     disabled={!selectedDepartment}
-                                    className={!selectedDepartment ? "opacity-50 pointer-events-none" : ""}
-                                />
-                                <CommandList>
-                                    <CommandEmpty>No position found.</CommandEmpty>
-                                    {positions.map((pos) => (
-                                    <CommandItem
-                                        key={pos.id_position}
-                                        onSelect={() => {
-                                        if (!selectedDepartment) return; // safety guard
-                                        setSelectedPosition(pos);
-                                        setOpenPos(false);
-                                        }}
-                                        className={!selectedDepartment ? "opacity-50 pointer-events-none" : ""}
                                     >
-                                        {pos.Position}
-                                    </CommandItem>
-                                    ))}
-                                </CommandList>
-                                </Command>
-                            </PopoverContent>
-                            </Popover>
+                                    {selectedPosition?.Position ?? "Select position"}
+                                    </button>
+                                </PopoverTrigger>
+
+                                <PopoverContent className="w-full p-0">
+                                    <Command>
+                                    <CommandInput
+                                        placeholder="Search position..."
+                                        disabled={!selectedDepartment}
+                                        className={!selectedDepartment ? "opacity-50 pointer-events-none" : ""}
+                                    />
+                                    <CommandList>
+                                        <CommandEmpty>No position found.</CommandEmpty>
+                                        {positions.map((pos) => (
+                                        <CommandItem
+                                            key={pos.id_position}
+                                            onSelect={() => {
+                                            if (!selectedDepartment) return; // safety guard
+                                            setSelectedPosition(pos);
+                                            setOpenPos(false);
+                                            }}
+                                            className={!selectedDepartment ? "opacity-50 pointer-events-none" : ""}
+                                        >
+                                            {pos.Position}
+                                        </CommandItem>
+                                        ))}
+                                    </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                                </Popover>
+                            </div>
+                            
 
 
                         </div>
@@ -560,14 +576,84 @@ export default function AddEmployee() {
                         </Button>
                     </Link>
                     
-                    <Button className="w-[80px]" variant="default" type="submit">
+                    <Button className="w-[80px] h-[40px]" variant="default" type="submit" disabled={loading}>
+                    {!loading ? (
+                        <>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M17 21V13H7V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M7 3V8H15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M17 21V13H7V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M7 3V8H15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                        Save
+                        <span className="ml-1">Save</span>
+                        </>
+                    ) : (
+                        <Spinner size="small" />
+                    )}
                     </Button>
+                    <Dialog
+                    open={success || error}
+                    onOpenChange={(open) => {
+                        if (!open) {
+                        setSuccess(false);
+                        setError(false);
+                        if (!preventRedirect) {
+                                // Jika bukan karena tombol Add Another, redirect
+                                router.push(`/employee`);
+                            } else {
+                                // reset flag supaya dialog bisa redirect normal di lain waktu
+                                setPreventRedirect(false);
+                            }
+                        }
+                    }}
+                    >
+                    <DialogContent className="bg-white max-w-sm mx-auto">
+                        <DialogHeader>
+                        <DialogTitle>{success ? "Success!" : "Error"}</DialogTitle>
+                        </DialogHeader>
+                        <div className="mt-2">
+                        {success && <p className="text-green-700">Successfully!</p>}
+                        {error && <p className="text-red-600">There was an error submitting the form.</p>}
+                        </div>
+                        <DialogFooter className="mt-4 flex gap-2 justify-end">
+                        {success && (
+                            <div className="flex gap-2 justify-end w-full">
+                            <Button
+                                variant="outline"
+                                className="max-w-[180px] whitespace-nowrap"
+                                onClick={() => {
+                                // Reset form & close popup
+                                formRef.current?.reset();
+                                setSuccess(false);
+                                setAvatarPreview("");
+                                setContractType("");
+                                setGender("");
+                                setEducation("");
+                                setBloodType("");
+                                setMaritalStatus("");
+                                setReligion("");
+                                setSelectedBank(null);
+                                setSelectedDepartment(null);
+                                setSelectedPosition(null);
+                                setPreventRedirect(true); // cegah redirect saat dialog close
+                                }}
+                            >
+                                Add Another Employee
+                            </Button>
+                            <DialogClose asChild>
+                                <Button variant="default" className="max-w-[180px] whitespace-nowrap">Close</Button>
+                            </DialogClose>
+                            </div>
+                        )}
+                        {error && (
+                            
+                            <DialogClose asChild>
+                                <Button variant="default" className="max-w-[180px] whitespace-nowrap">Close</Button>
+                            </DialogClose>
+                            
+                        )}
+                        </DialogFooter>
+                    </DialogContent>
+                    </Dialog>
                 </div>
             </Card>
             </form>

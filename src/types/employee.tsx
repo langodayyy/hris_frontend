@@ -6,8 +6,8 @@ export type Employee = {
   nik: string | null;
   first_name: string | null;
   last_name: string | null;
-  position_id: number | null;
-  department_id: number | null;
+  position_id: string | null;
+//   department_id: number | null;
   address: string | null;
   email: string | null;
   phone: number | null;
@@ -33,6 +33,7 @@ export type Employee = {
 
 export type EmployeeResponse = {
   employee: Employee;
+  department_id: string | null;
   position_name: string | null;
   department_name: string | null;
   bank_name: string | null;

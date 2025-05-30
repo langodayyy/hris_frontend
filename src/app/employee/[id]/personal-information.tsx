@@ -12,6 +12,7 @@ import {
     DialogTitle,
     DialogDescription,
     DialogClose,
+    DialogFooter,
     } from "@/components/ui/dialog"
 import {
     Select,
@@ -22,12 +23,14 @@ import {
 } from "@/components/ui/select"
 import { EmployeeResponse } from "@/types/employee";
 import { useEffect, useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 type Props = {
-  employeeData?: EmployeeResponse;
+    employeeData?: EmployeeResponse;
+    onUpdate: () => void;
 };
 
-const PersonalInformation = ({ employeeData }: Props) => {
+const PersonalInformation = ({ employeeData, onUpdate }: Props) => {
     const [gender, setGender] = useState("");
     const [education, setEducation] = useState("");
     const [bloodType, setBloodType] = useState("");
@@ -46,6 +49,8 @@ const PersonalInformation = ({ employeeData }: Props) => {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
+
+    
     const handleSubmitForm = async () => {
         setLoading(true);
         setError(false);
@@ -58,7 +63,7 @@ const PersonalInformation = ({ employeeData }: Props) => {
             const response = await fetch(`http://127.0.0.1:8000/api/employee/${employeeData?.employee.employee_id}?_method=PATCH`, {
                     method: "POST",
                     headers: {
-                        "Authorization": "Bearer 1|05bKC39wsT9TrhQRrpkar8o3j9nJJy4kP21u3Zutc4facf8d",
+                        "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
                         // Jangan tambahkan Content-Type manual di sini!
                     },
                     body: formData,
@@ -78,12 +83,19 @@ const PersonalInformation = ({ employeeData }: Props) => {
         }
     };
 
+    const [isDialogAOpen, setDialogAOpen] = useState(false);
+    const handleOkClick = async () => {
+        onUpdate(); // panggil fetchData() di parent
+        setDialogAOpen(false)
+        setSuccess(false); // reset state jika perlu
+
+    };
     return (
         <Card className="flex-1 h-full ml-[20px] gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
             <div className="flex mx-[20px] justify-between">
                 <p className="justify-center text-lg font-medium whitespace-nowrap">Personal Information</p>
                 <div>
-                    <Dialog>
+                    <Dialog open={isDialogAOpen} onOpenChange={setDialogAOpen}>
                         <DialogTrigger asChild>
                             <Button variant="ghost" size="icon">
                                 <svg className="!w-[24px] !h-[24px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -280,14 +292,54 @@ const PersonalInformation = ({ employeeData }: Props) => {
                                                 </DialogClose>
                                             </div>
                                             
-                                            <Button className="w-[80px]" variant="default" type="submit">
+                                            <Button className="w-[80px] h-[40px]" variant="default" type="submit" disabled={loading}>
+                                            {!loading ? (
+                                                <>
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                <path d="M17 21V13H7V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                <path d="M7 3V8H15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                    <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                    <path d="M17 21V13H7V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                    <path d="M7 3V8H15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                                 </svg>
-                                                Save
+                                                <span className="ml-1">Save</span>
+                                                </>
+                                            ) : (
+                                                <Spinner size="small" />
+                                            )}
                                             </Button>
+                                            <Dialog
+                                            open={success || error}
+                                            onOpenChange={(open) => {
+                                                if (!open) {
+                                                setSuccess(false);
+                                                setError(false);
+                                                handleOkClick();
+                                                }
+                                            }}
+                                            >
+                                            <DialogContent className="bg-white max-w-sm mx-auto">
+                                                <DialogHeader>
+                                                <DialogTitle>{success ? "Success!" : "Error"}</DialogTitle>
+                                                </DialogHeader>
+                                                <div className="mt-2">
+                                                {success && <p className="text-green-700">Successfully!</p>}
+                                                {error && <p className="text-red-600">There was an error submitting the form.</p>}
+                                                </div>
+                                                <DialogFooter className="mt-4 flex gap-2 justify-end">
+                                                {success && (
+                                                    <div className="flex gap-2 justify-end w-full">
+                                                    <DialogClose asChild>
+                                                        <Button onClick={handleOkClick} variant="default" className="max-w-[180px] whitespace-nowrap">Ok</Button>
+                                                    </DialogClose>
+                                                    </div>
+                                                )}
+                                                {error && (
+                                                    <DialogClose asChild>
+                                                        <Button onClick={handleOkClick} variant="default" className="max-w-[180px] whitespace-nowrap">OK</Button>
+                                                    </DialogClose>
+                                                )}
+                                                </DialogFooter>
+                                            </DialogContent>
+                                            </Dialog>
                                         </div>
                                     </div>
                                 </form>
