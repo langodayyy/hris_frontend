@@ -18,7 +18,7 @@ import { Spinner } from "@/components/ui/spinner";
 
 
 export default function EmployeeDetails(){
-    const [status, setStatus] = useState("Active");
+    const [employeeStatus, setEmployeeStatus] = useState("Active");
     // const [isDialogOpen, setIsDialogOpen] = useState(false);
     
     // const handleChangeStatus = () => {
@@ -187,7 +187,7 @@ export default function EmployeeDetails(){
                                                             
                                                             <div className="flex flex-col flex-1 gap-[8px]">
                                                                 <Label htmlFor="status">Employee Status</Label>
-                                                                <Select value={status} onValueChange={setStatus}>
+                                                                <Select value={employeeStatus} onValueChange={setEmployeeStatus}>
                                                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
                                                                         <SelectValue placeholder="Select employee status" />
                                                                     </SelectTrigger>
@@ -199,7 +199,7 @@ export default function EmployeeDetails(){
                                                                     
                                                                     </SelectContent>
                                                                 </Select>
-                                                                <input type="hidden" name="employee_status" value={status}/>
+                                                                <input type="hidden" name="employee_status" value={employeeStatus}/>
                                                             </div>
                                                         </div>
                                                         

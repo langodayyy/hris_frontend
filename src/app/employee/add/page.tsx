@@ -61,15 +61,15 @@ export default function AddEmployee() {
     const [bank, setBank] = useState<{ name: string; code: string }[] | null>(null);
 
     const [depPosData, setDepPosData] = useState<DepartmentPosition[]>([]);
-    const [departments, setDepartments] = useState<string[]>([]);
+    const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
     const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
     const [positions, setPositions] = useState<DepartmentPosition[]>([]);
     const [selectedPosition, setSelectedPosition] = useState<DepartmentPosition | null>(null);
 
     type DepartmentPosition = {
-        id_department: number;
+        id_department: string;
         Department: string;
-        id_position: number;
+        id_position: string;
         Position: string;
     };
 
@@ -99,7 +99,12 @@ export default function AddEmployee() {
             const dataDepPos: DepartmentPosition[] = await resDepPos.json();
 
             setDepPosData(dataDepPos);
-            const uniqueDepartments = [...new Set(dataDepPos.map(item => item.Department))];
+            setDepPosData(dataDepPos);
+            const uniqueDepartments = Array.from(
+                new Map(
+                    dataDepPos.map(item => [item.id_department, { id: item.id_department, name: item.Department }])
+                ).values()
+            );
             setDepartments(uniqueDepartments);
 
           } catch (error) {
@@ -113,7 +118,7 @@ export default function AddEmployee() {
 
     const handleSelectDepartment = (dep: string) => {
         setSelectedDepartment(dep);
-        setPositions(depPosData.filter(d => d.Department === dep));
+        setPositions(depPosData.filter(d => d.id_department === dep));
         setSelectedPosition(null); // reset position
     };
 
@@ -408,7 +413,7 @@ export default function AddEmployee() {
                                 <Popover open={openDep} onOpenChange={setOpenDep}>
                                 <PopoverTrigger asChild>
                                     <button className="file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
-                                    {selectedDepartment ?? "Select department"}
+                                    {departments.find(dep => dep.id === selectedDepartment)?.name ?? "Select department"}
                                     </button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-full p-0">
@@ -418,13 +423,13 @@ export default function AddEmployee() {
                                         <CommandEmpty>No department found.</CommandEmpty>
                                         {departments.map(dep => (
                                         <CommandItem
-                                            key={dep}
+                                            key={dep.id}
                                             onSelect={() => {
-                                            handleSelectDepartment(dep);
+                                            handleSelectDepartment(dep.id);
                                             setOpenDep(false);
                                             }}
                                         >
-                                            {dep}
+                                            {dep.name}
                                         </CommandItem>
                                         ))}
                                     </CommandList>
