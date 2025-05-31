@@ -11,17 +11,13 @@ import {
 import { Pie, PieChart } from "recharts";
 import { Spinner } from "@/components/ui/spinner";
 
-export function ApprovalCheckClock() {
-  const { dashboardData, loading } = useDashboardData();
+interface Props { 
+  dashboardData: any; // Replace with the actual type of dashboardData
+}
 
-  if (loading || !dashboardData)
-    return (
-      <Card className="flex flex-col py-0 gap-0 h-[251px] justify-center items-center">
-        <Spinner size="small" />
-      </Card>
-    );
+export function ApprovalCheckClock({dashboardData}: Props) {
 
-  const { chartDataPie, chartConfig, dataSummary } = getPieChartData(dashboardData.approvalStatus[0]);
+  const { chartDataPie, chartConfig, dataSummary } = getPieChartData(dashboardData);
 
   return (
     <Card className="flex flex-col py-0 gap-0 max-h-[251px]">

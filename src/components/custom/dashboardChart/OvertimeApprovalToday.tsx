@@ -10,17 +10,12 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { getPieChartData } from "@/utils/getPieChartData";
 import { Pie, PieChart } from "recharts";
 
-export function OvertimeApprovalToday() {
-  const { dashboardData, loading } = useDashboardData();
-  
-    if (loading || !dashboardData)
-      return (
-        <Card className="flex flex-col py-0 gap-0 h-[251px] justify-center items-center">
-          <Spinner size="small" />
-        </Card>
-      );
-  
-    const { chartDataPie, chartConfig, dataSummary } = getPieChartData(dashboardData.approvalStatus[0]);
+interface Props { 
+  dashboardData: any; // Replace with the actual type of dashboardData
+}
+
+export function OvertimeApprovalToday({dashboardData}:Props) {
+  const { chartDataPie, chartConfig, dataSummary } = getPieChartData(dashboardData);
 
   return (
     <Card className="flex flex-col py-0 gap-0">

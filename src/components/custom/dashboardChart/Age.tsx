@@ -23,19 +23,14 @@ import { getPieChartData } from "@/utils/getPieChartData";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { Spinner } from "@/components/ui/spinner";
 
+interface Props { 
+  dashboardData: any; // Replace with the actual type of dashboardData
+}
 
-export function Age() {
+export function Age({dashboardData}: Props) {
   const [position, setPosition] = useState("5")
-  const { dashboardData, loading } = useDashboardData();
   
-    if (loading || !dashboardData)
-      return (
-        <Card className="flex flex-col py-0 gap-0 h-[251px] justify-center items-center">
-          <Spinner size="small" />
-        </Card>
-      );
-  
-    const { chartDataPie, chartConfig, dataSummary } = getPieChartData(dashboardData.employeeAge[0]);
+  const { chartDataPie, chartConfig, dataSummary } = getPieChartData(dashboardData);
 
   return (
     <Card className="flex flex-col py-0 gap-0">

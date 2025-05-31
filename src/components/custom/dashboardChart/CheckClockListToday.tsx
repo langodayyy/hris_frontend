@@ -27,20 +27,15 @@ const chartData: CheckClockListRecord[] = [
   { id: "3", name: "Mumtaz", time: "10:00", position: "Employee" },
 ];
 
-export function CheckClockListToday() {
+interface Props { 
+  dashboardData: any; // Replace with the actual type of dashboardData
+}
+
+export function CheckClockListToday({dashboardData}:Props) {
   const column = CheckClockList();
   const [position, setPosition] = useState("sick")
 
-  const { dashboardData, loading } = useDashboardData();
-    
-      if (loading || !dashboardData)
-        return (
-          <Card className="flex flex-col py-0 gap-0 h-[251px] justify-center items-center">
-            <Spinner size="small" />
-          </Card>
-        );
-    
-      const { chartData } = getTableChartData(dashboardData.lateEmployee);
+  const { chartData } = getTableChartData(dashboardData);
 
   return (
     <Card>

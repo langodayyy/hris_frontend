@@ -18,17 +18,13 @@ const dd = String(today.getDate()).padStart(2, '0');
 
 const formattedDate = `${yyyy}-${mm}-${dd}`;
 
-export function AttendaceStatusToday() {
-  const { dashboardData, loading } = useDashboardData();
+interface Props { 
+  dashboardData: any; // Replace with the actual type of dashboardData
+}
+
+export function AttendaceStatusToday({dashboardData}: Props) {
   
-    if (loading || !dashboardData)
-      return (
-        <Card className="flex flex-col py-0 gap-0 h-[251px] justify-center items-center">
-          <Spinner size="small" />
-        </Card>
-      );
-  
-    const { chartDataPie, chartConfig, dataSummary } = getPieChartData(dashboardData.attendancePercentage[0]);
+  const { chartDataPie, chartConfig, dataSummary } = getPieChartData(dashboardData);
 
   return (
     <Card className="flex flex-col py-0 gap-0">
