@@ -20,16 +20,13 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { Spinner } from "@/components/ui/spinner";
 import { getBarChartData } from "@/utils/getBarChartData";
 
-export function CurrentEmployee() {
-  const { dashboardData, loading } = useDashboardData();
-  if (loading || !dashboardData)
-    return (
-      <Card className="flex flex-col py-0 gap-0 h-[251px] justify-center items-center">
-        <Spinner size="small" />
-      </Card>
-    );
+interface Props { 
+  dashboardData: any; // Replace with the actual type of dashboardData
+}
 
-  const { chartData, chartConfig } = getBarChartData(dashboardData.employeeCount[0]);
+export function CurrentEmployee({dashboardData}: Props) {
+
+  const { chartData, chartConfig } = getBarChartData(dashboardData);
 
   return (
     <Card>

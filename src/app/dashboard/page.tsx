@@ -22,6 +22,9 @@ import { EmployeeWorkStatus } from "@/components/custom/dashboardChart/EmployeeW
 import { CheckClockListToday } from "@/components/custom/dashboardChart/CheckClockListToday";
 import { OvertimeApprovalToday } from "@/components/custom/dashboardChart/OvertimeApprovalToday";
 import StatCard from "@/components/custom/dashboardChart/StatCard";
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const EmployeeIcon = (
   <svg
@@ -93,6 +96,30 @@ const ResignedEmployeeIcon = (
 );
 
 export default function Dashboard() {
+  const { dashboardData, loading } = useDashboardData();
+    
+  if (loading || !dashboardData)
+    return (
+      <Sidebar title="Dashboard">
+        <div className="grid grid-cols-4 gap-[30px] pb-[30px]">
+          <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[156px]"></Skeleton>
+          <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[156px]"></Skeleton>
+          <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[156px]"></Skeleton>
+          <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[156px]"></Skeleton>
+        </div>
+        {/* Chart */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-[30px]">
+          <div className="flex flex-col cols-span-1 gap-y-[30px]">
+            <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[250px]"></Skeleton>
+            <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[250px]"></Skeleton>
+          </div>
+          <div className="flex flex-col cols-span-1 gap-y-[30px]">
+            <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[250px]"></Skeleton>
+            <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[250px]"></Skeleton>
+          </div>
+        </div>
+      </Sidebar>
+    );
   
   return (
     <Sidebar title="Dashboard">
@@ -103,62 +130,66 @@ export default function Dashboard() {
           icon={EmployeeIcon}
           title="Total Employee"
           lastUpdated="21 April 2025"
+          dashboardData={dashboardData.employeeCount[0]}
         />
         {/* Card New Employee */}
         <StatCard
           icon={NewEmployeeIcon}
           title="New Employee"
           lastUpdated="21 April 2025"
+          dashboardData={dashboardData.employeeCount[0]}
         />
         {/* Card Active Employee */}
         <StatCard
           icon={ActiveEmployeeIcon}
           title="Active Employee"
           lastUpdated="21 April 2025"
+          dashboardData={dashboardData.employeeCount[0]}
         />
         {/* Card Resigned Employee */}
         <StatCard
           icon={ResignedEmployeeIcon}
           title="Resigned Employee"
           lastUpdated="21 April 2025"
+          dashboardData={dashboardData.employeeCount[0]}
         />
       </div>
       {/* Chart */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-[30px]">
         <div className="flex flex-col cols-span-1 gap-y-[30px]">
           {/* pie chart checkclock approval  */}
-          <ApprovalCheckClock></ApprovalCheckClock>
+          <ApprovalCheckClock dashboardData={dashboardData.approvalStatus[0]}></ApprovalCheckClock>
 
           {/* pie chart attendance status today */}
-          <AttendaceStatusToday></AttendaceStatusToday>
+          <AttendaceStatusToday dashboardData={dashboardData.attendancePercentage[0]}></AttendaceStatusToday>
 
           {/* bar chart horizontal current number of employee (new, active, resigned)*/}
-          <CurrentEmployee></CurrentEmployee>
+          <CurrentEmployee dashboardData={dashboardData.employeeCount[0]}></CurrentEmployee>
 
           {/* pie chart gender */}
-          <Gender></Gender>
+          <Gender dashboardData={dashboardData.employeeGender[0]}></Gender>
 
           {/* pie chart maritial status  */}
-          <MaritalStatus></MaritalStatus>
+          <MaritalStatus dashboardData={dashboardData.employeeMaritalStatus[0]}></MaritalStatus>
 
           {/* pie chart years of works */}
-          <YearsofWorks></YearsofWorks>
+          <YearsofWorks dashboardData={dashboardData.employeeWorkYear[0]}></YearsofWorks>
         </div>
         <div className="flex flex-col cols-span-1 gap-y-[30px]">
           {/* table late, absence, leave employee today  */}
-          <CheckClockListToday></CheckClockListToday>
+          <CheckClockListToday dashboardData={dashboardData.lateEmployee}></CheckClockListToday>
 
           {/* pie chart overtime approval today  */}
-          <OvertimeApprovalToday></OvertimeApprovalToday>
+          <OvertimeApprovalToday dashboardData={dashboardData.approvalStatus[0]}></OvertimeApprovalToday>
 
           {/* bar chart vertical employee type status (magang, tetap, pkwt, kontrak) */}
-          <EmployeeWorkStatus></EmployeeWorkStatus>
+          <EmployeeWorkStatus dashboardData={dashboardData.employeeWorkStatus[0]}></EmployeeWorkStatus>
 
           {/* pie chart age */}
-          <Age></Age>
+          <Age dashboardData={dashboardData.employeeAge[0]}></Age>
 
           {/* pie chart religion */}
-          <Religion></Religion>
+          <Religion dashboardData={dashboardData.employeeReligion[0]}></Religion>
         </div>
       </div>
     </Sidebar>
