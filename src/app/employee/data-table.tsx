@@ -69,6 +69,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useNavigate } from "react-router-dom";
 import { useRouter } from 'next/navigation';
+import Cookies from "js-cookie";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -181,11 +182,10 @@ export function DataTable<TData, TValue>({
     useEffect(() => {
         const fetchData = async () => {
         try {
-            const token = "1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a" // pastikan token sudah disimpan di login
            
             const resDepPos = await fetch("http://127.0.0.1:8000/api/department-position", {
             headers: {
-                "Authorization": `Bearer ${token}`,
+                "Authorization": `Bearer ${Cookies.get("token")}`,
                 "Content-Type": "application/json"
             }
             })
@@ -255,7 +255,7 @@ export function DataTable<TData, TValue>({
             const response = await fetch(url, {
             method: "GET",
             headers: {
-                "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
+                "Authorization": `Bearer ${Cookies.get("token")}`,
             },
             });
 
@@ -300,7 +300,7 @@ export function DataTable<TData, TValue>({
             const response = await fetch("http://127.0.0.1:8000/api/employees/preview-csv", {
                 method: "POST",
                 headers: {
-                    "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
+                    "Authorization": `Bearer ${Cookies.get("token")}`,
                 },
                 body: formData,
             });

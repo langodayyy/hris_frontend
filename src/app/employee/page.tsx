@@ -6,7 +6,7 @@ import { DataTable } from "./data-table"
 import { Card, CardContent } from "@/components/ui/card";
 import React, { useRef, useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
-
+import Cookies from "js-cookie";
 
 export default function Employee() {
   const [employees, setEmployees] = useState<Employees[]>([])
@@ -18,10 +18,9 @@ export default function Employee() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const token = localStorage.getItem("token") // pastikan token sudah disimpan di login
         const res = await fetch("http://127.0.0.1:8000/api/employees", {
           headers: {
-            "Authorization": `Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a`,
+            "Authorization": `Bearer ${Cookies.get("token")}`,
             "Content-Type": "application/json"
           }
         })

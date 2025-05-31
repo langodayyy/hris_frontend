@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useParams } from "next/navigation";
 import { EmployeeResponse } from "@/types/employee";
 import { Spinner } from "@/components/ui/spinner";
-
+import Cookies from "js-cookie";
 
 export default function EmployeeDetails(){
     const [employeeStatus, setEmployeeStatus] = useState("Active");
@@ -31,10 +31,9 @@ export default function EmployeeDetails(){
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            const token = localStorage.getItem("token");
             const res = await fetch(`http://127.0.0.1:8000/api/employees/${id}`, {
             headers: {
-                "Authorization": `Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a`,
+                "Authorization": `Bearer ${Cookies.get("token")}`,
                 "Content-Type": "application/json"
             }
             });
@@ -69,7 +68,7 @@ export default function EmployeeDetails(){
             const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}?_method=PATCH`, {
                     method: "POST",
                     headers: {
-                        "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
+                        "Authorization": `Bearer ${Cookies.get("token")}`,
                         // Jangan tambahkan Content-Type manual di sini!
                     },
                     body: formData,
@@ -98,7 +97,7 @@ export default function EmployeeDetails(){
             const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}/reset-password`, {
                     method: "POST",
                     headers: {
-                        "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
+                        "Authorization": `Bearer ${Cookies.get("token")}`,
                         // Jangan tambahkan Content-Type manual di sini!
                     },
             });
@@ -126,7 +125,7 @@ export default function EmployeeDetails(){
             const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}/d`, {
                     method: "POST",
                     headers: {
-                        "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
+                        "Authorization": `Bearer ${Cookies.get("token")}`,
                         // Jangan tambahkan Content-Type manual di sini!
                     },
             });

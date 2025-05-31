@@ -13,6 +13,7 @@ import { Employees } from "../column";
 import Link from "next/link";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useRouter } from 'next/navigation';
+import Cookies from "js-cookie";
 
 export default function Employee() {
   const [isLoading, setIsLoading] = useState(true);
@@ -79,7 +80,7 @@ export default function Employee() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
+                "Authorization": `Bearer ${Cookies.get("token")}`,
             },
             body: JSON.stringify({
                 employees: previewData.valid_rows,

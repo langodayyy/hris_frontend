@@ -18,6 +18,8 @@ import PhoneInput from "@/components/ui/phoneInput";
 import { EmployeeResponse } from "@/types/employee";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import Cookies from "js-cookie";
+
 type Props = {
   employeeData?: EmployeeResponse;
   onUpdate: () => void;
@@ -39,7 +41,7 @@ const ContactInformation = ({ employeeData, onUpdate }: Props) => {
             const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}?_method=PATCH`, {
                     method: "POST",
                     headers: {
-                        "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
+                        "Authorization": `Bearer ${Cookies.get("token")}`,
                         // Jangan tambahkan Content-Type manual di sini!
                     },
                     body: formData,

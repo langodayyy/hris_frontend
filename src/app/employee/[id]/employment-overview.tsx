@@ -32,6 +32,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { EmployeeResponse } from "@/types/employee";
 import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import Cookies from "js-cookie";
+
 type Props = {
   employeeData?: EmployeeResponse;
     onUpdate: () => void;
@@ -77,13 +79,13 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
             const token = "1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a" // pastikan token sudah disimpan di login
             const resBank = await fetch("http://127.0.0.1:8000/api/bank", {
                 headers: {
-                "Authorization": `Bearer ${token}`,
+                "Authorization": `Bearer ${Cookies.get("token")}`,
                 "Content-Type": "application/json"
                 }
             })
             const resDepPos = await fetch("http://127.0.0.1:8000/api/department-position", {
                 headers: {
-                "Authorization": `Bearer ${token}`,
+                "Authorization": `Bearer ${Cookies.get("token")}`,
                 "Content-Type": "application/json"
                 }
             })
@@ -179,7 +181,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
             const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}?_method=PATCH`, {
                     method: "POST",
                     headers: {
-                        "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
+                        "Authorization": `Bearer ${Cookies.get("token")}`,
                         // Jangan tambahkan Content-Type manual di sini!
                     },
                     body: formData,
