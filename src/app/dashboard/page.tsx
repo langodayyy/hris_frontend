@@ -24,6 +24,7 @@ import { OvertimeApprovalToday } from "@/components/custom/dashboardChart/Overti
 import StatCard from "@/components/custom/dashboardChart/StatCard";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const EmployeeIcon = (
   <svg
@@ -99,9 +100,25 @@ export default function Dashboard() {
     
   if (loading || !dashboardData)
     return (
-      <div className="py-0 gap-0 justify-center items-center bg-white bg-opacity-50 backdrop-blur-md rounded-lg shadow-md fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <Spinner size="small" />
-      </div>
+      <Sidebar title="Dashboard">
+        <div className="grid grid-cols-4 gap-[30px] pb-[30px]">
+          <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[156px]"></Skeleton>
+          <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[156px]"></Skeleton>
+          <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[156px]"></Skeleton>
+          <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[156px]"></Skeleton>
+        </div>
+        {/* Chart */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-[30px]">
+          <div className="flex flex-col cols-span-1 gap-y-[30px]">
+            <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[250px]"></Skeleton>
+            <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[250px]"></Skeleton>
+          </div>
+          <div className="flex flex-col cols-span-1 gap-y-[30px]">
+            <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[250px]"></Skeleton>
+            <Skeleton className="col-span-1 flex flex-col rounded-xl min-h-[250px]"></Skeleton>
+          </div>
+        </div>
+      </Sidebar>
     );
   
   return (
