@@ -176,7 +176,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
             if (selectedDepartmentId)
                 formData.append("department_id", selectedDepartmentId);
             console.log("Submitting data:", Object.fromEntries(formData.entries()));   
-            const response = await fetch(`http://127.0.0.1:8000/api/employee/${employeeData?.employee.employee_id}?_method=PATCH`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}?_method=PATCH`, {
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",

@@ -67,6 +67,8 @@ import {
   CommandList,
 } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/navigation';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -145,16 +147,19 @@ export function DataTable<TData, TValue>({
     }
 
     const formRef = useRef<HTMLFormElement>(null);
-      const fileInputRef = useRef<HTMLInputElement>(null);
-    
-      const handleFileDrop = (files: File[]) => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
+    const handleFileDrop = (files: File[]) => {
+        const file = files[0];
+        setUploadedFile(file);
         // Saat file di-drop, masukkan ke input file manual (untuk FormData)
         const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(files[0]);
+        dataTransfer.items.add(file);
         if (fileInputRef.current) {
-          fileInputRef.current.files = dataTransfer.files;
+            fileInputRef.current.files = dataTransfer.files;
         }
-      };
+    };
 
     const [openDep, setOpenDep] = useState(false)
     const [openPos, setOpenPos] = useState(false)
@@ -274,8 +279,51 @@ export function DataTable<TData, TValue>({
         } finally {
             setLoading(false);
         }
-        };
+    };
+    
+    const router = useRouter();
 
+    const handleImportButton = async () => {
+        if (!uploadedFile) {
+            console.warn("No file selected.");
+            return;
+        }
+
+        setLoading(true);
+        setError(false);
+        setSuccess(false);
+
+        try {
+            const formData = new FormData();
+            formData.append("csv_file", uploadedFile);
+
+            const response = await fetch("http://127.0.0.1:8000/api/employees/preview-csv", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
+                },
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error("Server returned an error");
+            }
+
+            const data = await response.json();
+
+            setSuccess(true);
+            
+            localStorage.setItem("previewImportData", JSON.stringify(data));
+            router.push("/employee/import");
+
+
+        } catch (err) {
+            console.error("Submit error:", err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
 
       
   return (
@@ -531,36 +579,7 @@ export function DataTable<TData, TValue>({
                         }}> */}
                         <div className="flex flex-col gap-[15px] mt-[15px]">
                             <div className="flex gap-[15px]">
-                            {/* <div className="flex flex-col flex-1 gap-[8px]">
-                                <Label htmlFor="department">Department</Label>
-                                <Select defaultValue="semua">
-                                    <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
-                                        <SelectValue placeholder="Select department" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="semua">Semua</SelectItem>
-                                        <SelectItem value="department_a">Department A</SelectItem>
-                                        <SelectItem value="department_b">Department B</SelectItem>
-                                        <SelectItem value="department_c">Department C</SelectItem>
-                                        <SelectItem value="department_d">Department D</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="flex flex-col flex-1 gap-[8px]">
-                                <Label htmlFor="position">Position</Label>
-                                <Select defaultValue="semua">
-                                    <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
-                                        <SelectValue placeholder="Select position" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                    <SelectItem value="semua">Semua</SelectItem>
-                                        <SelectItem value="position_a">Position A</SelectItem>
-                                        <SelectItem value="position_b">Position B</SelectItem>
-                                        <SelectItem value="position_c">Position C</SelectItem>
-                                        <SelectItem value="position_d">Position D</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div> */}
+                      
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="department">Department</Label>
                                 <Popover open={openDep} onOpenChange={setOpenDep}>
@@ -764,14 +783,6 @@ export function DataTable<TData, TValue>({
                         
                     </DialogDescription>
                 </DialogHeader>
-                <form
-                    ref={formRef}
-                    action="https://httpbin.org/post"
-                    method="POST"
-                    target="_blank"
-                    encType="multipart/form-data"
-                    className="space-y-4"
-                >
                     {/* FileUploader tetap digunakan untuk UI, tapi file dimasukkan ke input tersembunyi */}
                     <FileUploader
                     onDrop={handleFileDrop}
@@ -797,10 +808,16 @@ export function DataTable<TData, TValue>({
                                 </Button>
                             </DialogClose>
                         </div>
-                        <Button className="w-[80px]" variant="default" type="submit">Submit</Button>
+                        
+                        <Button className="w-[80px]" variant="default" onClick={handleImportButton}>
+                            {!loading ? (
+                            <span className="ml-1">Submit</span>
+                            ) : (
+                            <Spinner size="small" />
+                        )}
+                        </Button>
+                        
                     </div>
-                </form>
-
             </DialogContent>
         </Dialog>
     </div>

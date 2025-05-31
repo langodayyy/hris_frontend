@@ -32,7 +32,7 @@ export default function EmployeeDetails(){
         try {
             setIsLoading(true);
             const token = localStorage.getItem("token");
-            const res = await fetch(`http://127.0.0.1:8000/api/employee/${id}`, {
+            const res = await fetch(`http://127.0.0.1:8000/api/employees/${id}`, {
             headers: {
                 "Authorization": `Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a`,
                 "Content-Type": "application/json"
@@ -66,7 +66,7 @@ export default function EmployeeDetails(){
             const form = document.getElementById("employeeForm") as HTMLFormElement;
             const formData = new FormData(form);
 
-            const response = await fetch(`http://127.0.0.1:8000/api/employee/${employeeData?.employee.employee_id}?_method=PATCH`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}?_method=PATCH`, {
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
@@ -89,16 +89,93 @@ export default function EmployeeDetails(){
         }
     };
 
-    const [isDialogAOpen, setDialogAOpen] = useState(false);
-    const handleOkClick = async () => {
+    const resetEmployeePassword = async () => {
+        setLoading(true);
+        setError(false);
+        setSuccess(false);
+        try {
+
+            const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}/reset-password`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
+                        // Jangan tambahkan Content-Type manual di sini!
+                    },
+            });
+
+            const responseData = await response.json();
+            console.log("Response:", responseData);
+
+            if (!response.ok) throw new Error("Gagal submit");
+
+            setSuccess(true);
+        } catch (err) {
+            console.error("Submit error:", err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const deleteEmployee = async () => {
+        setLoading(true);
+        setError(false);
+        setSuccess(false);
+        try {
+
+            const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}/d`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",
+                        // Jangan tambahkan Content-Type manual di sini!
+                    },
+            });
+
+            const responseData = await response.json();
+            console.log("Response:", responseData);
+
+            if (!response.ok) throw new Error("Gagal submit");
+
+            setSuccess(true);
+        } catch (err) {
+            console.error("Submit error:", err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const [isDialogEmployeeStatusOpen, setDialogEmployeeStatusOpen] = useState(false);
+    const [isDialogResetPasswordOpen, setDialogResetPasswordOpen] = useState(false);
+    const [isDialogDeleteOpen, setDialogDeleteOpen] = useState(false);
+    const [confirmationText, setConfirmationText] = useState("");
+
+    const handleOkClickEmployeeStatus = async () => {
         fetchData()
-        setDialogAOpen(false)
-        setSuccess(false); // reset state jika perlu
+        setDialogEmployeeStatusOpen(false)
+        setSuccess(false);
+
+    };
+    const handleOkClickResetPassword = async () => {
+        setDialogResetPasswordOpen(false)
+        setSuccess(false);
+
+    };
+    const handleOkClickDelete = async () => {
+        setDialogDeleteOpen(false)
+        setSuccess(false);
 
     };
     const handleChangeStatus = () => {
-        setDialogAOpen(true);
+        setDialogEmployeeStatusOpen(true);
     };
+
+    const handleResetPassword = () => {
+        setDialogResetPasswordOpen(true)
+    }
+    const handleDelete = () => {
+        setDialogDeleteOpen(true)
+    }
 
     return (
         <Sidebar title="Employee Details">
@@ -165,10 +242,11 @@ export default function EmployeeDetails(){
                                         <DropdownMenuContent>
                                             <DropdownMenuItem>Export</DropdownMenuItem>
                                             <DropdownMenuItem onClick={handleChangeStatus}>Change Status</DropdownMenuItem>
-                                            {/* <DropdownMenuItem>Option 3</DropdownMenuItem> */}
+                                            <DropdownMenuItem onClick={handleResetPassword}>Reset Password</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
-                                    <Dialog open={isDialogAOpen} onOpenChange={setDialogAOpen}>
+                                    <Dialog open={isDialogEmployeeStatusOpen} onOpenChange={setDialogEmployeeStatusOpen}>
                                         <DialogContent className="bg-white">
                                             <DialogHeader>
                                                 <DialogTitle>Change Employee Status</DialogTitle>
@@ -232,7 +310,7 @@ export default function EmployeeDetails(){
                                                                     if (!open) {
                                                                     setSuccess(false);
                                                                     setError(false);
-                                                                    handleOkClick();
+                                                                    handleOkClickEmployeeStatus();
 
                                                                     }
                                                                 }}
@@ -249,13 +327,13 @@ export default function EmployeeDetails(){
                                                                     {success && (
                                                                         <div className="flex gap-2 justify-end w-full">
                                                                         <DialogClose asChild>
-                                                                            <Button onClick={handleOkClick} variant="default" className="max-w-[180px] whitespace-nowrap">Ok</Button>
+                                                                            <Button onClick={handleOkClickEmployeeStatus} variant="default" className="max-w-[180px] whitespace-nowrap">Ok</Button>
                                                                         </DialogClose>
                                                                         </div>
                                                                     )}
                                                                     {error && (
                                                                         <DialogClose asChild>
-                                                                            <Button onClick={handleOkClick} variant="default" className="max-w-[180px] whitespace-nowrap">OK</Button>
+                                                                            <Button onClick={handleOkClickEmployeeStatus} variant="default" className="max-w-[180px] whitespace-nowrap">OK</Button>
                                                                         </DialogClose>
                                                                     )}
                                                                     </DialogFooter>
@@ -267,6 +345,145 @@ export default function EmployeeDetails(){
                                             </div>
                                         </DialogContent>
                                     </Dialog>
+                                    <Dialog open={isDialogResetPasswordOpen} onOpenChange={setDialogResetPasswordOpen}>
+                                        <DialogContent className="bg-white">
+                                            <DialogHeader>
+                                                <DialogTitle>Reset Employee Password</DialogTitle>
+                                                <DialogDescription>
+                                                    
+                                                    
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div>
+                                                    <div className="flex flex-col gap-[15px] mt-[15px]">
+                                                        
+                                                        <div className="flex gap-[10px] justify-end">
+                                                            <div>
+                                                                <DialogClose asChild>
+                                                                    <Button className="w-[80px]" variant="outline" size="lg">
+                                                                        Cancel
+                                                                    </Button>
+                                                                </DialogClose>
+                                                            </div>
+                                                            
+                                                             <Button className="w-[80px] h-[40px]" variant="default" disabled={loading} onClick={resetEmployeePassword}>
+                                                                {!loading ? (
+                                                                    <span className="ml-1">Reset</span>
+                                                                ) : (
+                                                                    <Spinner size="small" />
+                                                                )}
+                                                                </Button>
+                                                                <Dialog
+                                                                open={success || error}
+                                                                onOpenChange={(open) => {
+                                                                    if (!open) {
+                                                                    setSuccess(false);
+                                                                    setError(false);
+                                                                    handleOkClickResetPassword();
+
+                                                                    }
+                                                                }}
+                                                                >
+                                                                <DialogContent className="bg-white max-w-sm mx-auto">
+                                                                    <DialogHeader>
+                                                                    <DialogTitle>{success ? "Success!" : "Error"}</DialogTitle>
+                                                                    </DialogHeader>
+                                                                    <div className="mt-2">
+                                                                    {success && <p className="text-green-700">Successfully!</p>}
+                                                                    {error && <p className="text-red-600">There was an error.</p>}
+                                                                    </div>
+                                                                    <DialogFooter className="mt-4 flex gap-2 justify-end">
+                                                                    {success && (
+                                                                        <div className="flex gap-2 justify-end w-full">
+                                                                        <DialogClose asChild>
+                                                                            <Button onClick={handleOkClickResetPassword} variant="default" className="max-w-[180px] whitespace-nowrap">Ok</Button>
+                                                                        </DialogClose>
+                                                                        </div>
+                                                                    )}
+                                                                    {error && (
+                                                                        <DialogClose asChild>
+                                                                            <Button onClick={handleOkClickResetPassword} variant="default" className="max-w-[180px] whitespace-nowrap">OK</Button>
+                                                                        </DialogClose>
+                                                                    )}
+                                                                    </DialogFooter>
+                                                                </DialogContent>
+                                                                </Dialog>
+                                                        </div>
+                                                    </div>
+                                       
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
+                                    <Dialog open={isDialogDeleteOpen} onOpenChange={setDialogDeleteOpen}>
+                                        <DialogContent className="bg-white">
+                                            <DialogHeader>
+                                            <DialogTitle>Delete Employee</DialogTitle>
+                                            <DialogDescription>
+                                                
+                                            </DialogDescription>
+                                            </DialogHeader>
+                                            <div>
+                                                
+                                            <div className="flex flex-col gap-[15px]">
+                                                <span>Please type <strong>DELETE</strong> to confirm this action. This action cannot be undone.</span>
+                                                <input
+                                                type="text"
+                                                placeholder="Type DELETE to confirm"
+                                                className="border px-3 py-2 rounded-md"
+                                                value={confirmationText}
+                                                onChange={(e) => setConfirmationText(e.target.value)}
+                                                />
+                                                <div className="flex gap-[10px] justify-end">
+                                                <div>
+                                                    <DialogClose asChild>
+                                                    <Button className="w-[80px]" variant="outline" size="lg">
+                                                        Cancel
+                                                    </Button>
+                                                    </DialogClose>
+                                                </div>
+                                                <Button
+                                                    className="w-[80px] h-[40px]"
+                                                    variant="destructive"
+                                                    disabled={loading || confirmationText !== "DELETE"}
+                                                    onClick={deleteEmployee}
+                                                >
+                                                    {!loading ? (
+                                                    <span className="ml-1">Delete</span>
+                                                    ) : (
+                                                    <Spinner size="small" />
+                                                    )}
+                                                </Button>
+                                                </div>
+                                            </div>
+                                            </div>
+
+                                            {/* Success/Error Dialog */}
+                                            <Dialog open={success || error} onOpenChange={(open) => {
+                                            if (!open) {
+                                                setSuccess(false);
+                                                setError(false);
+                                                handleOkClickDelete();
+                                            }
+                                            }}>
+                                            <DialogContent className="bg-white max-w-sm mx-auto">
+                                                <DialogHeader>
+                                                <DialogTitle>{success ? "Success!" : "Error"}</DialogTitle>
+                                                </DialogHeader>
+                                                <div className="mt-2">
+                                                {success && <p className="text-green-700">Successfully!</p>}
+                                                {error && <p className="text-red-600">There was an error.</p>}
+                                                </div>
+                                                <DialogFooter className="mt-4 flex gap-2 justify-end">
+                                                <DialogClose asChild>
+                                                    <Button onClick={handleOkClickDelete} variant="default" className="max-w-[180px] whitespace-nowrap">
+                                                    OK
+                                                    </Button>
+                                                </DialogClose>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                            </Dialog>
+                                        </DialogContent>
+                                        </Dialog>
                                 </div>
                             </div>
                             <div className="flex gap-[15px]">

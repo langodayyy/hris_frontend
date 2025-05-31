@@ -138,7 +138,7 @@ export default function AddEmployee() {
         
             console.log("Submitting data:", Object.fromEntries(formData.entries()));   
 
-            const response = await fetch("http://127.0.0.1:8000/api/employee", {
+            const response = await fetch("http://127.0.0.1:8000/api/employees", {
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a",

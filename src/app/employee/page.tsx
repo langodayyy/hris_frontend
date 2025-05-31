@@ -19,7 +19,7 @@ export default function Employee() {
       try {
         setIsLoading(true);
         const token = localStorage.getItem("token") // pastikan token sudah disimpan di login
-        const res = await fetch("http://127.0.0.1:8000/api/employee", {
+        const res = await fetch("http://127.0.0.1:8000/api/employees", {
           headers: {
             "Authorization": `Bearer 1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a`,
             "Content-Type": "application/json"
