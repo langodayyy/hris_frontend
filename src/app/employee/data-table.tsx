@@ -59,6 +59,17 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FileUploader } from "@/components/ui/fileUploader";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/navigation';
+import Cookies from "js-cookie";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -71,6 +82,8 @@ export function DataTable<TData, TValue>({
   data,
   isLoading,
 }: DataTableProps<TData, TValue>) {
+    console.log("Data struktur:", data);
+
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -135,16 +148,184 @@ export function DataTable<TData, TValue>({
     }
 
     const formRef = useRef<HTMLFormElement>(null);
-      const fileInputRef = useRef<HTMLInputElement>(null);
-    
-      const handleFileDrop = (files: File[]) => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
+    const handleFileDrop = (files: File[]) => {
+        const file = files[0];
+        setUploadedFile(file);
         // Saat file di-drop, masukkan ke input file manual (untuk FormData)
         const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(files[0]);
+        dataTransfer.items.add(file);
         if (fileInputRef.current) {
-          fileInputRef.current.files = dataTransfer.files;
+            fileInputRef.current.files = dataTransfer.files;
         }
-      };
+    };
+
+    const [openDep, setOpenDep] = useState(false)
+    const [openPos, setOpenPos] = useState(false)
+
+    const [depPosData, setDepPosData] = useState<DepartmentPosition[]>([]);
+    const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
+    const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
+    const [positions, setPositions] = useState<DepartmentPosition[]>([]);
+    const [selectedPosition, setSelectedPosition] = useState<DepartmentPosition | null>(null);
+
+    type DepartmentPosition = {
+        id_department: string;
+        Department: string;
+        id_position: string;
+        Position: string;
+    };
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+           
+            const resDepPos = await fetch("http://127.0.0.1:8000/api/department-position", {
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("token")}`,
+                "Content-Type": "application/json"
+            }
+            })
+    
+
+
+            if (!resDepPos.ok) throw new Error("Failed to fetch Department & Position")
+            const dataDepPos: DepartmentPosition[] = await resDepPos.json();
+
+            setDepPosData(dataDepPos);
+            const uniqueDepartments = Array.from(
+                new Map(
+                    dataDepPos.map(item => [item.id_department, { id: item.id_department, name: item.Department }])
+                ).values()
+                );
+            setDepartments(uniqueDepartments);
+
+
+        } catch (error) {
+            console.error("Error fetching data:", error)
+        }
+        }
+    
+        fetchData()
+    }, []
+    )
+
+    const handleSelectDepartment = (dep: string) => {
+        setSelectedDepartment(dep);
+        setPositions(depPosData.filter(d => d.id_department === dep));
+        setSelectedPosition(null); // reset position
+    };
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState(false);
+    const [employeeStatus, setEmployeeStatus] = useState("");
+    const [contractType, setContractType] = useState("");
+    const handleExportButton = async () => {
+        setLoading(true);
+        setError(false);
+        setSuccess(false);
+
+        try {
+            const baseUrl = "http://127.0.0.1:8000/api/employees/export-csv";
+            const params = new URLSearchParams();
+
+            if (selectedPosition?.id_position) {
+                params.append("position_id", selectedPosition.id_position.toString());
+            }
+            if (selectedDepartment) {
+                params.append("department_id", selectedDepartment.toString());
+            }
+
+            if (employeeStatus && employeeStatus !== "All") {
+                params.append("employee_status", employeeStatus);
+            }
+            if (contractType && contractType !== "All") {
+                params.append("work_type", contractType);
+            }
+
+            
+
+            const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+            
+            console.log(departments);
+            console.log(url);
+            const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("token")}`,
+            },
+            });
+
+            if (!response.ok) throw new Error("Gagal mengunduh file");
+
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = downloadUrl;
+            a.download = "employees.csv";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+
+            setSuccess(true);
+        } catch (err) {
+            console.error("Submit error:", err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    const router = useRouter();
+
+    const handleImportButton = async () => {
+        if (!uploadedFile) {
+            console.warn("No file selected.");
+            return;
+        }
+
+        setLoading(true);
+        setError(false);
+        setSuccess(false);
+
+        try {
+            const formData = new FormData();
+            formData.append("csv_file", uploadedFile);
+
+            const response = await fetch("http://127.0.0.1:8000/api/employees/preview-csv", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${Cookies.get("token")}`,
+                },
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error("Server returned an error");
+            }
+
+            const data = await response.json();
+
+            setSuccess(true);
+            
+            localStorage.setItem("previewImportData", JSON.stringify(data));
+            router.push("/employee/import");
+
+
+        } catch (err) {
+            console.error("Submit error:", err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+      
   return (
     <>
     <div className="flex items-center py-4 gap-[10px]">
@@ -302,8 +483,8 @@ export function DataTable<TData, TValue>({
                     </DropdownMenuCheckboxItem>
                 ))}
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel>Status</DropdownMenuLabel>
-                    {["Active", "Inactive"].map((status) => (
+                <DropdownMenuLabel>Employee Status</DropdownMenuLabel>
+                    {['Active', 'Retire', 'Resign', 'Fired'].map((status) => (
                         <DropdownMenuCheckboxItem
                             key={status}
                             checked={tempFilters.status.includes(status)}
@@ -392,68 +573,132 @@ export function DataTable<TData, TValue>({
                     </DialogDescription>
                 </DialogHeader>
                 <div>
-                    <form action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data">
+                    {/* <form id="exportForm" onSubmit={(e) => {
+                                    e.preventDefault(); // mencegah reload halaman
+                                    handleSubmitForm();
+                        }}> */}
                         <div className="flex flex-col gap-[15px] mt-[15px]">
                             <div className="flex gap-[15px]">
+                      
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="department">Department</Label>
-                                <Select defaultValue="semua">
-                                    <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
-                                        <SelectValue placeholder="Select department" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="semua">Semua</SelectItem>
-                                        <SelectItem value="department_a">Department A</SelectItem>
-                                        <SelectItem value="department_b">Department B</SelectItem>
-                                        <SelectItem value="department_c">Department C</SelectItem>
-                                        <SelectItem value="department_d">Department D</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <Popover open={openDep} onOpenChange={setOpenDep}>
+                                <PopoverTrigger asChild>
+                                    <button className="file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
+                                    {departments.find(dep => dep.id === selectedDepartment)?.name ?? "All Department"}
+                                    </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-0">
+                                    <Command>
+                                    <CommandInput placeholder="Search department..." />
+                                    <CommandList>
+                                        <CommandEmpty>No department found.</CommandEmpty>
+                                        <CommandItem
+                                            key="all"
+                                            onSelect={() => {
+                                                handleSelectDepartment(""); // Atau "" kalau kamu simpan sebagai string kosong
+                                                setOpenDep(false);
+                                            }}
+                                            >
+                                            All Departments
+                                        </CommandItem>
+                                        {departments.map(dep => (
+                                        <CommandItem
+                                            key={dep.id}
+                                            onSelect={() => {
+                                            handleSelectDepartment(dep.id);
+                                            setOpenDep(false);
+                                            }}
+                                        >
+                                            {dep.name}
+                                        </CommandItem>
+                                        ))}
+                                    </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                                </Popover>
                             </div>
+                            
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="position">Position</Label>
-                                <Select defaultValue="semua">
-                                    <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
-                                        <SelectValue placeholder="Select position" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                    <SelectItem value="semua">Semua</SelectItem>
-                                        <SelectItem value="position_a">Position A</SelectItem>
-                                        <SelectItem value="position_b">Position B</SelectItem>
-                                        <SelectItem value="position_c">Position C</SelectItem>
-                                        <SelectItem value="position_d">Position D</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <Popover open={openPos} onOpenChange={setOpenPos}>
+
+                                <PopoverTrigger asChild>
+                                    <button
+                                    className={`file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm`}
+                                    disabled={!selectedDepartment}
+                                    >
+                                    {selectedPosition?.Position ?? "All Position"}
+                                    </button>
+                                </PopoverTrigger>
+
+                                <PopoverContent className="w-full p-0">
+                                    <Command>
+                                    <CommandInput
+                                        placeholder="Search position..."
+                                        disabled={!selectedDepartment}
+                                        className={!selectedDepartment ? "opacity-50 pointer-events-none" : ""}
+                                    />
+                                    <CommandList>
+                                        <CommandEmpty>No position found.</CommandEmpty>
+                                        <CommandItem
+                                            key="all"
+                                            onSelect={() => {
+                                                setSelectedPosition(null); // Atau "" kalau kamu simpan sebagai string kosong
+                                                setOpenPos(false);
+                                            }}
+                                            >
+                                            All Position
+                                        </CommandItem>
+                                        {positions.map((pos) => (
+                                        <CommandItem
+                                            key={pos.id_position}
+                                            onSelect={() => {
+                                            if (!selectedDepartment) return; // safety guard
+                                            setSelectedPosition(pos);
+                                            setOpenPos(false);
+                                            }}
+                                            className={!selectedDepartment ? "opacity-50 pointer-events-none" : ""}
+                                        >
+                                            {pos.Position}
+                                        </CommandItem>
+                                        ))}
+                                    </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                                </Popover>
                             </div>
                             </div>
                             <div className="flex gap-[15px]">
                                 <div className="flex flex-col flex-1 gap-[8px]">
-                                <Label htmlFor="type">Type</Label>
-                                <Select defaultValue="semua">
+                                <Label htmlFor="contract type">Contract Type</Label>
+                                <Select value={contractType} onValueChange={setContractType}>
                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
-                                        <SelectValue placeholder="Select Type" />
+                                        <SelectValue placeholder="All Contract Type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                    <SelectItem value="semua">Semua</SelectItem>
-                                        <SelectItem value="type_a">Type A</SelectItem>
-                                        <SelectItem value="type_b">Type B</SelectItem>
-                                        <SelectItem value="type_c">Type C</SelectItem>
-                                        <SelectItem value="type_d">Type D</SelectItem>
+                                        <SelectItem value="All">All Contarct Type</SelectItem>
+                                        <SelectItem value="Permanent">Permanent</SelectItem>
+                                        <SelectItem value="Contract">Contract</SelectItem>
+                                        <SelectItem value="intern">Intern</SelectItem>
+                                        <SelectItem value="Part-time">Part Time</SelectItem>
+                                        <SelectItem value="Outsource">Outsource</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
                             <div className="flex flex-col flex-1 gap-[8px]">
-                                <Label htmlFor="status">Status</Label>
-                                <Select defaultValue="semua">
+                                <Label htmlFor="status">Employee Status</Label>
+                                <Select value={employeeStatus} onValueChange={setEmployeeStatus}>
                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
-                                        <SelectValue placeholder="Select Status" />
+                                        <SelectValue placeholder="All Employee Status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="semua">Semua</SelectItem>
-                                        <SelectItem value="status_a">Status A</SelectItem>
-                                        <SelectItem value="status_b">Status B</SelectItem>
-                                        <SelectItem value="status_c">Status C</SelectItem>
-                                        <SelectItem value="status_d">Status D</SelectItem>
+                                        <SelectItem value="All">All Employee Status</SelectItem>
+                                        <SelectItem value="Active">Active</SelectItem>
+                                        <SelectItem value="Retire">Retire</SelectItem>
+                                        <SelectItem value="Resign">Resign</SelectItem>
+                                        <SelectItem value="Fired">Fired</SelectItem>
+                                    
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -469,23 +714,43 @@ export function DataTable<TData, TValue>({
                                     </DialogClose>
                                 </div>
                                 
-                                <Button className="w-[100px]" variant="default" type="submit">
-                                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g clipPath="url(#clip0_462_2148)">
-                                <path d="M6.17401 11.3263C6.34814 11.5005 6.55489 11.6387 6.78245 11.733C7.01002 11.8273 7.25393 11.8759 7.50026 11.8759C7.74659 11.8759 7.99051 11.8273 8.21807 11.733C8.44564 11.6387 8.65239 11.5005 8.82651 11.3263L10.8334 9.31938C10.941 9.20037 10.9987 9.04455 10.9946 8.88416C10.9905 8.72378 10.9248 8.57112 10.8113 8.45779C10.6977 8.34447 10.5449 8.27916 10.3845 8.27538C10.2241 8.2716 10.0684 8.32965 9.94964 8.4375L8.12089 10.2669L8.12526 0.625C8.12526 0.45924 8.05941 0.300269 7.9422 0.183058C7.82499 0.065848 7.66602 0 7.50026 0V0C7.3345 0 7.17553 0.065848 7.05832 0.183058C6.94111 0.300269 6.87526 0.45924 6.87526 0.625L6.86964 10.255L5.05089 8.4375C4.93361 8.32031 4.77459 8.2545 4.60879 8.25456C4.443 8.25462 4.28402 8.32054 4.16683 8.43781C4.04963 8.55509 3.98383 8.71412 3.98389 8.87991C3.98395 9.0457 4.04986 9.20468 4.16714 9.32188L6.17401 11.3263Z" fill="currentColor"/>
-                                <path d="M14.375 9.99991C14.2092 9.99991 14.0503 10.0658 13.9331 10.183C13.8158 10.3002 13.75 10.4591 13.75 10.6249V13.1249C13.75 13.2907 13.6842 13.4496 13.5669 13.5668C13.4497 13.6841 13.2908 13.7499 13.125 13.7499H1.875C1.70924 13.7499 1.55027 13.6841 1.43306 13.5668C1.31585 13.4496 1.25 13.2907 1.25 13.1249V10.6249C1.25 10.4591 1.18415 10.3002 1.06694 10.183C0.949732 10.0658 0.79076 9.99991 0.625 9.99991C0.45924 9.99991 0.300269 10.0658 0.183058 10.183C0.065848 10.3002 0 10.4591 0 10.6249L0 13.1249C0 13.6222 0.197544 14.0991 0.549175 14.4507C0.900805 14.8024 1.37772 14.9999 1.875 14.9999H13.125C13.6223 14.9999 14.0992 14.8024 14.4508 14.4507C14.8025 14.0991 15 13.6222 15 13.1249V10.6249C15 10.4591 14.9342 10.3002 14.8169 10.183C14.6997 10.0658 14.5408 9.99991 14.375 9.99991Z" fill="currentColor"/>
-                                </g>
-                                <defs>
-                                <clipPath id="clip0_462_2148">
-                                <rect width="15" height="15" fill="white"/>
-                                </clipPath>
-                                </defs>
-                                </svg>
-                                    Export
+                                <Button className="w-[100px]" variant="default" onClick={handleExportButton} disabled={loading}>
+                                    {!loading ? (
+                                    <>
+                                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <g clipPath="url(#clip0_462_2148)">
+                                            <path d="M6.17401 11.3263C6.34814 11.5005 6.55489 11.6387 6.78245 11.733C7.01002 11.8273 7.25393 11.8759 7.50026 11.8759C7.74659 11.8759 7.99051 11.8273 8.21807 11.733C8.44564 11.6387 8.65239 11.5005 8.82651 11.3263L10.8334 9.31938C10.941 9.20037 10.9987 9.04455 10.9946 8.88416C10.9905 8.72378 10.9248 8.57112 10.8113 8.45779C10.6977 8.34447 10.5449 8.27916 10.3845 8.27538C10.2241 8.2716 10.0684 8.32965 9.94964 8.4375L8.12089 10.2669L8.12526 0.625C8.12526 0.45924 8.05941 0.300269 7.9422 0.183058C7.82499 0.065848 7.66602 0 7.50026 0V0C7.3345 0 7.17553 0.065848 7.05832 0.183058C6.94111 0.300269 6.87526 0.45924 6.87526 0.625L6.86964 10.255L5.05089 8.4375C4.93361 8.32031 4.77459 8.2545 4.60879 8.25456C4.443 8.25462 4.28402 8.32054 4.16683 8.43781C4.04963 8.55509 3.98383 8.71412 3.98389 8.87991C3.98395 9.0457 4.04986 9.20468 4.16714 9.32188L6.17401 11.3263Z" fill="currentColor"/>
+                                            <path d="M14.375 9.99991C14.2092 9.99991 14.0503 10.0658 13.9331 10.183C13.8158 10.3002 13.75 10.4591 13.75 10.6249V13.1249C13.75 13.2907 13.6842 13.4496 13.5669 13.5668C13.4497 13.6841 13.2908 13.7499 13.125 13.7499H1.875C1.70924 13.7499 1.55027 13.6841 1.43306 13.5668C1.31585 13.4496 1.25 13.2907 1.25 13.1249V10.6249C1.25 10.4591 1.18415 10.3002 1.06694 10.183C0.949732 10.0658 0.79076 9.99991 0.625 9.99991C0.45924 9.99991 0.300269 10.0658 0.183058 10.183C0.065848 10.3002 0 10.4591 0 10.6249L0 13.1249C0 13.6222 0.197544 14.0991 0.549175 14.4507C0.900805 14.8024 1.37772 14.9999 1.875 14.9999H13.125C13.6223 14.9999 14.0992 14.8024 14.4508 14.4507C14.8025 14.0991 15 13.6222 15 13.1249V10.6249C15 10.4591 14.9342 10.3002 14.8169 10.183C14.6997 10.0658 14.5408 9.99991 14.375 9.99991Z" fill="currentColor"/>
+                                            </g>
+                                            <defs>
+                                            <clipPath id="clip0_462_2148">
+                                            <rect width="15" height="15" fill="white"/>
+                                            </clipPath>
+                                            </defs>
+                                        </svg>
+                                        Export
+                                    </>
+                                    ) : (
+                                        <Spinner size="small" />
+                                    )}
                                 </Button>
+                                {/* <Button className="w-[80px] h-[40px]" variant="default" type="submit" disabled={loading}>
+                                {!loading ? (
+                                    <>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M17 21V13H7V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M7 3V8H15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                    <span className="ml-1">Save</span>
+                                    </>
+                                ) : (
+                                    <Spinner size="small" />
+                                )}
+                                </Button> */}
                             </div>
                         </div>
-                    </form>
+                    {/* </form> */}
                 </div>
             </DialogContent>
         </Dialog>
@@ -518,14 +783,6 @@ export function DataTable<TData, TValue>({
                         
                     </DialogDescription>
                 </DialogHeader>
-                <form
-                    ref={formRef}
-                    action="https://httpbin.org/post"
-                    method="POST"
-                    target="_blank"
-                    encType="multipart/form-data"
-                    className="space-y-4"
-                >
                     {/* FileUploader tetap digunakan untuk UI, tapi file dimasukkan ke input tersembunyi */}
                     <FileUploader
                     onDrop={handleFileDrop}
@@ -551,10 +808,16 @@ export function DataTable<TData, TValue>({
                                 </Button>
                             </DialogClose>
                         </div>
-                        <Button className="w-[80px]" variant="default" type="submit">Submit</Button>
+                        
+                        <Button className="w-[80px]" variant="default" onClick={handleImportButton}>
+                            {!loading ? (
+                            <span className="ml-1">Submit</span>
+                            ) : (
+                            <Spinner size="small" />
+                        )}
+                        </Button>
+                        
                     </div>
-                </form>
-
             </DialogContent>
         </Dialog>
     </div>
