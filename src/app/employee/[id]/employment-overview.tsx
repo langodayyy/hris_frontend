@@ -323,6 +323,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                                                     name="salary"
                                                     placeholder="Enter employee salary"
                                                     defaultValue={employeeData?.employee.salary??"0"}
+                                                    className="no-spinner"
                                                 />
                                             </div>
                                             <div className="flex flex-col flex-1 gap-[8px]">
@@ -382,6 +383,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                                                     name="account_number"
                                                     placeholder="Enter employee Account Number"
                                                     defaultValue={employeeData?.employee.account_number??""}
+                                                    className="no-spinner"
                                                 />
                                             </div>
                                         </div>

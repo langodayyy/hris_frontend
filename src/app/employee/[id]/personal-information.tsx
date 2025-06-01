@@ -151,6 +151,7 @@ const PersonalInformation = ({ employeeData, onUpdate }: Props) => {
                                                     name="nik"
                                                     placeholder="Enter employee NIK"
                                                     defaultValue={employeeData?.employee.nik??""}
+                                                    className="no-spinner"
                                                 />
                                             </div>
                                             <div className="flex flex-col flex-1 gap-[8px]">
