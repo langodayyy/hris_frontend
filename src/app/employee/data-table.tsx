@@ -229,7 +229,7 @@ export function DataTable<TData, TValue>({
         setSuccess(false);
 
         try {
-            const baseUrl = "http://127.0.0.1:8000/api/employees/export-csv";
+            const baseUrl = "http://127.0.0.1:8000/api/employee/export-csv";
             const params = new URLSearchParams();
 
             if (selectedPosition?.id_position) {

@@ -56,6 +56,50 @@ export default function EmployeeDetails(){
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
+
+    const handleExportButton = async () => {
+        setLoading(true);
+        setError(false);
+        setSuccess(false);
+
+        try {
+            const baseUrl = "http://127.0.0.1:8000/api/employee/export-csv";
+            const params = new URLSearchParams();
+
+            if (employeeData?.employee.employee_id) {
+                params.append("employee_id", employeeData?.employee.employee_id);
+                const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+    
+                const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${Cookies.get("token")}`,
+                },
+                });
+
+                if (!response.ok) throw new Error("Gagal mengunduh file");
+
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = downloadUrl;
+                a.download = "employees.csv";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(downloadUrl);
+
+                setSuccess(true);
+            }
+            
+        } catch (err) {
+            console.error("Submit error:", err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
     const handleSubmitForm = async () => {
         setLoading(true);
         setError(false);
@@ -239,7 +283,7 @@ export default function EmployeeDetails(){
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <DropdownMenuItem>Export</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={handleExportButton}>Export</DropdownMenuItem>
                                             <DropdownMenuItem onClick={handleChangeStatus}>Change Status</DropdownMenuItem>
                                             <DropdownMenuItem onClick={handleResetPassword}>Reset Password</DropdownMenuItem>
                                             <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
