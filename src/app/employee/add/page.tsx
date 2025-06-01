@@ -43,7 +43,7 @@ export default function AddEmployee() {
     const router = useRouter();
     const formRef = useRef<HTMLFormElement>(null);
     const [preventRedirect, setPreventRedirect] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);  
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
 
