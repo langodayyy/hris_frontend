@@ -38,6 +38,7 @@ import DownloadButton from "@/components/ui/downloadButton";
 // You can use a Zod schema here if you want.
 export type CheckclockOverview = {
   id: number;
+  data_id?: string;
   employeeName: string;
   position: string;
   date?: string | { startDate: string; endDate: string };
@@ -50,6 +51,8 @@ export type CheckclockOverview = {
   address: string;
   latitude: number;
   longitude: number;
+  startDate?: string;
+  endDate?: string;
 };
  
 const calculateWorkHours = (
@@ -87,8 +90,9 @@ const calculateWorkHours = (
   const totalMinutes = differenceInMinutes(clockOutDate, clockInDate);
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
+  const seconds = (totalMinutes % 1) * 60;
 
-  return `${hours}h ${minutes}m`;
+  return `${hours}h ${minutes}m ${seconds.toFixed(0)}s`;
 };
 
 export const columns: ColumnDef<CheckclockOverview>[] = [
@@ -287,8 +291,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                           </span>
                         </div>
                       </div>
-                      {selectedRow?.status === "On Time" ||
-                      selectedRow?.status === "Late" ? (
+                      {selectedRow?.status == "On Time" ||
+                      selectedRow?.status == "Late" ? (
                         <div className="w-fit flex justify-end items-center">
                           <ApprovalStatusBadge
                             status={selectedRow?.status as "On Time" | "Late"}
@@ -322,23 +326,23 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                             <Information
                               label="Start Date"
                               value={
-                                typeof selectedRow?.date === "object" &&
-                                selectedRow?.date?.startDate
+                                
+                                selectedRow?.startDate
                                   ? (console.log(
                                       "Start Date:",
-                                      selectedRow.date.startDate
+                                      selectedRow.startDate
                                     ),
-                                    selectedRow.date.startDate)
+                                    selectedRow.startDate)
                                   : "N/A"
                               }
                             ></Information>
                             <Information
                               label="End Date"
                               value={
-                                typeof selectedRow?.date === "object" &&
-                                selectedRow?.date?.endDate
-                                  ? (console.log(selectedRow.date.endDate),
-                                    selectedRow.date.endDate)
+                                
+                                selectedRow?.endDate
+                                  ? (console.log(selectedRow.endDate),
+                                    selectedRow.endDate)
                                   : "N/A"
                               }
                             ></Information>
@@ -419,7 +423,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                 value={
                                   typeof selectedRow?.date === "string"
                                     ? selectedRow?.date
-                                    : `${selectedRow?.date?.startDate} - ${selectedRow?.date?.endDate}`
+                                    : `${selectedRow?.startDate} - ${selectedRow?.endDate}`
                                 }
                               ></Information>
                               <Information
@@ -493,8 +497,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                     )}
                   </div>
 
-                  {selectedRow?.status === "On Time" ||
-                  selectedRow?.status === "Late" ? (
+                  {selectedRow?.status == "On Time" ||
+                  selectedRow?.status == "Late" ? (
                     <SheetFooter>
                       <div className="flex gap-2 flex-wrap">
                         <AlertDialog>
@@ -653,8 +657,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                           </span>
                         </div>
                       </div>
-                      {selectedRow?.status === "On Time" ||
-                      selectedRow?.status === "Late" ? (
+                      {selectedRow?.status == "On Time" ||
+                      selectedRow?.status == "Late" ? (
                         <div className="w-fit flex justify-end items-center">
                           <ApprovalStatusBadge
                             status={selectedRow?.status as "On Time" | "Late"}
@@ -689,23 +693,23 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                             <Information
                               label="Start Date"
                               value={
-                                typeof selectedRow?.date === "object" &&
-                                selectedRow?.date?.startDate
+                                
+                                selectedRow?.startDate
                                   ? (console.log(
                                       "Start Date:",
-                                      selectedRow.date.startDate
+                                      selectedRow.startDate
                                     ),
-                                    selectedRow.date.startDate)
+                                    selectedRow.startDate)
                                   : "N/A"
                               }
                             ></Information>
                             <Information
                               label="End Date"
                               value={
-                                typeof selectedRow?.date === "object" &&
-                                selectedRow?.date?.endDate
-                                  ? (console.log(selectedRow.date.endDate),
-                                    selectedRow.date.endDate)
+                                
+                                selectedRow?.endDate
+                                  ? (console.log(selectedRow.endDate),
+                                    selectedRow.endDate)
                                   : "N/A"
                               }
                             ></Information>
@@ -786,7 +790,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                 value={
                                   typeof selectedRow?.date === "string"
                                     ? selectedRow?.date
-                                    : `${selectedRow?.date?.startDate} - ${selectedRow?.date?.endDate}`
+                                    : `${selectedRow?.startDate} - ${selectedRow?.endDate}`
                                 }
                               ></Information>
                               <Information
@@ -891,8 +895,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                     )}
                   </div>
 
-                  {selectedRow?.status === "On Time" ||
-                  selectedRow?.status === "Late" ? (
+                  {selectedRow?.status == "On Time" ||
+                  selectedRow?.status == "Late" ? (
                     <SheetFooter>
                       <div className="flex gap-2 flex-wrap">
                         <AlertDialog>
