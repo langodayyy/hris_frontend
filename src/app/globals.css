@@ -257,3 +257,21 @@
 .no-spinner[type="number"] {
   -moz-appearance: textfield;
 }
+/* Hapus border dalam input */
+.PhoneInputInput {
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+/* Opsional: Hapus border dropdown negara */
+/* .PhoneInput {
+  border: none;
+  outline: none;
+  box-shadow: none;
+} */
+
+/* Hapus border flag */
+.PhoneInputCountry {
+  border: none;
+}
