@@ -34,6 +34,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import DownloadButton from "@/components/ui/downloadButton";
 
+import Cookies from "js-cookie";
+
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export type CheckclockOverview = {
@@ -54,7 +56,7 @@ export type CheckclockOverview = {
   startDate?: string;
   endDate?: string;
 };
- 
+
 const calculateWorkHours = (
   clockIn: string | undefined,
   clockOut: string | undefined
@@ -326,7 +328,6 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                             <Information
                               label="Start Date"
                               value={
-                                
                                 selectedRow?.startDate
                                   ? (console.log(
                                       "Start Date:",
@@ -339,7 +340,6 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                             <Information
                               label="End Date"
                               value={
-                                
                                 selectedRow?.endDate
                                   ? (console.log(selectedRow.endDate),
                                     selectedRow.endDate)
@@ -401,7 +401,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                               </AlertDialog>
 
                               <DownloadButton
-                              // fileUrl={`/images/bukti-absen-${selectedRow?.employeeName}.jpg`}
+                                // fileUrl={`/images/bukti-absen-${selectedRow?.employeeName}.jpg`}
 
                                 fileUrl="/images/proof-of-levave.jpg"
                                 fileName={`proof of leave ${selectedRow?.employeeName}.jpg`}
@@ -563,7 +563,30 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                       <div className="flex gap-2 flex-wrap">
                         {selectedRow?.approvalStatus === "Pending" ? (
                           <>
-                            <Button>Approve</Button>
+                            {/* <Button>Approve</Button> */}
+                            <Button
+                              onClick={async () => {
+                                try {
+                                  const response =
+                                    await updateCheckClockApproval(
+                                      selectedRow?.data_id || "",
+                                      "Approved"
+                                    );
+
+                                  if (response.success) {
+                                  } else {
+                                        console.error("failed app");
+                                      }
+                                } catch (error) {
+                                  console.error(
+                                    "Error approving attendance:",
+                                    error
+                                  );
+                                }
+                              }}
+                            >
+                              Approve
+                            </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button variant="outline">
@@ -573,14 +596,34 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
 
                               <AlertDialogContent>
                                 <form
-                                  onSubmit={(e) => {
+                                  onSubmit={async (e) => {
                                     e.preventDefault();
                                     const formData = new FormData(
                                       e.currentTarget
                                     );
-                                    const name = formData.get("name");
-                                    console.log("Submitted name:", name);
-                                    // Lanjutkan aksi setelah submit...
+                                    const rejectReason = formData.get(
+                                      "reason"
+                                    ) as string;
+
+                                    try {
+                                      const response =
+                                        await updateCheckClockApproval(
+                                          selectedRow?.data_id || "",
+                                          "Rejected",
+                                          rejectReason
+                                        );
+
+                                      if (response.success) {
+
+                                      } else {
+                                        console.error("failed");
+                                      }
+                                    } catch (error) {
+                                      console.error(
+                                        "Error rejecting attendance:",
+                                        error
+                                      );
+                                    }
                                   }}
                                 >
                                   <AlertDialogHeader>
@@ -693,7 +736,6 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                             <Information
                               label="Start Date"
                               value={
-                                
                                 selectedRow?.startDate
                                   ? (console.log(
                                       "Start Date:",
@@ -706,7 +748,6 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                             <Information
                               label="End Date"
                               value={
-                                
                                 selectedRow?.endDate
                                   ? (console.log(selectedRow.endDate),
                                     selectedRow.endDate)
@@ -767,8 +808,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                                 </AlertDialogContent>
                               </AlertDialog>
 
-                             <DownloadButton
-                              // fileUrl={`/images/bukti-absen-${selectedRow?.employeeName}.jpg`}
+                              <DownloadButton
+                                // fileUrl={`/images/bukti-absen-${selectedRow?.employeeName}.jpg`}
 
                                 fileUrl="/images/proof-of-leave.jpg"
                                 fileName={`proof of leave ${selectedRow?.employeeName}.jpg`}
@@ -829,67 +870,67 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                           </div>
                         </div>
                         {selectedRow?.status !== "Absent" && (
-
-                        <div className="flex flex-col px-2 py-4 border-2 border-neutral-300 gap-3 rounded-sm">
-                          <span className="font-semibold">
-                            Proof of Attendance
-                          </span>
-                          <div className="p-3 border border-neutral-200 rounded-sm flex gap-2 justify-between">
-                            <span className="text-base flex items-center w-full h-full">
-                              (nama file)
+                          <div className="flex flex-col px-2 py-4 border-2 border-neutral-300 gap-3 rounded-sm">
+                            <span className="font-semibold">
+                              Proof of Attendance
                             </span>
-                            <div className="flex gap-4">
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    className="w-auto"
-                                    size={"icon"}
-                                   
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      width="24"
-                                      height="24"
-                                      strokeWidth="2"
+                            <div className="p-3 border border-neutral-200 rounded-sm flex gap-2 justify-between">
+                              <span className="text-base flex items-center w-full h-full">
+                                (nama file)
+                              </span>
+                              <div className="flex gap-4">
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      className="w-auto"
+                                      size={"icon"}
                                     >
-                                      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-                                      <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
-                                    </svg>
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                      Proof of Attendance
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription className="max-h-96 overflow-auto">
-                                      <img
-                                        src="/images/proof-of-attendance.jpg"
-                                        alt="Proof of attendance"
-                                      />
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Close</AlertDialogCancel>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        width="24"
+                                        height="24"
+                                        strokeWidth="2"
+                                      >
+                                        <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                                        <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                                      </svg>
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>
+                                        Proof of Attendance
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription className="max-h-96 overflow-auto">
+                                        <img
+                                          src="/images/proof-of-attendance.jpg"
+                                          alt="Proof of attendance"
+                                        />
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>
+                                        Close
+                                      </AlertDialogCancel>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
 
-                              <DownloadButton
-                              // fileUrl={`/images/bukti-absen-${selectedRow?.employeeName}.jpg`}
+                                <DownloadButton
+                                  // fileUrl={`/images/bukti-absen-${selectedRow?.employeeName}.jpg`}
 
-                                fileUrl="/images/proof-of-attendance.jpg"
-                                fileName={`proof of attendance ${selectedRow?.employeeName}.jpg`}
-                              />
+                                  fileUrl="/images/proof-of-attendance.jpg"
+                                  fileName={`proof of attendance ${selectedRow?.employeeName}.jpg`}
+                                />
+                              </div>
                             </div>
                           </div>
-                        </div>
                         )}
                       </>
                     )}
@@ -1033,3 +1074,45 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
     },
   },
 ];
+
+export async function updateCheckClockApproval(
+  data_id: string,
+  status: "Approved" | "Rejected",
+  rejectReason?: string
+) {
+  try {
+    const userCookie = Cookies.get("token");
+    if (!userCookie) {
+      throw new Error("No authentication token found");
+    }
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/check-clock-approval/${data_id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userCookie}`,
+        },
+        body: JSON.stringify({
+          status_approval: status,
+          reject_reason: rejectReason || null,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to update approval status");
+    }
+
+    return { success: true, data };
+  } catch (error: any) {
+    return {
+      success: false,
+      error:
+        error.message || "An error occurred while updating approval status",
+    };
+  }
+}

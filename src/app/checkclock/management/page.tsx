@@ -21,6 +21,7 @@ export default function CheckclockOverviewPage() {
           // Transform API data to match your table structure
           const transformedData: CheckclockOverview[] = response.data.map((item: CheckclockResponse) => ({
             id: item.employee_id,
+            data_id: item.data_id,
             employeeName: item.employee_name,
             position: item.position,
             date: item.date,
