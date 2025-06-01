@@ -12,7 +12,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { EmployeeResponse } from "@/types/employee";
 import { Spinner } from "@/components/ui/spinner";
 import Cookies from "js-cookie";
@@ -160,14 +160,15 @@ export default function EmployeeDetails(){
         }
     };
 
+    const router = useRouter();
     const deleteEmployee = async () => {
         setLoading(true);
         setError(false);
         setSuccess(false);
         try {
 
-            const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}/d`, {
-                    method: "POST",
+            const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}`, {
+                    method: "DELETE",
                     headers: {
                         "Authorization": `Bearer ${Cookies.get("token")}`,
                         // Jangan tambahkan Content-Type manual di sini!
@@ -178,7 +179,7 @@ export default function EmployeeDetails(){
             console.log("Response:", responseData);
 
             if (!response.ok) throw new Error("Gagal submit");
-
+            
             setSuccess(true);
         } catch (err) {
             console.error("Submit error:", err);
@@ -207,6 +208,7 @@ export default function EmployeeDetails(){
     const handleOkClickDelete = async () => {
         setDialogDeleteOpen(false)
         setSuccess(false);
+        router.push("/employee");
 
     };
     const handleChangeStatus = () => {

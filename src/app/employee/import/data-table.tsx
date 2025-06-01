@@ -47,7 +47,6 @@ import {
 } from "@/components/ui/table"
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { FileUploader } from "@/components/ui/fileUploader";
 import { Spinner } from "@/components/ui/spinner";
 
 interface DataTableProps<TData, TValue> {
@@ -127,18 +126,7 @@ export function DataTable<TData, TValue>({
         endPage = totalPages;
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
-
-    const formRef = useRef<HTMLFormElement>(null);
-      const fileInputRef = useRef<HTMLInputElement>(null);
-    
-      const handleFileDrop = (files: File[]) => {
-        // Saat file di-drop, masukkan ke input file manual (untuk FormData)
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(files[0]);
-        if (fileInputRef.current) {
-          fileInputRef.current.files = dataTransfer.files;
-        }
-      };      
+  
   return (
     <>
     <div className="flex items-center py-4 gap-[10px]">
