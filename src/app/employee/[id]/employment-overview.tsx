@@ -335,9 +335,8 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                                                     <SelectContent>
                                                         <SelectItem value="Permanent">Permanent</SelectItem>
                                                         <SelectItem value="Contract">Contract</SelectItem>
-                                                        <SelectItem value="intern">Intern</SelectItem>
-                                                        <SelectItem value="Part-time">Part Time</SelectItem>
-                                                        <SelectItem value="Outsource">Outsource</SelectItem>
+                                                        <SelectItem value="Internship">Internship</SelectItem>
+                                               
                                                     </SelectContent>
                                                 </Select>
                                             </div>
@@ -494,8 +493,8 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                     <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.employee.join_date ?? "-"}</span> 
                 </div>
                 <div className="flex flex-col flex-1 gap-[8px]">
-                    <Label>Resign Date</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.employee.resign_date ?? "-"}</span> 
+                    <Label>Exit Date</Label>
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.employee.exit_date ?? "-"}</span> 
                 </div>
             </div>
         </Card>
