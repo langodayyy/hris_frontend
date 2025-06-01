@@ -12,7 +12,7 @@ export type Employees = {
   gender: "Male" | "Female"
   phone: string
   position: string
-  type: "Permanent" | "Contract" | "Intern" | "Part-time" | "Outsource"
+  type: "Permanent" | "Contract" | "Internship"
   workType: "WFO" | "WFH" | "Hybrid"
   status: "Active" | "Inactive"
 }

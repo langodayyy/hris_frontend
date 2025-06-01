@@ -24,7 +24,7 @@ export type EmployeeData = {
   bank_code: string | null;
   account_number: string | null;
   join_date: string | null;
-  resign_date: string | null | null;
+  exit_date: string | null | null;
   employee_photo: string | null;
   employee_status: string | null;
   created_at: string | null;

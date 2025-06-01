@@ -41,7 +41,7 @@ export default function Employee() {
         : "Male"; // Default or handle invalid gender
         const phone = employeeData.phone?.toString() || '';
         const position = employeeData.position_id || ''; // Or look up a display name based on position_id
-        const type: "Permanent" | "Contract" | "Intern" | "Part-time" | "Outsource" = (employeeData.contract_type as any) || "-"; // Cast or map if contract_type values don't directly match
+        const type: "Permanent" | "Contract" | "Internship" = (employeeData.contract_type as any) || "-"; // Cast or map if contract_type values don't directly match
         const workType: "WFO" | "WFH" | "Hybrid" = "WFO"; // You need to determine how to get this, or set a default
         const status: "Active" | "Inactive" =
         employeeData.employee_status === "Active" || employeeData.employee_status === "Inactive"

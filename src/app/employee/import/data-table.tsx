@@ -238,7 +238,7 @@ export function DataTable<TData, TValue>({
                 ))}
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Type</DropdownMenuLabel>
-                {["Permanent", "Contract", "Intern", "Part-time", "Outsource"].map((type) => (
+                {["Permanent", "Contract", "Internship"].map((type) => (
                     <DropdownMenuCheckboxItem
                         key={type}
                         checked={tempFilters.type.includes(type)}

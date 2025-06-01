@@ -315,7 +315,10 @@ export default function EmployeeDetails(){
                                                                         <SelectValue placeholder="Select employee status" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
-                                                                        <SelectItem value="Active">Active</SelectItem>
+                                                                        {employeeStatus === "Active" && 
+                                                                            <SelectItem value="Active">Active</SelectItem>
+                                                                        }
+                                                                        
                                                                         <SelectItem value="Retire">Retire</SelectItem>
                                                                         <SelectItem value="Resign">Resign</SelectItem>
                                                                         <SelectItem value="Fired">Fired</SelectItem>

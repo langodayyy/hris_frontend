@@ -347,7 +347,7 @@ export default function AddEmployee() {
                             </div>
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
-                             <div className="flex flex-col flex-1 gap-[8px]">
+                            <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="maritial-status">Maritial Status</Label>
                                 <Select value={maritalStatus} onValueChange={setMaritalStatus}>
                                     <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
@@ -382,31 +382,35 @@ export default function AddEmployee() {
                             </div>
                         </div>
                       
-                        <div className="flex mx-[20px] py-[12px]">
-                            <Label htmlFor="contract">Contract Type</Label>
-                            <RadioGroup defaultValue="permanent" className="flex ml-[50px]" value={contractType} onValueChange={setContractType}>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Permanent" id="permanent" />
-                                    <Label htmlFor="permanent">Permanent</Label>
-                                </div> 
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Contract" id="contract" />
-                                    <Label htmlFor="contract">Contract</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Intern" id="intern" />
-                                    <Label htmlFor="intern">Intern</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Part-time" id="part-time" />
-                                    <Label htmlFor="part-time">Part-time</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Outsource" id="outsource" />
-                                    <Label htmlFor="outsource">Outsource</Label>
-                                </div>
-                            </RadioGroup>
-                            <input type="hidden" name="contract_type" value={contractType} />
+                        <div className="flex mx-[20px] py-[12px] gap-[10px]">
+                            <div className="flex flex-col flex-1 gap-[8px]">
+                                <Label htmlFor="contract_type">Contract Type</Label>
+                                <Select value={contractType} onValueChange={setContractType}>
+                                    <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
+                                        <SelectValue placeholder="Select employee contract type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Permanent">Permanent</SelectItem>
+                                        <SelectItem value="Contract">Contract</SelectItem>
+                                        <SelectItem value="Internship">Internship</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <input type="hidden" name="contract_type" value={contractType} />
+                            </div>
+
+                            { contractType!=="Permanent" && contractType!=="" && (
+                                <>
+                                    <div className="flex flex-col flex-1 gap-[8px]">
+                                        <Label htmlFor="contract_end">Contract End</Label>
+                                        <Input
+                                            type="date"
+                                            id="contract_end"
+                                            name="contract_end"
+                                            placeholder="Enter employee contract_end" />
+
+                                    </div>
+                                </>
+                            )}
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
                             <div className="flex flex-col flex-1 gap-[8px]">

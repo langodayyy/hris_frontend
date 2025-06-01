@@ -46,8 +46,7 @@ export type LateEmployee = {
 export type EmployeeWorkStatus = {
   Permanent: number;
   Internship: number;
-  "Part-time": number;
-  Outsource: number;
+  Contract: number;
 };
 
 export type EmployeeGender = {
