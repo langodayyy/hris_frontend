@@ -5,7 +5,8 @@ import  Sidebar  from "../../../components/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import PhoneInput from "@/components/ui/phoneInput";
+import FormPhoneInput from "@/components/ui/phoneInput";
+
 import {
     Select,
     SelectContent,
@@ -489,9 +490,7 @@ export default function AddEmployee() {
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
                             <div className="flex flex-col flex-1 gap-[8px]">
-                                <PhoneInput 
-                                    placeholder="Enter employee phone number"
-                                />
+                                <FormPhoneInput placeholder="Enter employee phone number" />
                             </div>
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="email">Email</Label>
