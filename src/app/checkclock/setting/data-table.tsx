@@ -34,6 +34,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { checkclockSetting } from "./column";
 import { TimeInput } from "@/components/ui/timeInput";
+import { useCKSettingData } from "@/hooks/useCKSettingData";
+import { Spinner } from "@/components/ui/spinner";
+
+import { useEdit } from "@/context/EditFormContext";
+import EditWfoForm from "@/components/custom/ck-setting-form/EditWfoForm";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -48,8 +53,11 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
   selectedWorkType,
   setSelectedWorkType,
 }: DataTableProps<TData, TValue>) {
-  const [selectedRow, setSelectedRow] = useState<TData | null>(null);
-  const [open, setOpen] = useState(false);
+  // const [selectedRow, setSelectedRow] = useState<TData | null>(null);
+  // const [open, setOpen] = useState(false);
+
+  // context edit form
+  const { setSelectedRow, setIsOpen, setWorkType, isOpen } = useEdit();
 
   // Patch columns to override action cell
   const columnsWithAction = columns.map((col) => {
@@ -62,7 +70,8 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
             size="sm"
             onClick={() => {
               setSelectedRow(row.original);
-              setOpen(true);
+              setWorkType(selectedWorkType);
+              setIsOpen(true);
             }}
           >
             Edit
@@ -82,6 +91,42 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
     { label: "WFO", value: "WFO" },
     { label: "WFA", value: "WFA" },
   ];
+
+  const { loading } = useCKSettingData();
+
+  if (loading) {
+    return (
+      <Card className="flex items-center p-5 gap-6 w-full">
+        <div className="flex justify-between w-full">
+          <span className="w-[187px] text-lg flex-none flex items-center">
+            Checkclock Setting
+          </span>
+          <div className="flex gap-2 w-auto items-center">
+            <Label className="w-full">Work Type</Label>
+            <div className="">
+              <Select
+                value={selectedWorkType}
+                onValueChange={(value: "WFO" | "WFA") =>
+                  setSelectedWorkType(value)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select work type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="WFO">WFO</SelectItem>
+                  <SelectItem value="WFA">WFA</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+        <div className="w-full">
+          <Spinner></Spinner>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="flex items-center p-5 gap-6 w-full">
@@ -156,12 +201,13 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
           </TableBody>
         </Table>
       </div>
-      <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
         <AlertDialogContent className="min-w-2xl min-h-2xl">
           <AlertDialogTitle className="font-medium">
             Edit Checkclock Setting
           </AlertDialogTitle>
-          <form action="">
+          <EditWfoForm></EditWfoForm>
+          {/* <form action="">
             <div
               className={
                 selectedWorkType === "WFO"
@@ -229,7 +275,7 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
                 Save
               </Button>
             </AlertDialogFooter>
-          </form>
+          </form> */}
           {/* Tambahkan input lain sesuai kebutuhan */}
         </AlertDialogContent>
       </AlertDialog>
