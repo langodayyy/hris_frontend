@@ -1,28 +1,26 @@
-
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import { Label } from "@/components/ui/label";
 
-interface PhoneInputProps {
-  placeholder?: string;
-}
+export default function FormPhoneInput({
+  placeholder = "Enter your phone number",
+}) {
+  const [value, setValue] = useState<string | undefined>();
 
-export default function PhoneInput({ placeholder = "Enter your phone number" }: PhoneInputProps) {
   return (
     <div className="flex flex-col gap-2 w-full">
       <Label htmlFor="phone">Phone Number</Label>
-      <div className="flex border border-neutral-300 rounded-md overflow-hidden">
-        <div className="px-4 flex items-center text-base text-neutral-700 bg-white border-r border-neutral-300">
-          +62
-        </div>
-        <Input
-          id="phone"
-          type="number"
-          name="phone"
-          placeholder={placeholder}
-          className="border-0 focus-visible:ring-0 focus-visible:border-transparent [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-          inputMode="numeric"
-        />
-      </div>
+      <PhoneInput
+        id="phone"
+        international
+        countryCallingCodeEditable={false}
+        placeholder={placeholder}
+        value={value}
+        onChange={setValue}
+        defaultCountry="ID"
+        className="file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+      />
     </div>
   );
 }

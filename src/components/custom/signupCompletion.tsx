@@ -17,6 +17,7 @@ import { useFormContext } from "@/context/FormContext";
 import { Spinner } from "@/components/ui/spinner";
 
 import Cookies from "js-cookie";
+import PhoneInputt from "@/components/ui/phoneInput";
 
 const schema = z.object({
   first_name: z
@@ -162,7 +163,7 @@ export default function SignupCompleteForm() {
           </div>
         </div>
 
-        <PhoneInput></PhoneInput>
+        <PhoneInputt></PhoneInputt>
 
         <div className="flex flex-col gap-2 w-full">
           <Label htmlFor="companyname">Company Name</Label>
