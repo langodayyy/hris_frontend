@@ -573,9 +573,16 @@ export default function AddEmployee() {
                             </div>
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
-                            
-                            <PasswordInput id="password" name="password" placeholder="Enter employee password or leave blank for default"></PasswordInput>
-                            
+                            <div className="flex flex-col flex-1 gap-[8px]">
+                                <Label htmlFor="salary">Salary</Label>
+                                <Input
+                                type="number"
+                                id="salary"
+                                name="salary"
+                                placeholder="Enter Salary"
+                                className="no-spinner"
+                                />
+                            </div>
                         </div>
                     </Card>
                 </div>
