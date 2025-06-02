@@ -89,9 +89,10 @@ export function DataTable<TData, TValue>({
     []
     );
     const [filters, setFilters] = useState({
+        department: [] as string[],
         position: [] as string[],
         workType: [] as string[],
-        type: [] as string[],
+        contract_type: [] as string[],
         gender: [] as string[],
         status: [] as string[],
     });
@@ -170,7 +171,7 @@ export function DataTable<TData, TValue>({
     const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
     const [positions, setPositions] = useState<DepartmentPosition[]>([]);
     const [selectedPosition, setSelectedPosition] = useState<DepartmentPosition | null>(null);
-
+    const [uniquPositions, setUniquePositions] = useState<string[]>([]);
     type DepartmentPosition = {
         id_department: string;
         Department: string;
@@ -183,7 +184,7 @@ export function DataTable<TData, TValue>({
         const fetchData = async () => {
         try {
            
-            const resDepPos = await fetch("http://127.0.0.1:8000/api/department-position", {
+            const resDepPos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/department-position`, {
             headers: {
                 "Authorization": `Bearer ${Cookies.get("token")}`,
                 "Content-Type": "application/json"
@@ -196,6 +197,11 @@ export function DataTable<TData, TValue>({
             const dataDepPos: DepartmentPosition[] = await resDepPos.json();
 
             setDepPosData(dataDepPos);
+
+
+            const uniqPositions = Array.from(new Set(dataDepPos.map(item => item.Position)));
+            setUniquePositions(uniqPositions);
+
             const uniqueDepartments = Array.from(
                 new Map(
                     dataDepPos.map(item => [item.id_department, { id: item.id_department, name: item.Department }])
@@ -229,7 +235,7 @@ export function DataTable<TData, TValue>({
         setSuccess(false);
 
         try {
-            const baseUrl = "http://127.0.0.1:8000/api/employee/export-csv";
+            const baseUrl = `${process.env.NEXT_PUBLIC_API_URL}/employee/export-csv`;
             const params = new URLSearchParams();
 
             if (selectedPosition?.id_position) {
@@ -297,7 +303,7 @@ export function DataTable<TData, TValue>({
             const formData = new FormData();
             formData.append("csv_file", uploadedFile);
 
-            const response = await fetch("http://127.0.0.1:8000/api/employees/preview-csv", {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees/preview-csv`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${Cookies.get("token")}`,
@@ -390,8 +396,31 @@ export function DataTable<TData, TValue>({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-64">
+                <DropdownMenuLabel>Department</DropdownMenuLabel>
+                    {departments.map((dept) => (
+                    <DropdownMenuCheckboxItem
+                        key={dept.id}
+                        checked={tempFilters.department.includes(dept.name)}
+                        onSelect={(e) => e.preventDefault()}
+                        onCheckedChange={() => {
+                        setTempFilters((prev) => {
+                            const exists = prev.department.includes(dept.name);
+                            return {
+                            ...prev,
+                            department: exists
+                                ? prev.department.filter((item) => item !== dept.name)
+                                : [...prev.department, dept.name],
+                            };
+                        });
+                        }}
+                    >
+                        {dept.name}
+                    </DropdownMenuCheckboxItem>
+                    ))}
+                    <DropdownMenuSeparator />
+
                 <DropdownMenuLabel>Position</DropdownMenuLabel>
-                {["CEO", "Manager", "Staff", "Supervisor", "Assistant"].map((position) => (
+                {uniquPositions.map((position) => (
                     <DropdownMenuCheckboxItem
                         key={position}
                         checked={tempFilters.position.includes(position)}
@@ -413,49 +442,26 @@ export function DataTable<TData, TValue>({
                     </DropdownMenuCheckboxItem>
                 ))}
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel>Work Type</DropdownMenuLabel>
-                {["WFO", "WFH"].map((workType) => (
+                <DropdownMenuLabel>Contract Type</DropdownMenuLabel>
+                {["Permanent", "Contract", "Internship"].map((contract_type) => (
                     <DropdownMenuCheckboxItem
-                        key={workType}
-                        checked={tempFilters.workType.includes(workType)}
+                        key={contract_type}
+                        checked={tempFilters.contract_type.includes(contract_type)}
                         onSelect={(e) => e.preventDefault()}
                         onCheckedChange={() => {
                             setTempFilters((prev) => {
-                                const exists = prev.workType.includes(workType);
+                                const exists = prev.contract_type.includes(contract_type);
                                 return {
                                 ...prev,
-                                workType: exists
-                                    ? prev.workType.filter((item) => item !== workType)
-                                    : [...prev.workType, workType],
+                                contract_type: exists
+                                    ? prev.contract_type.filter((item) => item !== contract_type)
+                                    : [...prev.contract_type, contract_type],
                                 };
                             });
                         }}
 
                     >
-                        {workType}
-                    </DropdownMenuCheckboxItem>
-                ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>Type</DropdownMenuLabel>
-                {["Permanent", "Contract", "Internship"].map((type) => (
-                    <DropdownMenuCheckboxItem
-                        key={type}
-                        checked={tempFilters.type.includes(type)}
-                        onSelect={(e) => e.preventDefault()}
-                        onCheckedChange={() => {
-                            setTempFilters((prev) => {
-                                const exists = prev.type.includes(type);
-                                return {
-                                ...prev,
-                                type: exists
-                                    ? prev.type.filter((item) => item !== type)
-                                    : [...prev.type, type],
-                                };
-                            });
-                        }}
-
-                    >
-                        {type}
+                        {contract_type}
                     </DropdownMenuCheckboxItem>
                 ))}
         
@@ -530,9 +536,10 @@ export function DataTable<TData, TValue>({
                         className="w-full"
                         onClick={() => {
                             setTempFilters({
+                                department: [],
                                 position: [],
                                 workType: [],
-                                type: [],
+                                contract_type: [],
                                 gender: [],
                                 status: [],
                             });

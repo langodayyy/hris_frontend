@@ -18,7 +18,7 @@ export default function Employee() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch("http://127.0.0.1:8000/api/employees", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees`, {
           headers: {
             "Authorization": `Bearer ${Cookies.get("token")}`,
             "Content-Type": "application/json"
