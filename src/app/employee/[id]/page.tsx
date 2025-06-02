@@ -19,7 +19,6 @@ import Cookies from "js-cookie";
 import React from "react";
 
 export default function EmployeeDetails(){
-    const [openDropdown, setOpenDropdown] = React.useState(false);
     const [employeeStatus, setEmployeeStatus] = useState("");
     // const [isDialogOpen, setIsDialogOpen] = useState(false);
     
@@ -276,7 +275,7 @@ export default function EmployeeDetails(){
                                    
 
 
-                                    <DropdownMenu open={openDropdown} onOpenChange={setOpenDropdown}>
+                                    <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button className="w-fit" size="icon" variant="link">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="!w-[24px] !h-[24px]" viewBox="0 0 24 24" fill="none">
@@ -287,10 +286,10 @@ export default function EmployeeDetails(){
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <DropdownMenuItem onSelect={() => {setOpenDropdown(false); setTimeout(() => {}, 0)}} onClick={handleExportButton}>Export</DropdownMenuItem>
-                                            <DropdownMenuItem onSelect={() => {setOpenDropdown(false); setTimeout(() => {}, 0)}} onClick={handleChangeStatus}>Change Status</DropdownMenuItem>
-                                            <DropdownMenuItem onSelect={() => {setOpenDropdown(false); setTimeout(() => {}, 0)}} onClick={handleResetPassword}>Reset Password</DropdownMenuItem>
-                                            <DropdownMenuItem onSelect={() => {setOpenDropdown(false); setTimeout(() => {}, 0)}} onClick={handleDelete}>Delete</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={handleExportButton}>Export</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={handleChangeStatus}>Change Status</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={handleResetPassword}>Reset Password</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                     <Dialog open={isDialogEmployeeStatusOpen} onOpenChange={setDialogEmployeeStatusOpen}>

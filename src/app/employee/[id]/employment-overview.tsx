@@ -250,7 +250,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                                                     {departments.find(dep => dep.id === selectedDepartment)?.name ?? "Select department"}
                                                     </button>
                                                 </PopoverTrigger>
-                                                <PopoverContent className="w-full p-0">
+                                                <PopoverContent className="w-full p-0" onWheel={(e) => {e.stopPropagation();}}>
                                                     <Command>
                                                     <CommandInput placeholder="Search department..." />
                                                     <CommandList>
@@ -285,7 +285,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                                                     </button>
                                                 </PopoverTrigger>
 
-                                                <PopoverContent className="w-full p-0">
+                                                <PopoverContent className="w-full p-0" onWheel={(e) => {e.stopPropagation();}}>
                                                     <Command>
                                                     <CommandInput
                                                         placeholder="Search position..."
@@ -353,7 +353,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
 
                                                     </button>
                                                     </PopoverTrigger>
-                                                    <PopoverContent className="w-full p-0">
+                                                    <PopoverContent className="w-full p-0" onWheel={(e) => {e.stopPropagation();}}>
                                                     <Command>
                                                         <CommandInput placeholder="Search bank..." />
                                                         <CommandList>
