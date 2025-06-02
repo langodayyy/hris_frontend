@@ -75,6 +75,7 @@ export default function EditWfoForm() {
           <div className="flex flex-col gap-2">
             <Label className="h-6">Day</Label>
             <Input defaultValue={selectedRow?.day ?? ""} readOnly />
+            <input name="worktype_id" type="hidden" value={selectedRow?.worktype_id ?? "hehe"}/>
           </div>
           <div className="">
             <TimeInput

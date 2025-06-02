@@ -1,6 +1,7 @@
 export type CheckclockSetting = {
   data_id: number;
   worktype: "WFO" | "WFA";
+  worktype_id: number;
   day: string;
   clockIn: string;
   clockOut: string;

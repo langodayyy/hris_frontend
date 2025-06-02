@@ -46,33 +46,33 @@ export const wfoColumns: ColumnDef<checkclockSetting>[] = [
       return <div className="text-center">{row.getValue("clockOut")}</div>;
     },
   },
-  {
-    accessorKey: "latidude",
-    header: ({ column }) => {
-      return <div className="text-center">Latitude</div>;
-    },
-    cell: ({ row }) => {
-      return <div className="text-center">{row.getValue("latidude")}</div>;
-    },
-  },
-  {
-    accessorKey: "longitude",
-    header: ({ column }) => {
-      return <div className="text-center">Longitude</div>;
-    },
-    cell: ({ row }) => {
-      return <div className="text-center">{row.getValue("longitude")}</div>;
-    },
-  },
-  {
-    accessorKey: "radius",
-    header: ({ column }) => {
-      return <div className="text-center">Radius (m)</div>;
-    },
-    cell: ({ row }) => {
-      return <div className="text-center">{row.getValue("radius")}</div>;
-    },
-  },
+  // {
+  //   accessorKey: "latidude",
+  //   header: ({ column }) => {
+  //     return <div className="text-center">Latitude</div>;
+  //   },
+  //   cell: ({ row }) => {
+  //     return <div className="text-center">{row.getValue("latidude")}</div>;
+  //   },
+  // },
+  // {
+  //   accessorKey: "longitude",
+  //   header: ({ column }) => {
+  //     return <div className="text-center">Longitude</div>;
+  //   },
+  //   cell: ({ row }) => {
+  //     return <div className="text-center">{row.getValue("longitude")}</div>;
+  //   },
+  // },
+  // {
+  //   accessorKey: "radius",
+  //   header: ({ column }) => {
+  //     return <div className="text-center">Radius (m)</div>;
+  //   },
+  //   cell: ({ row }) => {
+  //     return <div className="text-center">{row.getValue("radius")}</div>;
+  //   },
+  // },
   {
     accessorKey: "action",
     header: ({ column }) => {
