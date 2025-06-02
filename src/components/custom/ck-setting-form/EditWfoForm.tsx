@@ -65,11 +65,7 @@ export default function EditWfoForm() {
   return (
     <form ref={form} method="post">
       <div
-        className={
-          workType === "WFO"
-            ? "grid grid-cols-2 gap-4"
-            : "flex flex-col gap-4"
-        }
+        className={"flex flex-col gap-4"}
       >
         <div className="flex flex-col gap-2">
           <div className="flex flex-col gap-2">
@@ -160,7 +156,7 @@ export default function EditWfoForm() {
             )}
           </div>
         </div>
-        {workType === "WFO" && (
+        {/* {workType === "WFO" && (
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
               <Label className="h-[24px]">Latitude</Label>
@@ -294,7 +290,7 @@ export default function EditWfoForm() {
               )}
             </div>
           </div>
-        )}
+        )} */}
       </div>
       <AlertDialogFooter className="pt-6">
         <AlertDialogCancel type="button" className="w-auto">

@@ -39,6 +39,7 @@ import { Spinner } from "@/components/ui/spinner";
 
 import { useEdit } from "@/context/EditFormContext";
 import EditWfoForm from "@/components/custom/ck-setting-form/EditWfoForm";
+import MapboxMap from "@/components/custom/mapbox/MapboxMap";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -129,7 +130,7 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
   }
 
   return (
-    <Card className="flex items-center p-5 gap-6 w-full">
+    <Card className="flex items-center p-5 gap-4 w-full">
       <div className="flex justify-between w-full">
         <span className="w-[187px] text-lg flex-none flex items-center">
           Checkclock Setting
@@ -154,9 +155,33 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-5 gap-2 w-full">
-        <div className="col-span-2 p-10 bg-primary-500 rounded-md"></div>
-        <div className="col-span-3 rounded-md border w-full">
+
+      {selectedWorkType === "WFO" && (
+      <div className="grid grid-cols-3 gap-10 w-full">
+        <div className="flex flex-col gap-2">
+          <Label className="h-6">Latitude</Label>
+          <Input defaultValue={12} readOnly />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label className="h-6">Longitude</Label>
+          <Input defaultValue={12} readOnly />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label className="h-6">Radius</Label>
+          <Input defaultValue={12} readOnly />
+        </div>
+      </div>
+      )}
+
+      <div className={`gap-2 w-full ${selectedWorkType === "WFO" ? "grid grid-cols-5" : "flex"}`}>
+
+        {selectedWorkType === "WFO" && (
+        <div className="col-span-2 rounded-md h-fit">
+          <MapboxMap></MapboxMap>
+        </div>
+        )}
+        
+        <div className={`rounded-md border ${selectedWorkType === "WFO" ? "col-span-3" : "w-full"}`}>
           <Table className="h-fit">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -210,76 +235,7 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
             Edit Checkclock Setting
           </AlertDialogTitle>
           <EditWfoForm></EditWfoForm>
-          {/* <form action="">
-            <div
-              className={
-                selectedWorkType === "WFO"
-                  ? "grid grid-cols-2 gap-4"
-                  : "flex flex-col gap-4"
-              }
-            >
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-2">
-                  <Label className="h-6">Day</Label>
-                  <Input defaultValue={selectedRow?.day ?? ""} readOnly />
-                </div>
-                <div className="">
-                  <TimeInput
-                    label={"Clock In"}
-                    name={"clockIn"}
-                    defaultValue={selectedRow?.clockIn}
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <TimeInput
-                    label={"Clock Out"}
-                    name={"clockOut"}
-                    defaultValue={selectedRow?.clockOut}
-                  />
-                </div>
-              </div>
-              {selectedWorkType === "WFO" && (
-                <div className="flex flex-col gap-2">
-                  <div className="flex flex-col gap-2">
-                    <Label className="h-[24px]">Latidue</Label>
-                    <Input
-                      defaultValue={selectedRow?.latidude ?? ""}
-                      name="latidude"
-                      type="number"
-                      className="no-spinner"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label className="h-[24px]">Longitude</Label>
-                    <Input
-                      defaultValue={selectedRow?.longitude ?? ""}
-                      name="longitude"
-                      type="number"
-                      className="no-spinner"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label className="h-[24px]">Radius (m)</Label>
-                    <Input
-                      defaultValue={selectedRow?.radius ?? ""}
-                      name="radius"
-                      type="number"
-                      className="no-spinner"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-            <AlertDialogFooter className="pt-6">
-              <AlertDialogCancel type="button" className="w-auto">
-                Cancel
-              </AlertDialogCancel>
-              <Button type="submit" className="w-auto">
-                Save
-              </Button>
-            </AlertDialogFooter>
-          </form> */}
-          {/* Tambahkan input lain sesuai kebutuhan */}
+          
         </AlertDialogContent>
       </AlertDialog>
     </Card>
