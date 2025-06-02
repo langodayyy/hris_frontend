@@ -38,4 +38,5 @@ export type EmployeeResponse = {
   position_name: string | null;
   department_name: string | null;
   bank_name: string | null;
+  employee_photo_url: string | null;
 };

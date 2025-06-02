@@ -320,7 +320,7 @@ export default function AddEmployee() {
                                     <SelectItem value="B">B</SelectItem>
                                     <SelectItem value="AB">AB</SelectItem>
                                     <SelectItem value="O">O</SelectItem>
-                                    <SelectItem value="unknown">Unknown</SelectItem>
+                                    <SelectItem value="Unknown">Unknown</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <input type="hidden" name="blood_type" value={bloodType}/>
