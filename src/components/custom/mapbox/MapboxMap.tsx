@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import RadiusForm from "@/components/custom/mapbox/RadiusForm";
+import { useCKSettingData } from "@/hooks/useCKSettingData";
 
 mapboxgl.accessToken = `${process.env.NEXT_PUBLIC_MAPBOX_KEY}`;
 
@@ -14,14 +16,19 @@ export default function MapboxMap() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerRef = useRef<mapboxgl.Marker | null>(null);
 
+  const {locationRule} = useCKSettingData();
+
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
 
-  const designatedLat = -7.944280192922373;
-  const designatedLng = 112.60562448554032;
+  const designatedLat = parseFloat(locationRule?.latitude ?? "0");
+  const designatedLng = parseFloat(locationRule?.longitude ?? "0");
+  // const designatedLat = -7.944283557841846;
+  // const designatedLng = 112.65026022789809;
+  const radius = parseFloat(locationRule?.radius ?? "0")
 
   const getDistanceFromLatLonInMeters = (
     lat1: number,
@@ -106,7 +113,7 @@ export default function MapboxMap() {
 
     // Add radius circle
     map.on("load", () => {
-      const circle = turf.circle([designatedLng, designatedLat], 50, {
+      const circle = turf.circle([designatedLng, designatedLat], radius, {
         steps: 64,
         units: "meters",
       });
@@ -186,7 +193,7 @@ export default function MapboxMap() {
     }
 
     return () => map.remove();
-  }, [isEditMode]);
+  }, [designatedLat, designatedLng, radius, isEditMode]);
 
   const handleEditClick = () => {
     setIsEditMode(true);
@@ -228,32 +235,33 @@ export default function MapboxMap() {
       }
     );
   };
+  
+  const handleSetLocation = () => {
+    mapRef.current?.flyTo({
+          center: [designatedLng, designatedLat],
+          zoom: 17,
+          essential: true,
+        });
+  };
 
   return (
     <div className="w-full h-full">
       <div ref={mapContainer} className="w-full h-[300px] rounded-md" />
-      <button
-        onClick={handleLocationClick}
-        className="bg-primary-700 text-white rounded-md p-2 w-full mt-2"
-      >
-        Go to my location
-      </button>
-
-      {isEditMode && (
-        <div className="mt-2 space-y-2">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="radius">Radius (meters)</Label>
-            <Input
-              id="radius"
-              type="number"
-              min="1"
-              // value={12}
-              // onChange={handleRadiusChange}
-              className="w-full"
-            />
-          </div>
-        </div>
-      )}
+      <div className="grid grid-cols-2 gap-2 mt-2">
+        <Button
+          onClick={handleLocationClick}
+          className="bg-primary-700 text-white rounded-md p-2 col-span-1"
+        >
+          Go to My Location
+        </Button>
+        <Button
+        variant={"outline"}
+          onClick={handleSetLocation}
+          className="rounded-md p-2 col-span-1"
+        >
+          Go to My Office
+        </Button>
+      </div>
 
       {!isEditMode ? (
         <Button
@@ -265,30 +273,8 @@ export default function MapboxMap() {
           Edit
         </Button>
       ) : (
-        <div className="flex gap-2 mt-2">
-          <Button
-            variant="outline"
-            size="lg"
-            className="flex-1"
-            onClick={handleSaveClick}
-            disabled={!selectedLocation}
-          >
-            Save
-          </Button>
-          <Button
-            variant="destructive"
-            size="lg"
-            className="flex-1"
-            onClick={handleCancelClick}
-          >
-            Cancel
-          </Button>
-        </div>
-      )}
-
-      {isEditMode && (
-        <div className="mt-2 text-sm text-gray-500 text-center">
-          Click on the map to place a marker
+        <div className="mt-4">
+          <RadiusForm handleCancelClick={handleCancelClick} handleSaveClick={handleSaveClick} selectedLocation={selectedLocation} data_id={locationRule?.data_id}></RadiusForm>
         </div>
       )}
     </div>

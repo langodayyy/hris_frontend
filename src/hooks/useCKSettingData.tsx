@@ -3,13 +3,19 @@ import { useEffect, useState, useCallback } from "react";
 import Cookies from "js-cookie";
 import { CheckclockSetting } from "@/types/cksetting";
 import { redirect } from "next/navigation";
-import { transformCKData } from "@/utils/transfromCkSData";
-import { CheckclockSettingForm } from "@/types/cksettingForm";
+
+export type LocationRule = {
+  data_id: number;
+  latitude: string;
+  longitude: string;
+  radius: string;
+};
 
 export function useCKSettingData() {
+  // ubah jangan simpen data di state, karena data ini akan diambil dari API
   const [ckData, setCkData] = useState<CheckclockSetting | null>(null);
-  // const [wfo, setWfo] = useState<CheckclockSettingForm[]>([]);
-  // const [wfa, setWfa] = useState<CheckclockSettingForm[]>([]);
+  const [locationRule, setLocationRule] = useState<LocationRule | null>(null);
+  
   const [loading, setLoadingCKS] = useState(true);
 
   const fetchCkSetting = useCallback(async () => {
@@ -32,11 +38,22 @@ export function useCKSettingData() {
         }
       );
       const json = await res.json();
-      setCkData(json);
+
+      // get data cc from db
+      setCkData(json.ckdata);
       console.log("ckData response", json);
-      // const { wfo, wfa } = transformCKData(Array.isArray(json) ? json : []);
-      // setWfo(wfo);
-      // setWfa(wfa);
+
+      // get rule cc from db
+      const locationRule = json.location_rule?.[0] || {};
+      console.log("locationRule from API:", locationRule); // Debugging log
+
+      setLocationRule({
+        data_id: locationRule.data_id || 0,
+        latitude: locationRule.latitude || "0",
+        longitude: locationRule.longitude || "0",
+        radius: locationRule.radius || "0",
+      });
+      
       setLoadingCKS(false);
     } catch (error) {
       console.error("Error initializing get cks data:", error);
@@ -54,5 +71,5 @@ export function useCKSettingData() {
     await fetchCkSetting();
   }, [fetchCkSetting]);
 
-  return { ckData, loading, refetch };
+  return { ckData, locationRule, loading, refetch };
 }

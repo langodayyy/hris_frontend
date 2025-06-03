@@ -8,7 +8,7 @@ import { useCKSettingData } from "@/hooks/useCKSettingData";
 import { transformCKData } from "@/utils/transfromCkSData";
 
 export default function CheckclockSettingPage() {
-  const { ckData, loading, refetch } = useCKSettingData();
+  const { ckData, locationRule } = useCKSettingData();
   const [selectedWorkType, setSelectedWorkType] = useState<"WFO" | "WFA">(
     "WFO"
   );
