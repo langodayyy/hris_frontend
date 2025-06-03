@@ -314,17 +314,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                                             
                                         </div>
                                         <div className="flex gap-[10px]">
-                                            <div className="flex flex-col flex-1 gap-[8px]">
-                                                <Label htmlFor="salary">Salary (IDR)</Label>
-                                                <Input
-                                                    type="number"
-                                                    id="salary"
-                                                    name="salary"
-                                                    placeholder="Enter employee salary"
-                                                    defaultValue={employeeData?.employee.salary??"0"}
-                                                    className="no-spinner"
-                                                />
-                                            </div>
+                                            
                                             <div className="flex flex-col flex-1 gap-[8px]">
                                                 <Label htmlFor="contract type">Contract Type</Label>
                                                 <Select value={contractType} onValueChange={setContractType}>
@@ -340,7 +330,46 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                                                 </Select>
                                                 <input type="hidden" value={contractType} name="contract_type"/>
                                             </div>
+                                             { contractType!=="Permanent" && contractType!=="" && (
+                                                <>
+                                                    <div className="flex flex-col flex-1 gap-[8px]">
+                                                        <Label htmlFor="contract_end">Contract End</Label>
+                                                        <Input
+                                                            type="date"
+                                                            id="contract_end"
+                                                            name="contract_end"
+                                                            placeholder="Enter employee contract end" 
+                                                            defaultValue={employeeData?.employee.contract_end || undefined}
+                                                            />
+                
+                                                    </div>
+                                                </>
+                                            )}
+                                             
                                         </div>
+                                        <div className="flex gap-[10px]">
+                                            <div className="flex flex-col flex-1 gap-[8px]">
+                                                <Label htmlFor="join date">Join Date</Label>
+                                                <Input
+                                                    type="date"
+                                                    id="join_date"
+                                                    name="join_date"
+                                                    placeholder="Enter employee join date"
+                                                    defaultValue={employeeData?.employee.join_date || undefined}
+                                                />
+                                            </div>
+                                            <div className="flex flex-col flex-1 gap-[8px]">
+                                                <Label htmlFor="exit date">Exit Date</Label>
+                                                <Input
+                                                    type="date"
+                                                    id="exit_date"
+                                                    name="exit_date"
+                                                    placeholder="Enter employee exit date"
+                                                    defaultValue={employeeData?.employee.exit_date || undefined}
+                                                />
+                                            </div>
+                                        </div>
+                                        
                                         <div className="flex gap-[10px]">
                                             <div className="flex flex-col flex-1 gap-[8px]">
                                                 <Label htmlFor="bank">Bank</Label>
@@ -382,6 +411,19 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                                                     name="account_number"
                                                     placeholder="Enter employee Account Number"
                                                     defaultValue={employeeData?.employee.account_number??""}
+                                                    className="no-spinner"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-[10px]">
+                                            <div className="flex flex-col flex-1 gap-[8px]">
+                                                <Label htmlFor="salary">Salary (IDR)</Label>
+                                                <Input
+                                                    type="number"
+                                                    id="salary"
+                                                    name="salary"
+                                                    placeholder="Enter employee salary"
+                                                    defaultValue={employeeData?.employee.salary??"0"}
                                                     className="no-spinner"
                                                 />
                                             </div>
@@ -467,6 +509,29 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                     <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.position_name ?? "-"}</span> 
                 </div>
             </div>
+            
+            <div className="flex mx-[20px] gap-[10px]">
+                <div className="flex flex-col flex-1 gap-[8px]">
+                    <Label>Contract Type</Label>
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.employee.contract_type ?? "-"}</span> 
+                </div>
+                {employeeData?.employee.contract_type !== "Permanent" ? (
+                <div className="flex flex-col flex-1 gap-[8px]">
+                    <Label>Contract End</Label>
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.employee.contract_end ?? "-"}</span> 
+                </div>
+                ): null }
+            </div>
+            <div className="flex mx-[20px] gap-[10px]">
+                <div className="flex flex-col flex-1 gap-[8px]">
+                    <Label>Join Date</Label>
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.employee.join_date ?? "-"}</span> 
+                </div>
+                <div className="flex flex-col flex-1 gap-[8px]">
+                    <Label>Exit Date</Label>
+                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.employee.exit_date ?? "-"}</span> 
+                </div>
+            </div>
             <div className="flex mx-[20px] gap-[10px]">
                 <div className="flex flex-col flex-1 gap-[8px]">
                     <Label>Bank</Label>
@@ -481,20 +546,6 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                 <div className="flex flex-col flex-1 gap-[8px]">
                     <Label>Salary</Label>
                     <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">IDR {employeeData?.employee.salary ?? "-"}</span> 
-                </div>
-                <div className="flex flex-col flex-1 gap-[8px]">
-                    <Label>Contract Type</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.employee.contract_type ?? "-"}</span> 
-                </div>
-            </div>
-            <div className="flex mx-[20px] gap-[10px]">
-                <div className="flex flex-col flex-1 gap-[8px]">
-                    <Label>Join Date</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.employee.join_date ?? "-"}</span> 
-                </div>
-                <div className="flex flex-col flex-1 gap-[8px]">
-                    <Label>Exit Date</Label>
-                    <span className="text-gray-600 border border-neutral-300 rounded-md px-4 py-3 overflow-hidden">{employeeData?.employee.exit_date ?? "-"}</span> 
                 </div>
             </div>
         </Card>

@@ -22,6 +22,7 @@ export type Employee = {
   blood_type: string | null;
   salary: number | null;
   contract_type: string | null;
+  contract_end: string | null;
   bank_code: string | null;
   account_number: string | null;
   join_date: string | null;

@@ -30,7 +30,7 @@
     import dynamic from "next/dynamic";
     import { useRouter } from "next/navigation";
     import { Spinner } from "@/components/ui/spinner";
-
+    import Cookies from "js-cookie";
     export default function AddDocument() {
         const [selectedTemplate, setSelectedTemplate] = useState("")
         const [mode, setMode] = useState("upload")
@@ -93,13 +93,23 @@
                 if (mode === "template" && quillRef.current) {
                     const blob = await quillRef.current.getPdfBlob();
                     if (!blob) throw new Error("Gagal membuat PDF");
-
+                    
                     formData.delete("document"); // pastikan tidak ada file lain
                     formData.append("document", new File([blob], `document${timestamp()}.pdf`, { type: "application/pdf" }));
                 }
+                formData.append("employee_id", employeeId);
 
-                const response = await fetch("https://httpbin.org/post", {
+                for (const [key, value] of formData.entries()) {
+                    console.log(`${key}:`, value);
+                }
+                console.log(employeeId)
+
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents`, {
                     method: "POST",
+                     headers: {
+                        "Authorization": `Bearer ${Cookies.get("token")}`,
+                        // Jangan tambahkan Content-Type manual di sini!
+                    },
                     body: formData,
                 });
 
@@ -171,9 +181,9 @@
                         
                         {/* <form  ref={formRef} action="https://httpbin.org/post" method="POST" target="_blank" encType="multipart/form-data"  onSubmit={handleInsertPdfBeforeSubmit}> */}
                         <form
-                        ref={formRef}
-                        onSubmit={handleSubmitFormManual}
-                        encType="multipart/form-data"
+                            ref={formRef}
+                            onSubmit={handleSubmitFormManual}
+                            encType="multipart/form-data"
                         >
 
                             <div className="flex gap-6 justify-between flex-col lg:flex-row">

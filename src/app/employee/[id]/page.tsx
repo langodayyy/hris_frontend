@@ -3,7 +3,7 @@ import Sidebar from "@/components/sidebar";
 import PersonalInformation from "./personal-information";
 import ContactInformation from "./contact-information";
 import EmploymentOverview from "./employment-overview";
-import EmployeeDocuments from "./documents";
+import EmployeeDocuments from "./document/document";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
