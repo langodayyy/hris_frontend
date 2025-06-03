@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { CheckclockSettingForm } from "@/types/cksettingForm";
 import { ColumnDef } from "@tanstack/react-table";
 import React from "react";
 
@@ -18,7 +19,7 @@ export type checkclockSetting = {
   radius?: number;
 };
 
-export const wfoColumns: ColumnDef<checkclockSetting>[] = [
+export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
   { accessorKey: "no", header: ({ column }) => {
       return <div className="text-center">No.</div>;
     }, cell: ({ row }) =>  {return <div className="text-center">{row.index + 1}</div>;} },
@@ -94,7 +95,7 @@ export const wfoColumns: ColumnDef<checkclockSetting>[] = [
   },
 ];
 
-export const wfaColumns: ColumnDef<checkclockSetting>[] = [
+export const wfaColumns: ColumnDef<CheckclockSettingForm>[] = [
   { accessorKey: "no", header: ({ column }) => {
       return <div className="text-center">No.</div>;
     }, cell: ({ row }) =>  {return <div className="text-center">{row.index + 1}</div>;} },

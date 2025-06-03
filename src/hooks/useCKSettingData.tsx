@@ -1,10 +1,15 @@
+"use client";
 import { useEffect, useState, useCallback } from "react";
 import Cookies from "js-cookie";
 import { CheckclockSetting } from "@/types/cksetting";
 import { redirect } from "next/navigation";
+import { transformCKData } from "@/utils/transfromCkSData";
+import { CheckclockSettingForm } from "@/types/cksettingForm";
 
 export function useCKSettingData() {
   const [ckData, setCkData] = useState<CheckclockSetting | null>(null);
+  // const [wfo, setWfo] = useState<CheckclockSettingForm[]>([]);
+  // const [wfa, setWfa] = useState<CheckclockSettingForm[]>([]);
   const [loading, setLoadingCKS] = useState(true);
 
   const fetchCkSetting = useCallback(async () => {
@@ -23,14 +28,19 @@ export function useCKSettingData() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${userCookie}`,
           },
+          cache: "no-store",
         }
       );
       const json = await res.json();
       setCkData(json);
+      console.log("ckData response", json);
+      // const { wfo, wfa } = transformCKData(Array.isArray(json) ? json : []);
+      // setWfo(wfo);
+      // setWfa(wfa);
       setLoadingCKS(false);
     } catch (error) {
       console.error("Error initializing get cks data:", error);
-      setLoadingCKS(false); // Make sure to set loading to false even on error
+      setLoadingCKS(false);
     }
   }, []);
 
@@ -38,17 +48,11 @@ export function useCKSettingData() {
     fetchCkSetting();
   }, [fetchCkSetting]);
 
-  // Add effect to watch loading state changes
-  useEffect(() => {
-    if (loading) {
-      fetchCkSetting();
-    }
-  }, [loading, fetchCkSetting]);
+  const refetch = useCallback(async () => {
+    console.log("refetch is working")
+    setLoadingCKS(true);
+    await fetchCkSetting();
+  }, [fetchCkSetting]);
 
-  return { 
-    ckData, 
-    loading, 
-    setLoadingCKS,
-    refetch: fetchCkSetting // Expose refetch function
-  };
+  return { ckData, loading, refetch };
 }

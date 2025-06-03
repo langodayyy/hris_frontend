@@ -1,3 +1,4 @@
+import { CheckclockSettingForm } from "@/types/cksettingForm";
 import { data } from "react-router-dom";
 
 type ApiResponse = {
@@ -11,19 +12,6 @@ type ApiResponse = {
   longitude: string | null;
   radius: string | null;
   created_at: string;
-};
-
-export type CheckclockSetting = {
-  id: string;
-  data_id: number;
-  workType: "WFO" | "WFA";
-  worktype_id: number;
-  clockIn: string;
-  clockOut: string;
-  day: string;
-  latidude?: number;
-  longitude?: number;
-  radius?: number;
 };
 
 const days = [
@@ -46,7 +34,7 @@ export function transformCKData(apiData: ApiResponse[]) {
     day: day.charAt(0).toUpperCase() + day.slice(1),
   }));
 
-  const wfo: CheckclockSetting[] = defaultSettings.map((setting) => ({
+  const wfo: CheckclockSettingForm[] = defaultSettings.map((setting) => ({
     ...setting,
     workType: "WFO",
     latidude: undefined,
@@ -54,7 +42,7 @@ export function transformCKData(apiData: ApiResponse[]) {
     radius: undefined,
   }));
 
-  const wfa: CheckclockSetting[] = defaultSettings.map((setting) => ({
+  const wfa: CheckclockSettingForm[] = defaultSettings.map((setting) => ({
     ...setting,
     workType: "WFA",
   }));

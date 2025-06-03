@@ -60,6 +60,8 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
   // context edit form
   const { setSelectedRow, setIsOpen, setWorkType, isOpen } = useEdit();
 
+  const {ckData, loading, refetch} = useCKSettingData();
+
   // Patch columns to override action cell
   const columnsWithAction = columns.map((col) => {
     if ((col as any).accessorKey === "action") {
@@ -93,8 +95,7 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
     { label: "WFA", value: "WFA" },
   ];
 
-  const { loading } = useCKSettingData();
-
+  // console.log("loading fetch", loading);
   if (loading) {
     return (
       <Card className="flex items-center p-5 gap-6 w-full">
@@ -234,7 +235,10 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
           <AlertDialogTitle className="font-medium">
             Edit Checkclock Setting
           </AlertDialogTitle>
-          <EditWfoForm></EditWfoForm>
+          <EditWfoForm onUpdate={() => {
+            console.log("refetech triggered")
+            refetch();
+          } }></EditWfoForm>
           
         </AlertDialogContent>
       </AlertDialog>

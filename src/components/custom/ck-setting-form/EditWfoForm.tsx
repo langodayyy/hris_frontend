@@ -30,9 +30,12 @@ const EditCKsSchema = z.object({
 
 type CKsetting = z.infer<typeof EditCKsSchema>;
 
-export default function EditWfoForm() {
-  const { setLoadingCKS, refetch } = useCKSettingData();
-  const { setErrors, selectedRow, isOpen, setIsOpen, workType } = useEdit();
+type Props = {
+  onUpdate?: () => void;
+}
+
+export default function EditWfoForm({ onUpdate }: Props) {
+  const { setErrors, selectedRow, setIsOpen } = useEdit();
   const [isLoading, setLoading] = useState(false);
 
   const { form, errors } = useForm<CKsetting>({
@@ -44,18 +47,21 @@ export default function EditWfoForm() {
         Object.entries(values).forEach(([key, value]) => {
           formData.append(key, String(value));
         });
-        
+
         const response = await editCKS(formData, selectedRow?.data_id);
 
         if (response.success) {
-          await refetch(); // Wait for refetch to complete
-          setIsOpen(false); // Close dialog after successful refetch
+          setIsOpen(false); // Close dialog after successful submission
+          if (onUpdate) {
+            console.log("calling update")
+            onUpdate(); // Trigger the refetch function passed as a prop
+          }
         } else if (response.errors) {
           console.error(response.errors);
           setErrors(response.errors);
         }
       } catch (error) {
-        console.error('Form submission error:', error);
+        console.error("Form submission error:", error);
       } finally {
         setLoading(false);
       }
@@ -156,141 +162,6 @@ export default function EditWfoForm() {
             )}
           </div>
         </div>
-        {/* {workType === "WFO" && (
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-col gap-2">
-              <Label className="h-[24px]">Latitude</Label>
-              <Input
-                defaultValue={selectedRow?.latidude ?? ""}
-                name="latitude"
-                type="number"
-                className="no-spinner"
-              />
-              {errors().latitude && (
-                <div className="text-sm p-[10px] bg-danger-50 rounded-md">
-                  {Array.isArray(errors().latitude) ? (
-                    errors()!.latitude!.map((err, idx) => (
-                      <div
-                        className="flex flex-row items-center gap-2 py-2"
-                        key={idx}
-                      >
-                        <svg
-                          width="15"
-                          height="16"
-                          viewBox="0 0 22 23"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <circle cx="11" cy="11.5" r="11" fill="#C11106" />
-                          <path
-                            d="M7 8L15 16M15 8L7 16"
-                            stroke="white"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-
-                        <span key={idx} className="text-danger-700 block">
-                          {err}
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <span className="text-danger-700">{errors().latitude}</span>
-                  )}
-                </div>
-              )}
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label className="h-[24px]">Longitude</Label>
-              <Input
-                defaultValue={selectedRow?.longitude ?? ""}
-                name="longitude"
-                type="number"
-                className="no-spinner"
-              />
-              {errors().longitude && (
-                <div className="text-sm p-[10px] bg-danger-50 rounded-md">
-                  {Array.isArray(errors().longitude) ? (
-                    errors()!.longitude!.map((err, idx) => (
-                      <div
-                        className="flex flex-row items-center gap-2 py-2"
-                        key={idx}
-                      >
-                        <svg
-                          width="15"
-                          height="16"
-                          viewBox="0 0 22 23"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <circle cx="11" cy="11.5" r="11" fill="#C11106" />
-                          <path
-                            d="M7 8L15 16M15 8L7 16"
-                            stroke="white"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-
-                        <span key={idx} className="text-danger-700 block">
-                          {err}
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <span className="text-danger-700">
-                      {errors().longitude}
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label className="h-[24px]">Radius (m)</Label>
-              <Input
-                defaultValue={selectedRow?.radius ?? ""}
-                name="radius"
-                type="number"
-                className="no-spinner"
-              />
-              {errors().radius && (
-                <div className="text-sm p-[10px] bg-danger-50 rounded-md">
-                  {Array.isArray(errors().radius) ? (
-                    errors()!.radius!.map((err, idx) => (
-                      <div
-                        className="flex flex-row items-center gap-2 py-2"
-                        key={idx}
-                      >
-                        <svg
-                          width="15"
-                          height="16"
-                          viewBox="0 0 22 23"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <circle cx="11" cy="11.5" r="11" fill="#C11106" />
-                          <path
-                            d="M7 8L15 16M15 8L7 16"
-                            stroke="white"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-
-                        <span key={idx} className="text-danger-700 block">
-                          {err}
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <span className="text-danger-700">{errors().radius}</span>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )} */}
       </div>
       <AlertDialogFooter className="pt-6">
         <AlertDialogCancel type="button" className="w-auto">
