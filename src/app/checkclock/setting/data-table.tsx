@@ -34,6 +34,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { checkclockSetting } from "./column";
 import { TimeInput } from "@/components/ui/timeInput";
+import { useCKSettingData } from "@/hooks/useCKSettingData";
+import { Spinner } from "@/components/ui/spinner";
+
+import { useEdit } from "@/context/EditFormContext";
+import EditWfoForm from "@/components/custom/ck-setting-form/EditWfoForm";
+import MapboxMap from "@/components/custom/mapbox/MapboxMap";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -48,8 +54,11 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
   selectedWorkType,
   setSelectedWorkType,
 }: DataTableProps<TData, TValue>) {
-  const [selectedRow, setSelectedRow] = useState<TData | null>(null);
-  const [open, setOpen] = useState(false);
+  // const [selectedRow, setSelectedRow] = useState<TData | null>(null);
+  // const [open, setOpen] = useState(false);
+
+  // context edit form
+  const { setSelectedRow, setIsOpen, setWorkType, isOpen } = useEdit();
 
   // Patch columns to override action cell
   const columnsWithAction = columns.map((col) => {
@@ -62,7 +71,8 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
             size="sm"
             onClick={() => {
               setSelectedRow(row.original);
-              setOpen(true);
+              setWorkType(selectedWorkType);
+              setIsOpen(true);
             }}
           >
             Edit
@@ -83,8 +93,44 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
     { label: "WFA", value: "WFA" },
   ];
 
+  const { loading } = useCKSettingData();
+
+  if (loading) {
+    return (
+      <Card className="flex items-center p-5 gap-6 w-full">
+        <div className="flex justify-between w-full">
+          <span className="w-[187px] text-lg flex-none flex items-center">
+            Checkclock Setting
+          </span>
+          <div className="flex gap-2 w-auto items-center">
+            <Label className="w-full">Work Type</Label>
+            <div className="">
+              <Select
+                value={selectedWorkType}
+                onValueChange={(value: "WFO" | "WFA") =>
+                  setSelectedWorkType(value)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select work type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="WFO">WFO</SelectItem>
+                  <SelectItem value="WFA">WFA</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+        <div className="w-full">
+          <Spinner></Spinner>
+        </div>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="flex items-center p-5 gap-6 w-full">
+    <Card className="flex items-center p-5 gap-4 w-full">
       <div className="flex justify-between w-full">
         <span className="w-[187px] text-lg flex-none flex items-center">
           Checkclock Setting
@@ -109,128 +155,87 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
           </div>
         </div>
       </div>
-      <div className="rounded-md border w-full">
-        <Table className="h-fit">
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getPaginationRowModel().rows.length > 0 ? (
-              table.getPaginationRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="text-center">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+
+      {selectedWorkType === "WFO" && (
+      <div className="grid grid-cols-3 gap-10 w-full">
+        <div className="flex flex-col gap-2">
+          <Label className="h-6">Latitude</Label>
+          <Input defaultValue={12} readOnly />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label className="h-6">Longitude</Label>
+          <Input defaultValue={12} readOnly />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label className="h-6">Radius</Label>
+          <Input defaultValue={12} readOnly />
+        </div>
       </div>
-      <AlertDialog open={open} onOpenChange={setOpen}>
+      )}
+
+      <div className={`gap-2 w-full ${selectedWorkType === "WFO" ? "grid grid-cols-5" : "flex"}`}>
+
+        {selectedWorkType === "WFO" && (
+        <div className="col-span-2 rounded-md h-fit">
+          <MapboxMap></MapboxMap>
+        </div>
+        )}
+        
+        <div className={`rounded-md border ${selectedWorkType === "WFO" ? "col-span-3" : "w-full"}`}>
+          <Table className="h-fit">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getPaginationRowModel().rows.length > 0 ? (
+                table.getPaginationRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="text-center">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+      <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
         <AlertDialogContent className="min-w-2xl min-h-2xl">
           <AlertDialogTitle className="font-medium">
             Edit Checkclock Setting
           </AlertDialogTitle>
-          <form action="">
-            <div
-              className={
-                selectedWorkType === "WFO"
-                  ? "grid grid-cols-2 gap-4"
-                  : "flex flex-col gap-4"
-              }
-            >
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-2">
-                  <Label className="h-6">Day</Label>
-                  <Input defaultValue={selectedRow?.day ?? ""} readOnly />
-                </div>
-                <div className="">
-                  <TimeInput
-                    label={"Clock In"}
-                    name={"clockIn"}
-                    defaultValue={selectedRow?.clockIn}
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <TimeInput
-                    label={"Clock Out"}
-                    name={"clockOut"}
-                    defaultValue={selectedRow?.clockOut}
-                  />
-                </div>
-              </div>
-              {selectedWorkType === "WFO" && (
-                <div className="flex flex-col gap-2">
-                  <div className="flex flex-col gap-2">
-                    <Label className="h-[24px]">Latidue</Label>
-                    <Input
-                      defaultValue={selectedRow?.latidude ?? ""}
-                      name="latidude"
-                      type="number"
-                      className="no-spinner"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label className="h-[24px]">Longitude</Label>
-                    <Input
-                      defaultValue={selectedRow?.longitude ?? ""}
-                      name="longitude"
-                      type="number"
-                      className="no-spinner"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label className="h-[24px]">Radius (m)</Label>
-                    <Input
-                      defaultValue={selectedRow?.radius ?? ""}
-                      name="radius"
-                      type="number"
-                      className="no-spinner"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-            <AlertDialogFooter className="pt-6">
-              <AlertDialogCancel type="button" className="w-auto">
-                Cancel
-              </AlertDialogCancel>
-              <Button type="submit" className="w-auto">
-                Save
-              </Button>
-            </AlertDialogFooter>
-          </form>
-          {/* Tambahkan input lain sesuai kebutuhan */}
+          <EditWfoForm></EditWfoForm>
+          
         </AlertDialogContent>
       </AlertDialog>
     </Card>

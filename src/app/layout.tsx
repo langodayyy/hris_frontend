@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { FormProvider } from "@/context/FormContext";
+import { EditProvider } from "@/context/EditFormContext";
 // import { GoogleOAuthProvider } from "@react-oauth/google";
 // import { AuthProvider } from "@/context/AuthContext";
 // import AuthGate from "@/components/custom/authGate";
@@ -59,7 +60,11 @@ export default function RootLayout({
       >
         {/* <AuthProvider> */}
         {/* <AuthGate> */}
-        <FormProvider>{children}</FormProvider>
+        <FormProvider>
+          <EditProvider>
+            {children}
+          </EditProvider>
+        </FormProvider>
         {/* </AuthGate> */}
         {/* </AuthProvider> */}
 
