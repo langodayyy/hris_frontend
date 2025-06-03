@@ -3,7 +3,7 @@ import Sidebar from "@/components/sidebar";
 import PersonalInformation from "./personal-information";
 import ContactInformation from "./contact-information";
 import EmploymentOverview from "./employment-overview";
-import EmployeeDocuments from "./documents";
+import EmployeeDocuments from "./document/document";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -19,7 +19,14 @@ import Cookies from "js-cookie";
 import React from "react";
 
 export default function EmployeeDetails(){
+    const [employeeData, setEmployeeData] = useState<EmployeeResponse | undefined>(undefined);
     const [employeeStatus, setEmployeeStatus] = useState("");
+    useEffect(() => {
+    if (employeeData?.employee.employee_status) {
+        if (employeeData.employee.employee_status) setEmployeeStatus(employeeData.employee.employee_status);
+    }
+    }, [employeeData?.employee.employee_status]);
+
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const inputFileRef = useRef<HTMLInputElement>(null);
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,7 +103,7 @@ export default function EmployeeDetails(){
     // };
     const params = useParams();
     const id = params.id;
-    const [employeeData, setEmployeeData] = useState<EmployeeResponse | undefined>(undefined);
+
     const [isLoading, setIsLoading] = useState(true);
     const fetchData = async () => {
         try {
@@ -449,10 +456,9 @@ export default function EmployeeDetails(){
                                                                         <SelectValue placeholder="Select employee status" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
-                                                                        {employeeStatus === "Active" && 
+                                                                        {employeeData?.employee.employee_status === "Active" && 
                                                                             <SelectItem value="Active">Active</SelectItem>
                                                                         }
-                                                                        
                                                                         <SelectItem value="Retire">Retire</SelectItem>
                                                                         <SelectItem value="Resign">Resign</SelectItem>
                                                                         <SelectItem value="Fired">Fired</SelectItem>
