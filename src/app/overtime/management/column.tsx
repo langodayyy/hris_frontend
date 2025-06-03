@@ -15,19 +15,20 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { ApprovalStatusBadge } from "@/components/ui/approval";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 
 type OvertimeRecord = {
   id: string;
   id_emp: string;
   name: string;
-  position: string;
   overtime_name: string;
-  overtime_type: string;
+  overtime_type: "Government Regulation" | "Flat";
   date: string;
   hour: number;
   ovt_payroll: number;
-  approval_status: string;
+  approval_status: "Approved" | "Pending" | "Rejected";
 };
 
 
@@ -86,16 +87,32 @@ export const OvertimeColumn = (
     cell: ({ row }) => <div className="text-start">{row.getValue("name")}</div>,
   },
   {
-    accessorKey: "position",
-    header: "Position",
-  },
-  {
     accessorKey: "overtime_name",
     header: "Overtime Name",
   },
   {
     accessorKey: "overtime_type",
     header: "Overtime Type",
+    filterFn: (row, columnId, filterValues: string[]) => {
+      if (filterValues.length === 0) return true; // If no filters selected, show all
+      const overtimeType = row.getValue(columnId) as string;
+      return filterValues.includes(overtimeType);
+    },
+
+    // cell: ({ row }) => {
+    //   const overtime_type = row.getValue("overtime_type") as string;
+
+    //   return (
+    //     <div
+    //       className="text-left max-w-[120px] truncate"
+    //       title={overtime_type} // Tooltip untuk menampilkan nama lengkap
+    //     >
+    //       {overtime_type.length > 20
+    //         ? `${overtime_type.slice(0, 20)}...`
+    //         : overtime_type}
+    //     </div>
+    //   );
+    // },
   },
   {
     accessorKey: "date",
@@ -127,7 +144,7 @@ export const OvertimeColumn = (
   },
   {
     accessorKey: "approval_status",
-    header: "Action",
+    header: "Status",
     cell: ({ row }) => {
       const status = row.getValue(
         "approval_status"
@@ -138,8 +155,79 @@ export const OvertimeColumn = (
       } else if (status === "Rejected") {
         return <ApprovalStatusBadge status="Rejected" />;
       } else {
+        return <ApprovalStatusBadge status="Approved" />;
+      }
+    },
+    filterFn: (row, columnId, filterValues: string[]) => {
+      if (filterValues.length === 0) return true; // If no filters selected, show all
+      const status = row.getValue(columnId) as string;
+      return filterValues.includes(status);
+    },
+  },
+  {
+    accessorKey: "action",
+    header: "Action",
+    cell: ({ row }) => {
+      const status = row.getValue(
+        "approval_status"
+      ) as OvertimeRecord["approval_status"];
+
+      if (status === "Pending") {
         return (
           <div className="flex px-6 justify-center gap-1">
+            <AlertDialog>
+              <AlertDialogTrigger className="hover:bg-danger-50 rounded-md p-1 h-auto w-auto">
+                <svg
+                  width="19"
+                  height="18"
+                  viewBox="0 0 19 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g opacity="0.7">
+                    <rect
+                      x="1.63867"
+                      y="0.75"
+                      width="16.5"
+                      height="16.5"
+                      rx="3.25"
+                      stroke="#C11106"
+                      strokeWidth="1.5"
+                    />
+                    <path
+                      d="M14.3886 4.50004L5.38867 13.5M5.38863 4.5L14.3886 13.5"
+                      stroke="#C11106"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </g>
+                </svg>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    <div className="flex items-center gap-2">
+                      <div className="grid flex-1 gap-2">
+                        <Label htmlFor="reason" className="sr-only">
+                          Link
+                        </Label>
+                        <Input id="reason" placeholder="Enter the reason" />
+                      </div>
+                    </div>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="w-auto">
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction className="w-auto bg-danger-700 text-white border border-danger-700 hover:bg-danger-800 hover:text-white">
+                    Reject
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button
               variant="ghost"
               size="icon"
@@ -147,35 +235,36 @@ export const OvertimeColumn = (
               className="p-1 h-auto w-auto"
               icon={
                 <svg
-                  width="17"
-                  height="16"
-                  viewBox="0 0 17 16"
+                  width="19"
+                  height="18"
+                  viewBox="0 0 19 18"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <g clipPath="url(#clip0_459_4153)">
-                    <path
-                      d="M13.2368 0.62016L5.10883 8.74816C4.79839 9.05692 4.55228 9.4242 4.38475 9.82872C4.21722 10.2332 4.13159 10.667 4.13283 11.1048V12.0002C4.13283 12.177 4.20306 12.3465 4.32809 12.4716C4.45311 12.5966 4.62268 12.6668 4.79949 12.6668H5.69483C6.13267 12.6681 6.56641 12.5824 6.97093 12.4149C7.37545 12.2474 7.74273 12.0013 8.05149 11.6908L16.1795 3.56283C16.5691 3.17227 16.7879 2.64314 16.7879 2.09149C16.7879 1.53984 16.5691 1.01071 16.1795 0.62016C15.7833 0.241423 15.2563 0.0300598 14.7082 0.0300598C14.16 0.0300598 13.633 0.241423 13.2368 0.62016V0.62016ZM15.2368 2.62016L7.10883 10.7482C6.73291 11.1218 6.22483 11.3321 5.69483 11.3335H5.46616V11.1048C5.46755 10.5748 5.67787 10.0667 6.05149 9.69083L14.1795 1.56283C14.3219 1.4268 14.5112 1.35089 14.7082 1.35089C14.9051 1.35089 15.0944 1.4268 15.2368 1.56283C15.3768 1.70317 15.4554 1.89329 15.4554 2.09149C15.4554 2.2897 15.3768 2.47982 15.2368 2.62016V2.62016Z"
-                      fill="#374957"
-                    />
-                    <path
-                      d="M16.1322 5.986C15.9554 5.986 15.7858 6.05624 15.6608 6.18126C15.5357 6.30629 15.4655 6.47586 15.4655 6.65267V10H12.7988C12.2684 10 11.7597 10.2107 11.3846 10.5858C11.0095 10.9609 10.7988 11.4696 10.7988 12V14.6667H4.13216C3.60173 14.6667 3.09302 14.456 2.71795 14.0809C2.34288 13.7058 2.13216 13.1971 2.13216 12.6667V3.33333C2.13216 2.8029 2.34288 2.29419 2.71795 1.91912C3.09302 1.54405 3.60173 1.33333 4.13216 1.33333H10.1602C10.337 1.33333 10.5065 1.2631 10.6316 1.13807C10.7566 1.01305 10.8268 0.843478 10.8268 0.666667C10.8268 0.489856 10.7566 0.320286 10.6316 0.195262C10.5065 0.0702379 10.337 0 10.1602 0L4.13216 0C3.24843 0.00105857 2.4012 0.352588 1.77631 0.97748C1.15142 1.60237 0.799887 2.4496 0.798828 3.33333L0.798828 12.6667C0.799887 13.5504 1.15142 14.3976 1.77631 15.0225C2.4012 15.6474 3.24843 15.9989 4.13216 16H11.6942C12.1321 16.0013 12.5659 15.9156 12.9706 15.7481C13.3752 15.5806 13.7426 15.3345 14.0515 15.024L15.8222 13.252C16.1327 12.9432 16.3789 12.576 16.5465 12.1715C16.7141 11.767 16.7999 11.3332 16.7988 10.8953V6.65267C16.7988 6.47586 16.7286 6.30629 16.6036 6.18126C16.4785 6.05624 16.309 5.986 16.1322 5.986ZM13.1088 14.0813C12.8408 14.3487 12.5019 14.5337 12.1322 14.6147V12C12.1322 11.8232 12.2024 11.6536 12.3274 11.5286C12.4524 11.4036 12.622 11.3333 12.7988 11.3333H15.4155C15.333 11.7023 15.1482 12.0406 14.8822 12.3093L13.1088 14.0813Z"
-                      fill="#374957"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_459_4153">
-                      <rect
-                        width="17"
-                        height="20"
-                        fill="white"
-                        transform="translate(0.798828)"
-                      />
-                    </clipPath>
-                  </defs>
+                  <rect
+                    x="1.63867"
+                    y="0.75"
+                    width="16.5"
+                    height="16.5"
+                    rx="3.25"
+                    stroke="#25703F"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M4.63867 9L8.38867 12.75L15.8887 5.25"
+                    stroke="#25703F"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               }
             ></Button>
+          </div>
+        );
+      } else {
+        return (
+          <div className="flex px-6 justify-center gap-1">
             <AlertDialog>
               <AlertDialogTrigger className="hover:bg-danger-50 rounded-md p-1 h-auto w-auto">
                 <svg

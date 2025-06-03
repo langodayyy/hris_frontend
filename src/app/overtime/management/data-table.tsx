@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef } from "react"; 
 import { Button } from "@/components/ui/button";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
@@ -32,22 +32,13 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { overtimeDummy, overtimeType } from "@/components/dummy/overtimeData";
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -60,19 +51,18 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
-
-  // State untuk Popover filter di bagian atas tabel
   const [date, setDate] = useState<DateRange | undefined>(undefined);
-  const [open, setOpen] = useState(false); // State untuk Popover di bagian atas
+  const [open, setOpen] = useState(false);
 
   const router = useRouter();
-  const [dialogOpen, setDialogOpen] = useState(false); // State untuk Dialog Export
 
-  // State untuk Date Range Picker di dalam Dialog Export
-  const [dialogDateRange, setDialogDateRange] = useState<
-    DateRange | undefined
-  >(undefined);
-  const [dialogDatePickerOpen, setDialogDatePickerOpen] = useState(false); // State untuk Popover di dalam Dialog
+  // State baru untuk filter dropdown
+  const [filters, setFilters] = useState({
+    overtimeType: [] as string[],
+    status: [] as string[],
+  });
+  const [tempFilters, setTempFilters] = useState(filters); // State sementara untuk dropdown
+  const applyClickedRef = useRef(false); // Ref untuk melacak klik tombol apply
 
   const filteredData = useMemo(() => {
     // Menggunakan state 'date' untuk filter tabel utama
@@ -82,7 +72,6 @@ export function DataTable<TData, TValue>({
 
     return data.filter((item: any) => {
       const itemDate = new Date(item.date);
-      // Pastikan itemDate valid dan masuk rentang
       return (
         itemDate instanceof Date &&
         !isNaN(itemDate.getTime()) &&
@@ -90,7 +79,7 @@ export function DataTable<TData, TValue>({
         itemDate <= date.to!
       );
     });
-  }, [data, date]); // Dependency array diubah ke 'date'
+  }, [data, date]);
 
   const table = useReactTable({
     data: filteredData,
@@ -114,11 +103,41 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  // Fungsi untuk menerapkan filter dari tempFilters ke table.setColumnFilters
+  const applyFiltersToTable = () => {
+    const newColumnFilters: ColumnFiltersState = [];
+    if (tempFilters.overtimeType.length > 0) {
+      newColumnFilters.push({
+        id: "overtime_type", 
+        value: tempFilters.overtimeType,
+      });
+    }
+    if (tempFilters.status.length > 0) {
+      newColumnFilters.push({
+        id: "approval_status", 
+        value: tempFilters.status,
+      });
+    }
+    table.setColumnFilters(newColumnFilters);
+    setFilters(tempFilters); 
+  };
+
+  const clearAllFilters = () => {
+    setTempFilters({
+      overtimeType: [],
+      status: [],
+    });
+    table.setColumnFilters([]);
+    setFilters({
+      overtimeType: [],
+      status: [],
+    });
+  };
+
   return (
     <div className="flex flex-col gap-[10px]">
       <div className="flex flex-row justify-start items-center py-[10px] px-6 gap-4 w-full">
         <span className="w-auto text-lg flex-none">Overtime Employees</span>
-        {/* Filter input + icon */}
         <div className="relative w-full">
           <img
             src="/search.svg"
@@ -134,7 +153,6 @@ export function DataTable<TData, TValue>({
         </div>
 
         <div className="flex gap-2">
-          {/* date range filter for the main table */}
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
@@ -242,294 +260,121 @@ export function DataTable<TData, TValue>({
             </PopoverContent>
           </Popover>
 
-          {/* export filter (Dialog) */}
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-[100px]" variant="outline" size="lg">
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 15 15"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+          <div className="w-fit ">
+            <DropdownMenu
+              onOpenChange={(open) => {
+                if (!open && !applyClickedRef.current) {
+                  // Jika ditutup tanpa apply, reset tempFilters ke filters yang terakhir diterapkan
+                  setTempFilters(filters);
+                  // Atau jika ingin filter langsung hilang saat ditutup tanpa apply:
+                  // table.setColumnFilters([]);
+                }
+                if (!open) {
+                  applyClickedRef.current = false; // Reset ref
+                }
+              }}
+            >
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  icon={
+                    <svg
+                      width="20"
+                      height="21"
+                      viewBox="0 0 20 21"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5 10.5H15M2.5 5.5H17.5M7.5 15.5H12.5"
+                        stroke="currentColor"
+                        strokeWidth="1.67"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  }
                 >
-                  <g clipPath="url(#clip0_462_2148)">
-                    <path
-                      d="M6.17401 11.3263C6.34814 11.5005 6.55489 11.6387 6.78245 11.733C7.01002 11.8273 7.25393 11.8759 7.50026 11.8759C7.74659 11.8759 7.99051 11.8273 8.21807 11.733C8.44564 11.6387 8.65239 11.5005 8.82651 11.3263L10.8334 9.31938C10.941 9.20037 10.9987 9.04455 10.9946 8.88416C10.9905 8.72378 10.9248 8.57112 10.8113 8.45779C10.6977 8.34447 10.5449 8.27916 10.3845 8.27538C10.2241 8.2716 10.0684 8.32965 9.94964 8.4375L8.12089 10.2669L8.12526 0.625C8.12526 0.45924 8.05941 0.300269 7.9422 0.183058C7.82499 0.065848 7.66602 0 7.50026 0V0C7.3345 0 7.17553 0.065848 7.05832 0.183058C6.94111 0.300269 6.87526 0.45924 6.87526 0.625L6.86964 10.255L5.05089 8.4375C4.93361 8.32031 4.77459 8.2545 4.60879 8.25456C4.443 8.25462 4.28402 8.32054 4.16683 8.43781C4.04963 8.55509 3.98383 8.71412 3.98389 8.87991C3.98395 9.0457 4.04986 9.20468 4.16714 9.32188L6.17401 11.3263Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M14.375 9.99991C14.2092 9.99991 14.0503 10.0658 13.9331 10.183C13.8158 10.3002 13.75 10.4591 13.75 10.6249V13.1249C13.75 13.2907 13.6842 13.4496 13.5669 13.5668C13.4497 13.6841 13.2908 13.7499 13.125 13.7499H1.875C1.70924 13.7499 1.55027 13.6841 1.43306 13.5668C1.31585 13.4496 1.25 13.2907 1.25 13.1249V10.6249C1.25 10.4591 1.18415 10.3002 1.06694 10.183C0.949732 10.0658 0.79076 9.99991 0.625 9.99991C0.45924 9.99991 0.300269 10.0658 0.183058 10.183C0.065848 10.3002 0 10.4591 0 10.6249L0 13.1249C0 13.6222 0.197544 14.0991 0.549175 14.4507C0.900805 14.8024 1.37772 14.9999 1.875 14.9999H13.125C13.6223 14.9999 14.0992 14.8024 14.4508 14.4507C14.8025 14.0991 15 13.6222 15 13.1249V10.6249C15 10.4591 14.9342 10.3002 14.8169 10.183C14.6997 10.0658 14.5408 9.99991 14.375 9.99991Z"
-                      fill="currentColor"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_462_2148">
-                      <rect width="15" height="15" fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-                Export
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-white !max-w-[726px]">
-              <DialogHeader>
-                <DialogTitle>Export Employee</DialogTitle>
-              </DialogHeader>
-              <div>
-                <form>
-                  <div className="flex flex-col gap-[15px] mt-[15px]">
-                    <div className="flex gap-[15px]">
-                      {/* employee information */}
-                      <div className="flex flex-col flex-1 gap-[8px]">
-                        <Label htmlFor="department">Employee Name</Label>
-                        <Select defaultValue="semua">
-                          <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
-                            <SelectValue placeholder="Select department" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="semua">Semua</SelectItem>
-                            {overtimeDummy.map((item, index) => (
-                              <SelectItem key={index} value={item.id_emp}>
-                                {item.id_emp} - {item.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                  Filters
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-64 p-3">
+                <DropdownMenuLabel>Overtime Type</DropdownMenuLabel>
+                {[
+                  "Government Regulation", 
+                  "Flat",
+                ].map((type) => (
+                  <DropdownMenuCheckboxItem
+                    key={type}
+                    checked={tempFilters.overtimeType.includes(type)}
+                    onSelect={(e) => e.preventDefault()}
+                    onCheckedChange={() => {
+                      setTempFilters((prev) => {
+                        const exists = prev.overtimeType.includes(type);
+                        return {
+                          ...prev,
+                          overtimeType: exists
+                            ? prev.overtimeType.filter((item) => item !== type)
+                            : [...prev.overtimeType, type],
+                        };
+                      });
+                    }}
+                  >
+                    {type}
+                  </DropdownMenuCheckboxItem>
+                ))}
 
-                      {/* position */}
-                      <div className="flex flex-col flex-1 gap-[8px]">
-                        <Label htmlFor="position">Position</Label>
-                        <Select defaultValue="semua">
-                          <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
-                            <SelectValue placeholder="Select position" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="semua">Semua</SelectItem>
-                            <SelectItem value="staff">Staff</SelectItem>
-                            <SelectItem value="supervisor">
-                              Supervisor
-                            </SelectItem>
-                            <SelectItem value="manager">Manager</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Status</DropdownMenuLabel>
+                {["Approved", "Pending", "Rejected"].map((status) => (
+                  <DropdownMenuCheckboxItem
+                    key={status}
+                    checked={tempFilters.status.includes(status)}
+                    onSelect={(e) => e.preventDefault()}
+                    onCheckedChange={() => {
+                      setTempFilters((prev) => {
+                        const exists = prev.status.includes(status);
+                        return {
+                          ...prev,
+                          status: exists
+                            ? prev.status.filter((item) => item !== status)
+                            : [...prev.status, status],
+                        };
+                      });
+                    }}
+                  >
+                    {status}
+                  </DropdownMenuCheckboxItem>
+                ))}
 
-                    <div className="flex gap-[15px]">
-                      {/* overtime type */}
-                      <div className="flex flex-col flex-1 gap-[8px]">
-                        <Label htmlFor="type">Overtime Type</Label>
-                        <Select defaultValue="semua">
-                          <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
-                            <SelectValue placeholder="Select Type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="semua">Semua</SelectItem>
-                            {overtimeType.map((item) => (
-                              <SelectItem key={item.id} value={item.id}>
-                                {item.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                <DropdownMenuSeparator />
 
-                      {/* status */}
-                      <div className="flex flex-col flex-1 gap-[8px]">
-                        <Label htmlFor="status">Status</Label>
-                        <Select defaultValue="semua">
-                          <SelectTrigger className="w-full !h-[46px] !border !border-neutral-300 !text-neutral-300">
-                            <SelectValue placeholder="Select Status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="semua">Semua</SelectItem>
-                            <SelectItem value="rejected">Rejected</SelectItem>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="approved">Approved</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+                <div className="flex flex-col px-2 py-1 gap-[10px]">
+                  <Button
+                    variant="default"
+                    className="w-full"
+                    onClick={() => {
+                      applyClickedRef.current = true; // Set ref to true
+                      applyFiltersToTable(); // Terapkan filter ke tabel
+                    }}
+                  >
+                    Apply Filters
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => {
+                      applyClickedRef.current = true; // Set ref to true
+                      clearAllFilters(); // Hapus semua filter
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
-                    <div className="flex flex-col gap-[15px] mt-[15px]">
-                      {/* date range inside dialog */}
-                      <div className="flex flex-col flex-1 gap-[8px]">
-                        <Label htmlFor="type">Date Range</Label>
-                        <Popover
-                          open={dialogDatePickerOpen}
-                          onOpenChange={setDialogDatePickerOpen}
-                        >
-                          <PopoverTrigger asChild>
-                            <Button
-                              id="date"
-                              variant={"calendar"}
-                              icon={
-                                <svg
-                                  width="25"
-                                  height="25"
-                                  viewBox="0 0 25 25"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M16.6663 2.08333V6.25"
-                                    stroke="#B0B0B0"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M8.33333 2.08333V6.25"
-                                    stroke="#B0B0B0"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M3.125 9.375H21.875"
-                                    stroke="#B0B0B0"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    fillRule="evenodd"
-                                    clipRule="evenodd"
-                                    d="M19.7917 4.16667H5.20833C4.05729 4.16667 3.125 5.09896 3.125 6.25001V19.7917C3.125 20.9427 4.05729 21.875 5.20833 21.875H19.7917C20.9427 21.875 21.875 20.9427 21.875 19.7917V6.25001C21.875 5.09896 20.9427 4.16667 19.7917 4.16667Z"
-                                    stroke="#B0B0B0"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M7.30495 13.2594C7.1612 13.2594 7.04453 13.376 7.04558 13.5198C7.04558 13.6635 7.16224 13.7802 7.30599 13.7802C7.44974 13.7802 7.56641 13.6635 7.56641 13.5198C7.56641 13.376 7.44974 13.2594 7.30495 13.2594"
-                                    stroke="#B0B0B0"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M12.5139 13.2594C12.3702 13.2594 12.2535 13.376 12.2546 13.5198C12.2546 13.6635 12.3712 13.7802 12.515 13.7802C12.6587 13.7802 12.7754 13.6635 12.7754 13.5198C12.7754 13.376 12.6587 13.2594 12.5139 13.2594"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M17.7219 13.2594C17.5782 13.2594 17.4615 13.376 17.4626 13.5198C17.4626 13.6635 17.5792 13.7802 17.723 13.7802C17.8667 13.7802 17.9834 13.6635 17.9834 13.5198C17.9834 13.376 17.8667 13.2594 17.7219 13.2594"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M7.30495 17.426C7.1612 17.426 7.04453 17.5427 7.04558 17.6865C7.04558 17.8302 7.16224 17.9469 7.30599 17.9469C7.44974 17.9469 7.56641 17.8302 7.56641 17.6865C7.56641 17.5427 7.44974 17.426 7.30495 17.426"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M12.5139 17.426C12.3702 17.426 12.2535 17.5427 12.2546 17.6865C12.2546 17.8302 12.3712 17.9469 12.515 17.9469C12.6587 17.9469 12.7754 17.8302 12.7754 17.6865C12.7754 17.5427 12.6587 17.426 12.5139 17.426"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              }
-                              className={cn(
-                                "w-auto justify-start text-left font-normal",
-                                !dialogDateRange?.from &&
-                                  "text-muted-foreground"
-                              )}
-                            >
-                              {dialogDateRange?.from && dialogDateRange?.to ? (
-                                `${format(
-                                  dialogDateRange.from,
-                                  "yyyy-MM-dd"
-                                )} - ${format(
-                                  dialogDateRange.to,
-                                  "yyyy-MM-dd"
-                                )}`
-                              ) : (
-                                <span className="text-neutral-300">
-                                  Pick a date range
-                                </span>
-                              )}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-auto p-0"
-                            align="start"
-                          >
-                            <Calendar
-                              initialFocus
-                              mode="range"
-                              defaultMonth={dialogDateRange?.from}
-                              selected={dialogDateRange}
-                              onSelect={setDialogDateRange}
-                              numberOfMonths={1}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-[10px] justify-end">
-                      <div>
-                        <DialogClose asChild>
-                          <Button
-                            className="w-[80px]"
-                            variant="outline"
-                            size="lg"
-                            type="button"
-                          >
-                            Cancel
-                          </Button>
-                        </DialogClose>
-                      </div>
-
-                      <Button
-                        className="w-[100px]"
-                        variant="default"
-                        type="submit"
-                      >
-                        <svg
-                          width="15"
-                          height="15"
-                          viewBox="0 0 15 15"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <g clipPath="url(#clip0_462_2148)">
-                            <path
-                              d="M6.17401 11.3263C6.34814 11.5005 6.55489 11.6387 6.78245 11.733C7.01002 11.8273 7.25393 11.8759 7.50026 11.8759C7.74659 11.8759 7.99051 11.8273 8.21807 11.733C8.44564 11.6387 8.65239 11.5005 8.82651 11.3263L10.8334 9.31938C10.941 9.20037 10.9987 9.04455 10.9946 8.88416C10.9905 8.72378 10.9248 8.57112 10.8113 8.45779C10.6977 8.34447 10.5449 8.27916 10.3845 8.27538C10.2241 8.2716 10.0684 8.32965 9.94964 8.4375L8.12089 10.2669L8.12526 0.625C8.12526 0.45924 8.05941 0.300269 7.9422 0.183058C7.82499 0.065848 7.66602 0 7.50026 0V0C7.3345 0 7.17553 0.065848 7.05832 0.183058C6.94111 0.300269 6.87526 0.45924 6.87526 0.625L6.86964 10.255L5.05089 8.4375C4.93361 8.32031 4.77459 8.2545 4.60879 8.25456C4.443 8.25462 4.28402 8.32054 4.16683 8.43781C4.04963 8.55509 3.98383 8.71412 3.98389 8.87991C3.98395 9.0457 4.04986 9.20468 4.16714 9.32188L6.17401 11.3263Z"
-                              fill="currentColor"
-                            />
-                            <path
-                              d="M14.375 9.99991C14.2092 9.99991 14.0503 10.0658 13.9331 10.183C13.8158 10.3002 13.75 10.4591 13.75 10.6249V13.1249C13.75 13.2907 13.6842 13.4496 13.5669 13.5668C13.4497 13.6841 13.2908 13.7499 13.125 13.7499H1.875C1.70924 13.7499 1.55027 13.6841 1.43306 13.5668C1.31585 13.4496 1.25 13.2907 1.25 13.1249V10.6249C1.25 10.4591 1.18415 10.3002 1.06694 10.183C0.949732 10.0658 0.79076 9.99991 0.625 9.99991C0.45924 9.99991 0.300269 10.0658 0.183058 10.183C0.065848 10.3002 0 10.4591 0 10.6249L0 13.1249C0 13.6222 0.197544 14.0991 0.549175 14.4507C0.900805 14.8024 1.37772 14.9999 1.875 14.9999H13.125C13.6223 14.9999 14.0992 14.8024 14.4508 14.4507C14.8025 14.0991 15 13.6222 15 13.1249V10.6249C15 10.4591 14.9342 10.3002 14.8169 10.183C14.6997 10.0658 14.5408 9.99991 14.375 9.99991Z"
-                              fill="currentColor"
-                            />
-                          </g>
-                          <defs>
-                            <clipPath id="clip0_462_2148">
-                              <rect width="15" height="15" fill="white" />
-                            </clipPath>
-                          </defs>
-                        </svg>
-                        Export
-                      </Button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          {/* add button */}
           <Button
             className="w-[80px] cursor-pointer"
             variant="default"
