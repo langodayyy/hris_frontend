@@ -39,7 +39,7 @@ const ContactInformation = ({ employeeData, onUpdate }: Props) => {
       const formData = new FormData(form);
 
       const response = await fetch(
-        `http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}?_method=PATCH`,
+        `${process.env.NEXT_PUBLIC_API_URL}/employees/${employeeData?.employee.employee_id}?_method=PATCH`,
         {
           method: "POST",
           headers: {
@@ -118,7 +118,7 @@ const ContactInformation = ({ employeeData, onUpdate }: Props) => {
                   <div className="flex flex-col gap-[15px] mt-[15px]">
                     <div className="flex gap-[10px]">
                       <div className="flex flex-col flex-1 gap-[8px]">
-                        <PhoneInput placeholder="Enter employee phone number" />
+                        <PhoneInput defaultValue={employeeData?.employee.phone} placeholder="Enter employee phone number"/>
                       </div>
                       <div className="flex flex-col flex-1 gap-[8px]">
                         <Label htmlFor="email">Email</Label>

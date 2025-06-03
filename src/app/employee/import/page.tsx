@@ -9,7 +9,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "react-router-dom";
 import { EmployeeData, PreviewImport } from '@/types/peviewImport';
-import { Employees } from "../column";
+import { Employees } from "./column";
 import Link from "next/link";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useRouter } from 'next/navigation';
@@ -35,26 +35,34 @@ export default function Employee() {
     return data.map((employeeData) => {
         // Handle potential nulls or different types if necessary
         const id = employeeData.employee_id?.toString() || employeeData.id?.toString() || '';
+        const company_id = employeeData.company_id?.toString() || employeeData.company_id?.toString() || '';
+        const employee_id = employeeData.employee_id?.toString() || employeeData.employee_id?.toString() || '';
         const name = `${employeeData.first_name || ''} ${employeeData.last_name || ''}`.trim();
         const gender: "Male" | "Female" = employeeData.gender === "Male" || employeeData.gender === "Female"
         ? employeeData.gender
         : "Male"; // Default or handle invalid gender
         const phone = employeeData.phone?.toString() || '';
-        const position = employeeData.position_id || ''; // Or look up a display name based on position_id
-        const type: "Permanent" | "Contract" | "Internship" = (employeeData.contract_type as any) || "-"; // Cast or map if contract_type values don't directly match
+        const position = employeeData.position_name || ''; // Or look up a display name based on position_id
+        const department = employeeData.department_name || ''; // Or look up a display name based on position_id
+        const contract_type: "Permanent" | "Contract" | "Internship" = (employeeData.contract_type as any) || "-"; // Cast or map if contract_type values don't directly match
         const workType: "WFO" | "WFH" | "Hybrid" = "WFO"; // You need to determine how to get this, or set a default
-        const status: "Active" | "Inactive" =
-        employeeData.employee_status === "Active" || employeeData.employee_status === "Inactive"
-            ? employeeData.employee_status
-            : "Active"; // Default or handle invalid status
+        const rawStatus = employeeData.employee_status;
+        const status: "Active" | "Retire" | "Fired" | "Resign" =
+        ["Active", "Retire", "Fired", "Resign"].includes(rawStatus as any)
+            ? (rawStatus as "Active" | "Retire" | "Fired" | "Resign")
+            : "Active";
+
 
         return {
         id,
+        company_id,
+        employee_id,
         name,
         gender,
         phone,
         position,
-        type,
+        department,
+        contract_type,
         workType,
         status,
         };
@@ -76,7 +84,7 @@ export default function Employee() {
             return;
         }
 
-        const response = await fetch("http://127.0.0.1:8000/api/employees/confirm-import", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees/confirm-import`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

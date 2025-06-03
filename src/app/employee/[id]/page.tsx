@@ -7,7 +7,7 @@ import EmployeeDocuments from "./documents";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +20,75 @@ import React from "react";
 
 export default function EmployeeDetails(){
     const [employeeStatus, setEmployeeStatus] = useState("");
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const inputFileRef = useRef<HTMLInputElement>(null);
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+                setAvatarPreview(URL.createObjectURL(file));
+            }
+    };
+
+    const handleEditPhotoClick = () => {
+        inputFileRef.current?.click();
+    };
+    const handleCancelPhotoClick = () => {
+        setAvatarPreview(null);           // reset preview foto
+        if (inputFileRef.current) {
+            inputFileRef.current.value = ""; // reset input file supaya kosong
+        }
+    };
+    const [loadingPhoto, setLoadingPhoto] = useState(false);
+    const [successPhoto, setSuccessPhoto] = useState(false);
+    const [errorPhoto, setErrorPhoto] = useState(false);
+    const handleSavePhotoCLick = async () => {
+        setLoadingPhoto(true);
+        setErrorPhoto(false);
+        setSuccessPhoto(false);
+
+        try {
+            const formData = new FormData();
+
+            const file = inputFileRef.current?.files?.[0];
+            if (file) {
+                formData.append("employee_photo", file);
+            }
+
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/employees/${employeeData?.employee.employee_id}?_method=PATCH`,
+                {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${Cookies.get("token")}`,
+                    // Jangan tambahkan Content-Type manual di sini!
+                },
+                body: formData,
+            
+            }
+        );
+
+        const responseData = await response.json();
+        console.log("Response:", responseData);
+
+        if (!response.ok) throw new Error("Gagal submit");
+
+        setSuccessPhoto(true);
+        fetchData()
+        setAvatarPreview(null);
+        } catch (err) {
+        console.error("Submit error:", err);
+        setErrorPhoto(true);
+        } finally {
+
+        setLoadingPhoto(false);
+        }
+    };
+    const [isDialogAOpen, setDialogAOpen] = useState(false);
+    const handleOkClick = async () => {
+         // panggil fetchData()
+        setDialogAOpen(false);
+        setSuccess(false); // reset state jika perlu
+    };
     // const [isDialogOpen, setIsDialogOpen] = useState(false);
     
     // const handleChangeStatus = () => {
@@ -32,7 +101,7 @@ export default function EmployeeDetails(){
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            const res = await fetch(`http://127.0.0.1:8000/api/employees/${id}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees/${id}`, {
             headers: {
                 "Authorization": `Bearer ${Cookies.get("token")}`,
                 "Content-Type": "application/json"
@@ -64,7 +133,7 @@ export default function EmployeeDetails(){
         setSuccess(false);
 
         try {
-            const baseUrl = "http://127.0.0.1:8000/api/employee/export-csv";
+            const baseUrl = `${process.env.NEXT_PUBLIC_API_URL}/employee/export-csv`;
             const params = new URLSearchParams();
 
             if (employeeData?.employee.employee_id) {
@@ -110,7 +179,7 @@ export default function EmployeeDetails(){
             const form = document.getElementById("employeeForm") as HTMLFormElement;
             const formData = new FormData(form);
 
-            const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}?_method=PATCH`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees/${employeeData?.employee.employee_id}?_method=PATCH`, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${Cookies.get("token")}`,
@@ -139,7 +208,7 @@ export default function EmployeeDetails(){
         setSuccess(false);
         try {
 
-            const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}/reset-password`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees/${employeeData?.employee.employee_id}/reset-password`, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${Cookies.get("token")}`,
@@ -168,7 +237,7 @@ export default function EmployeeDetails(){
         setSuccess(false);
         try {
 
-            const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees/${employeeData?.employee.employee_id}`, {
                     method: "DELETE",
                     headers: {
                         "Authorization": `Bearer ${Cookies.get("token")}`,
@@ -239,16 +308,80 @@ export default function EmployeeDetails(){
                         <Card className="flex-1 gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
                        
                             <div className="flex mx-[20px] items-center">
-                                <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect width="78" height="78" rx="39" fill="#F3F4F6" />
-                                    <mask id="mask0_462_2363" maskUnits="userSpaceOnUse" x="0" y="16" width="78" height="62" mask-type="alpha">
-                                        <path d="M78 68.2272V78H0V68.263C4.53684 62.1999 10.4257 57.2791 17.1983 53.8916C23.9709 50.5042 31.4405 48.7436 39.013 48.75C54.951 48.75 69.108 56.4005 78 68.2272V68.2272ZM52.0065 29.2467C52.0065 32.6945 50.6369 36.0011 48.1989 38.4391C45.7609 40.8771 42.4543 42.2467 39.0065 42.2467C35.5587 42.2467 32.2521 40.8771 29.8141 38.4391C27.3761 36.0011 26.0065 32.6945 26.0065 29.2467C26.0065 25.7989 27.3761 22.4923 29.8141 20.0543C32.2521 17.6163 35.5587 16.2467 39.0065 16.2467C42.4543 16.2467 45.7609 17.6163 48.1989 20.0543C50.6369 22.4923 52.0065 25.7989 52.0065 29.2467V29.2467Z" fill="black"/>
-                                    </mask>
-                                    <g mask="url(#mask0_462_2363)">
-                                        <rect width="78" height="78" rx="39" fill="#D1D5DB" />
-                                    </g>
-                                </svg>
-                             
+                                <div className="relative w-[78px] h-[78px]">
+                                    {(avatarPreview || employeeData?.employee_photo_url) ? (
+                                        <img
+                                        src={avatarPreview ?? employeeData?.employee_photo_url ?? ""}
+                                        alt="Employee Photo"
+                                        className="w-[78px] h-[78px] rounded-full object-cover bg-gray-200"
+                                        />
+                                    ) : (
+                                    <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="78" height="78" rx="39" fill="#F3F4F6" />
+                                        <mask id="mask0_462_2363" maskUnits="userSpaceOnUse" x="0" y="16" width="78" height="62" mask-type="alpha">
+                                            <path d="M78 68.2272V78H0V68.263C4.53684 62.1999 10.4257 57.2791 17.1983 53.8916C23.9709 50.5042 31.4405 48.7436 39.013 48.75C54.951 48.75 69.108 56.4005 78 68.2272V68.2272ZM52.0065 29.2467C52.0065 32.6945 50.6369 36.0011 48.1989 38.4391C45.7609 40.8771 42.4543 42.2467 39.0065 42.2467C35.5587 42.2467 32.2521 40.8771 29.8141 38.4391C27.3761 36.0011 26.0065 32.6945 26.0065 29.2467C26.0065 25.7989 27.3761 22.4923 29.8141 20.0543C32.2521 17.6163 35.5587 16.2467 39.0065 16.2467C42.4543 16.2467 45.7609 17.6163 48.1989 20.0543C50.6369 22.4923 52.0065 25.7989 52.0065 29.2467V29.2467Z" fill="black"/>
+                                        </mask>
+                                        <g mask="url(#mask0_462_2363)">
+                                            <rect width="78" height="78" rx="39" fill="#D1D5DB" />
+                                        </g>
+                                    </svg>
+                                    )}
+                                    {/* Tombol edit kecil di pojok kanan bawah */}
+                                    <button
+                                        onClick={handleEditPhotoClick}
+                                        type="button"
+                                        className="absolute bottom-0 right-0 bg-white border border-gray-300 rounded-full p-1 hover:bg-gray-100 shadow-md"
+                                        aria-label="Edit photo"
+                                    >
+                                        <svg
+                                            className="!w-[12px] !h-[12px]"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                            <path
+                                                d="M12 20H21"
+                                                stroke="black"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                            <path
+                                                d="M16.5 3.49998C16.8978 3.10216 17.4374 2.87866 18 2.87866C18.2786 2.87866 18.5544 2.93353 18.8118 3.04014C19.0692 3.14674 19.303 3.303 19.5 3.49998C19.697 3.69697 19.8532 3.93082 19.9598 4.18819C20.0665 4.44556 20.1213 4.72141 20.1213 4.99998C20.1213 5.27856 20.0665 5.55441 19.9598 5.81178C19.8532 6.06915 19.697 6.303 19.5 6.49998L7 19L3 20L4 16L16.5 3.49998Z"
+                                                stroke="black"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                            </svg>
+                                    </button>
+                                </div>
+                                
+
+                                {/* Input file tersembunyi */}
+                                <input
+                                    type="file"
+                                    name="employee_photo"
+                                    accept="image/*"
+                                    id="employee_photo"
+                                    className="hidden"
+                                    ref={inputFileRef}
+                                    onChange={handleFileChange}
+                                />
+                                <div className="flex flex-col ml-[15px] gap-[10px]">
+                                    {avatarPreview && (
+                                        <>
+                                        
+                                        <Button disabled={loadingPhoto} onClick={handleSavePhotoCLick} variant={"default"} size={"sm"}>
+                                            {!loadingPhoto ? (<span className="ml-1">Save</span>): (<Spinner size="small"/>)}
+                                        </Button>
+                                        <Button disabled={loadingPhoto} onClick={handleCancelPhotoClick} variant={"secondary"} size={"sm"}>
+                                            {!loadingPhoto ? (<span className="ml-1">Cancel</span>): (<Spinner size="small"/>)}
+                                        </Button>
+                                        </>
+                                    )}
+                                </div>
+                                
                                 <div className="flex flex-col ml-[15px] gap-[10px]">
                                     <p className="font-medium text-base text-black">{employeeData?.employee.first_name} {employeeData?.employee.last_name}</p>
                                     <p className="font-normal text-base text-black/52">{employeeData?.employee.employee_id}</p>

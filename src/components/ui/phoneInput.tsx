@@ -5,8 +5,12 @@ import { Label } from "@/components/ui/label";
 
 export default function FormPhoneInput({
   placeholder = "Enter your phone number",
+  defaultValue,
+}: {
+  placeholder?: string;
+  defaultValue?: string | null;
 }) {
-  const [value, setValue] = useState<string | undefined>();
+  const [value, setValue] = useState<string | undefined>(defaultValue ?? undefined);
 
   return (
     <div className="flex flex-col gap-2 w-full">

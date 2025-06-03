@@ -76,14 +76,13 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
         const fetchData = async () => {
             try {
             setIsLoading(true);
-            const token = "1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a" // pastikan token sudah disimpan di login
-            const resBank = await fetch("http://127.0.0.1:8000/api/bank", {
+            const resBank = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank`, {
                 headers: {
                 "Authorization": `Bearer ${Cookies.get("token")}`,
                 "Content-Type": "application/json"
                 }
             })
-            const resDepPos = await fetch("http://127.0.0.1:8000/api/department-position", {
+            const resDepPos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/department-position`, {
                 headers: {
                 "Authorization": `Bearer ${Cookies.get("token")}`,
                 "Content-Type": "application/json"
@@ -178,7 +177,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
             if (selectedDepartmentId)
                 formData.append("department_id", selectedDepartmentId);
             console.log("Submitting data:", Object.fromEntries(formData.entries()));   
-            const response = await fetch(`http://127.0.0.1:8000/api/employees/${employeeData?.employee.employee_id}?_method=PATCH`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees/${employeeData?.employee.employee_id}?_method=PATCH`, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${Cookies.get("token")}`,
@@ -339,6 +338,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                                                
                                                     </SelectContent>
                                                 </Select>
+                                                <input type="hidden" value={contractType} name="contract_type"/>
                                             </div>
                                         </div>
                                         <div className="flex gap-[10px]">

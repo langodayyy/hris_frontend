@@ -79,14 +79,13 @@ export default function AddEmployee() {
     useEffect(() => {
         const fetchData = async () => {
           try {
-            const token = "1|9p4rp7VWgX8z4umUP9l1fJj3eyXI20abvAAViakR32d8c87a" // pastikan token sudah disimpan di login
-            const resBank = await fetch("http://127.0.0.1:8000/api/bank", {
+            const resBank = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank`, {
               headers: {
                 "Authorization": `Bearer ${Cookies.get("token")}`,
                 "Content-Type": "application/json"
               }
             })
-            const resDepPos = await fetch("http://127.0.0.1:8000/api/department-position", {
+            const resDepPos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/department-position`, {
               headers: {
                 "Authorization": `Bearer ${Cookies.get("token")}`,
                 "Content-Type": "application/json"
@@ -140,7 +139,7 @@ export default function AddEmployee() {
         
             console.log("Submitting data:", Object.fromEntries(formData.entries()));   
 
-            const response = await fetch("http://127.0.0.1:8000/api/employees", {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees`, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${Cookies.get("token")}`,
@@ -321,7 +320,7 @@ export default function AddEmployee() {
                                     <SelectItem value="B">B</SelectItem>
                                     <SelectItem value="AB">AB</SelectItem>
                                     <SelectItem value="O">O</SelectItem>
-                                    <SelectItem value="unknown">Unknown</SelectItem>
+                                    <SelectItem value="Unknown">Unknown</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <input type="hidden" name="blood_type" value={bloodType}/>
@@ -382,8 +381,11 @@ export default function AddEmployee() {
                                 <input type="hidden" name="religion" value={religion} />
                             </div>
                         </div>
-                      
-                        <div className="flex mx-[20px] py-[12px] gap-[10px]">
+                        <div className="mx-[20px]">
+                            <hr className="border-t border-neutral-200 my-[16px]" />
+                        </div>
+
+                        <div className="flex mx-[20px] gap-[10px]">
                             <div className="flex flex-col flex-1 gap-[8px]">
                                 <Label htmlFor="contract_type">Contract Type</Label>
                                 <Select value={contractType} onValueChange={setContractType}>
@@ -398,7 +400,17 @@ export default function AddEmployee() {
                                 </Select>
                                 <input type="hidden" name="contract_type" value={contractType} />
                             </div>
+                        </div>
+                        <div className="flex mx-[20px] gap-[10px]">
+                                <div className="flex flex-col flex-1 gap-[8px]">
+                                    <Label htmlFor="join_date">Join Date</Label>
+                                    <Input
+                                        type="date"
+                                        id="join_date"
+                                        name="join_date"
+                                        placeholder="Enter employee join date" />
 
+                                </div>
                             { contractType!=="Permanent" && contractType!=="" && (
                                 <>
                                     <div className="flex flex-col flex-1 gap-[8px]">
@@ -407,7 +419,7 @@ export default function AddEmployee() {
                                             type="date"
                                             id="contract_end"
                                             name="contract_end"
-                                            placeholder="Enter employee contract_end" />
+                                            placeholder="Enter employee contract end" />
 
                                     </div>
                                 </>
@@ -484,9 +496,9 @@ export default function AddEmployee() {
                                 </PopoverContent>
                                 </Popover>
                             </div>
-                            
-
-
+                        </div>
+                         <div className="mx-[20px]">
+                            <hr className="border-t border-neutral-200 my-[16px]" />
                         </div>
                         <div className="flex mx-[20px] gap-[10px]">
                             <div className="flex flex-col flex-1 gap-[8px]">

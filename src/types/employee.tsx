@@ -2,6 +2,7 @@ export type Employee = {
   id: number | null;
   user_id: number | null;
   ck_setting_id: number | null;
+  company_id: string | null;
   employee_id: string | null;
   nik: string | null;
   first_name: string | null;
@@ -10,7 +11,7 @@ export type Employee = {
 //   department_id: number | null;
   address: string | null;
   email: string | null;
-  phone: number | null;
+  phone: string | null;
   birth_place: string | null;
   birth_date: string | null;
   education: string | null;
@@ -37,4 +38,5 @@ export type EmployeeResponse = {
   position_name: string | null;
   department_name: string | null;
   bank_name: string | null;
+  employee_photo_url: string | null;
 };
