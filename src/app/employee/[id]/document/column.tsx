@@ -51,7 +51,7 @@ export const columns = (onDownload: (id: string) => void) : ColumnDef<Documents>
       return (
         <div className="text-center">
             <Button variant="outline" size="sm" onClick={() => onDownload(document.id)}>
-              Download
+              Open
             </Button>
         </div>
       )

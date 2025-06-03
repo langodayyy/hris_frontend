@@ -36,44 +36,68 @@ const EmployeeDocuments = () => {
 
     fetchData()
   }, [])
-    const handleDownload = async (documentId: string) => {
-    try {
-        const token = Cookies.get("token");
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/download/${documentId}`,
-            {
-                headers: {
-                Authorization: `Bearer ${token}`,
-                },
-            }
-        );
-        if (!response.ok) {
-        throw new Error("Failed to fetch download URL");
-        }
+  // const handleDownload = async (documentId: string) => {
+  //   try {
+  //     const token = Cookies.get("token");
 
-        const data = await response.json();
-        const fileUrl = data.url;
+  //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/download/${documentId}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
 
-        // Fetch isi file sebagai blob
-        const fileResponse = await fetch(fileUrl);
-        const blob = await fileResponse.blob();
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch download URL");
+  //     }
 
-        // Buat URL sementara untuk blob
-        const url = window.URL.createObjectURL(blob);
+  //     const data = await response.json();
+  //     const fileUrl = data.document_url;
 
-        // Buat link untuk download
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `document-${documentId}.pdf`; // Atur nama file sesuai kebutuhan
-        document.body.appendChild(link);
-        link.click();
+  //     // Ambil ekstensi dari URL
+  //     const urlPath = new URL(fileUrl).pathname;
+  //     const extMatch = urlPath.match(/\.[0-9a-z]+$/i);
+  //     const extension = extMatch ? extMatch[0] : "";
 
-        // Bersihkan
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-    } catch (err) {
-        console.error("Download failed", err);
+  //     const fileName = `document-${documentId}${extension}`;
+
+  //     // Simulasikan klik langsung ke file dengan nama file khusus
+  //     const link = document.createElement("a");
+  //     link.href = fileUrl;
+  //     link.download = fileName; // Nama file lokal yang akan disimpan user
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //   } catch (err) {
+  //     console.error("Download failed", err);
+  //   }
+  // };
+  const handleDownload = async (documentId: string) => {
+  try {
+    const token = Cookies.get("token");
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/download/${documentId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch download URL");
     }
-    };
+
+    const data = await response.json();
+    const fileUrl = data.document_url;
+
+    // Buka file di tab baru
+    window.open(fileUrl, "_blank", "noopener,noreferrer");
+  } catch (err) {
+    console.error("Download failed", err);
+  }
+};
+
+
+
+
 
 
     return (
