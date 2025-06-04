@@ -50,12 +50,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   isLoading?: boolean
+  isActive?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   isLoading,
+  isActive,
 }: DataTableProps<TData, TValue>) {
     console.log("Data struktur:", data);
 
@@ -170,10 +172,10 @@ export function DataTable<TData, TValue>({
         </svg>}
         value={(table.getColumn("document_name")?.getFilterValue() as string) ?? ""}
         onChange={(event) => table.getColumn("document_name")?.setFilterValue(event.target.value)}
-        className="w-full min-w-[200px]" />
+        className="mim-w-[200px]" />
         
    
-                  
+    {!isActive && (          
     <div className="w-fit">
         <Link href={`/employee/${employeeId}/document/add`}>
             <Button className="w-full" variant="default" >
@@ -186,6 +188,7 @@ export function DataTable<TData, TValue>({
             </Button>
         </Link>
     </div>
+    )}
     </div>
     {isLoading ? (
         <Spinner size="large" />

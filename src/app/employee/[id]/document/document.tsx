@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Cookies from "js-cookie";
 import { useParams } from "next/navigation";
 
-const EmployeeDocuments = () => {
+const EmployeeDocuments = ({ isActive }: { isActive: boolean }) => {
     const [documents, setDocuments] = useState<Documents[]>([])
 
     const [isLoading, setIsLoading] = useState(true);
@@ -104,7 +104,7 @@ const EmployeeDocuments = () => {
         
         <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
             <CardContent>
-                <DataTable columns={columns(handleDownload)} data={documents} isLoading={isLoading}/>
+                <DataTable columns={columns(handleDownload)} data={documents} isLoading={isLoading} isActive={isActive}/>
             </CardContent>
         </Card>
 

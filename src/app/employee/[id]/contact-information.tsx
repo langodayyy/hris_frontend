@@ -76,6 +76,7 @@ const ContactInformation = ({ employeeData, onUpdate }: Props) => {
           Contact Information
         </p>
         <div>
+          {employeeData?.employee.employee_status === "Active" && (
           <Dialog open={isDialogAOpen} onOpenChange={setDialogAOpen}>
             <DialogTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -248,6 +249,7 @@ const ContactInformation = ({ employeeData, onUpdate }: Props) => {
               </div>
             </DialogContent>
           </Dialog>
+          )}
         </div>
       </div>
 

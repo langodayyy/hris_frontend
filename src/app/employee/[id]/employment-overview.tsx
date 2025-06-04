@@ -212,6 +212,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                 
                 <p className="justify-center text-lg font-medium whitespace-nowrap">Employment Overview</p>
                 <div>
+                    {employeeData?.employee.employee_status === "Active" && (
                     <Dialog open={isDialogAOpen} onOpenChange={setDialogAOpen}>
                         <DialogTrigger asChild>
                             <Button variant="ghost" size="icon">
@@ -495,6 +496,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                             )}
                         </DialogContent>
                     </Dialog>
+                    )}
                 </div>
                 
             </div>
