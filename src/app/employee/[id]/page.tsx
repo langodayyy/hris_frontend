@@ -269,7 +269,8 @@ export default function EmployeeDetails(){
     const [isDialogEmployeeStatusOpen, setDialogEmployeeStatusOpen] = useState(false);
     const [isDialogResetPasswordOpen, setDialogResetPasswordOpen] = useState(false);
     const [isDialogDeleteOpen, setDialogDeleteOpen] = useState(false);
-    const [confirmationText, setConfirmationText] = useState("");
+    const [confirmationTextDelete, setConfirmationTextDelete] = useState("");
+    const [confirmationTextStatus, setConfirmationTextStatus] = useState("");
 
     const handleOkClickEmployeeStatus = async () => {
         fetchData()
@@ -334,6 +335,7 @@ export default function EmployeeDetails(){
                                     </svg>
                                     )}
                                     {/* Tombol edit kecil di pojok kanan bawah */}
+                                    {employeeData?.employee.employee_status === "Active" && (
                                     <button
                                         onClick={handleEditPhotoClick}
                                         type="button"
@@ -362,6 +364,7 @@ export default function EmployeeDetails(){
                                             />
                                             </svg>
                                     </button>
+                                    )}
                                 </div>
                                 
 
@@ -425,10 +428,15 @@ export default function EmployeeDetails(){
                                             </svg>
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent>
+                                        <DropdownMenuContent className="mx-[50px]">
                                             <DropdownMenuItem onClick={handleExportButton}>Export</DropdownMenuItem>
-                                            <DropdownMenuItem onClick={handleChangeStatus}>Change Status</DropdownMenuItem>
-                                            <DropdownMenuItem onClick={handleResetPassword}>Reset Password</DropdownMenuItem>
+                                            {employeeData?.employee.employee_status === "Active" && (
+                                                <>
+                                                <DropdownMenuItem onClick={handleChangeStatus}>Change Status</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={handleResetPassword}>Reset Password</DropdownMenuItem>
+                                                </>
+                                            )}
+                                            
                                             <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -468,6 +476,30 @@ export default function EmployeeDetails(){
                                                                 <input type="hidden" name="employee_status" value={employeeStatus}/>
                                                             </div>
                                                         </div>
+                                                        {employeeData?.employee.employee_status === "Active" && employeeStatus !=="Active" ? (
+                                                            <>
+                                                                <div className="flex flex-col flex-1 gap-[8px]">
+                                                                    <Label htmlFor="exit date">Exit Date</Label>
+                                                                    <Input
+                                                                        type="date"
+                                                                        id="exit_date"
+                                                                        name="exit_date"
+                                                                        placeholder="Enter employee exit date"
+                                                                        defaultValue={employeeData?.employee.exit_date || undefined}
+                                                                    />
+                                                                </div>
+                                                                
+                                                                <span>Please type <strong>{employeeData?.employee.first_name} {employeeData?.employee.last_name}</strong> to confirm this action. This action cannot be undone.</span>
+                                                                <input
+                                                                type="text"
+                                                                placeholder="Type DELETE to confirm"
+                                                                className="border px-3 py-2 rounded-md"
+                                                                value={confirmationTextStatus}
+                                                                onChange={(e) => setConfirmationTextStatus(e.target.value)}
+                                                                />
+                                                            </>
+
+                                                        ):("")}
                                                         
                                                         <div className="flex gap-[10px] justify-end">
                                                             <div>
@@ -478,7 +510,7 @@ export default function EmployeeDetails(){
                                                                 </DialogClose>
                                                             </div>
                                                             
-                                                             <Button className="w-[80px] h-[40px]" variant="default" type="submit" disabled={loading}>
+                                                                <Button className="w-[80px] h-[40px]" variant={employeeData?.employee.employee_status === "Active" && employeeStatus !== "Active" ? "destructive" : "default"}  type="submit" disabled={loading || (confirmationTextStatus !== `${employeeData?.employee.first_name} ${employeeData?.employee.last_name}` && employeeData?.employee.employee_status === "Active" && employeeStatus !== "Active")}>
                                                                 {!loading ? (
                                                                     <>
                                                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -613,13 +645,13 @@ export default function EmployeeDetails(){
                                             <div>
                                                 
                                             <div className="flex flex-col gap-[15px]">
-                                                <span>Please type <strong>DELETE</strong> to confirm this action. This action cannot be undone.</span>
+                                                <span>Please type <strong>`{employeeData?.employee.first_name} {employeeData?.employee.last_name}`</strong> to confirm this action. This action cannot be undone.</span>
                                                 <input
                                                 type="text"
                                                 placeholder="Type DELETE to confirm"
                                                 className="border px-3 py-2 rounded-md"
-                                                value={confirmationText}
-                                                onChange={(e) => setConfirmationText(e.target.value)}
+                                                value={confirmationTextDelete}
+                                                onChange={(e) => setConfirmationTextDelete(e.target.value)}
                                                 />
                                                 <div className="flex gap-[10px] justify-end">
                                                 <div>
@@ -632,7 +664,7 @@ export default function EmployeeDetails(){
                                                 <Button
                                                     className="w-[80px] h-[40px]"
                                                     variant="destructive"
-                                                    disabled={loading || confirmationText !== "DELETE"}
+                                                    disabled={loading || confirmationTextDelete !== `${employeeData?.employee.first_name} ${employeeData?.employee.last_name}`}
                                                     onClick={deleteEmployee}
                                                 >
                                                     {!loading ? (
@@ -688,7 +720,9 @@ export default function EmployeeDetails(){
                         </Card>
                     </div>   )}  
                 {/* </Card> */}
-                <EmployeeDocuments></EmployeeDocuments>
+                {employeeData?.employee && (
+                <EmployeeDocuments isActive={employeeData?.employee.employee_status !== "Active"}></EmployeeDocuments>
+                )}
              </div>
         </Sidebar>
     );

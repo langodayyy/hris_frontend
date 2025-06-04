@@ -96,6 +96,7 @@ const PersonalInformation = ({ employeeData, onUpdate }: Props) => {
             <div className="flex mx-[20px] justify-between">
                 <p className="justify-center text-lg font-medium whitespace-nowrap">Personal Information</p>
                 <div>
+                    {employeeData?.employee.employee_status === "Active" && (
                     <Dialog open={isDialogAOpen} onOpenChange={setDialogAOpen}>
                         <DialogTrigger asChild>
                             <Button variant="ghost" size="icon">
@@ -348,6 +349,7 @@ const PersonalInformation = ({ employeeData, onUpdate }: Props) => {
                             </div>
                         </DialogContent>
                     </Dialog>
+                    )}
                 </div>
                 
             </div>
