@@ -16,7 +16,7 @@ export default function MapboxMap() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerRef = useRef<mapboxgl.Marker | null>(null);
 
-  const {locationRule} = useCKSettingData();
+  const {locationRule, refetch} = useCKSettingData();
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{
@@ -26,8 +26,6 @@ export default function MapboxMap() {
 
   const designatedLat = parseFloat(locationRule?.latitude ?? "0");
   const designatedLng = parseFloat(locationRule?.longitude ?? "0");
-  // const designatedLat = -7.944283557841846;
-  // const designatedLng = 112.65026022789809;
   const radius = parseFloat(locationRule?.radius ?? "0")
 
   const getDistanceFromLatLonInMeters = (
@@ -274,7 +272,9 @@ export default function MapboxMap() {
         </Button>
       ) : (
         <div className="mt-4">
-          <RadiusForm handleCancelClick={handleCancelClick} handleSaveClick={handleSaveClick} selectedLocation={selectedLocation} data_id={locationRule?.data_id}></RadiusForm>
+          <RadiusForm handleCancelClick={handleCancelClick} handleSaveClick={handleSaveClick} selectedLocation={selectedLocation} data_id={locationRule?.data_id} onUpdate={() => {
+            refetch();
+          } }></RadiusForm>
         </div>
       )}
     </div>

@@ -57,8 +57,8 @@ export function transformCKData(apiData: ApiResponse[]) {
       data_id: item.data_id,
       workType: item.worktype as "WFO" | "WFA",
       worktype_id: item.worktype_id,
-      clockIn: item.clock_in.slice(0, 5),
-      clockOut: item.clock_out.slice(0, 5),
+      clockIn: item.clock_in ? item.clock_in.slice(0, 5) : "--:--",
+      clockOut: item.clock_out ? item.clock_out.slice(0, 5) : "--:--",
       day: item.day.charAt(0).toUpperCase() + item.day.slice(1),
       ...(item.worktype === "WFO" && {
         latidude: item.latitude ? parseFloat(item.latitude) : undefined,

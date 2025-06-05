@@ -161,15 +161,15 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
       <div className="grid grid-cols-3 gap-10 w-full">
         <div className="flex flex-col gap-2">
           <Label className="h-6">Latitude</Label>
-          <Input defaultValue={locationRule?.latitude} readOnly />
+          <Input value={locationRule?.latitude} readOnly />
         </div>
         <div className="flex flex-col gap-2">
           <Label className="h-6">Longitude</Label>
-          <Input defaultValue={locationRule?.longitude} readOnly />
+          <Input value={locationRule?.longitude} readOnly />
         </div>
         <div className="flex flex-col gap-2">
           <Label className="h-6">Radius</Label>
-          <Input defaultValue={locationRule?.radius} readOnly />
+          <Input value={locationRule?.radius} readOnly />
         </div>
       </div>
       )}

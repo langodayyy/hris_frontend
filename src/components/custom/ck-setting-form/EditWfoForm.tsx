@@ -17,12 +17,11 @@ import { AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { AlertDialogCancel } from "@radix-ui/react-alert-dialog";
 import { Spinner } from "@/components/ui/spinner";
 import Cookies from "js-cookie";
-import { useCKSettingData } from "@/hooks/useCKSettingData";
-import { set } from "date-fns";
+import { Toaster, toast } from "sonner";
 
 const EditCKsSchema = z.object({
-  clockIn: z.string().nonempty("This field cannot be empty"),
-  clockOut: z.string().nonempty("This field cannot be empty"),
+  clockIn: z.string().optional(),
+  clockOut: z.string().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   radius: z.number().optional(),
@@ -35,7 +34,7 @@ type Props = {
 }
 
 export default function EditWfoForm({ onUpdate }: Props) {
-  const { setErrors, selectedRow, setIsOpen } = useEdit();
+  const { setErrors, setSuccess, selectedRow, setIsOpen } = useEdit();
   const [isLoading, setLoading] = useState(false);
 
   const { form, errors } = useForm<CKsetting>({
@@ -53,15 +52,29 @@ export default function EditWfoForm({ onUpdate }: Props) {
         if (response.success) {
           setIsOpen(false); // Close dialog after successful submission
           if (onUpdate) {
-            console.log("calling update")
             onUpdate(); // Trigger the refetch function passed as a prop
+            setSuccess(response.message)
           }
         } else if (response.errors) {
           console.error(response.errors);
-          setErrors(response.errors);
+          setSuccess(response.errors);
+
+          //  Object.entries(response.errors).forEach(([field, messages]) => {
+          //   if (Array.isArray(messages)) {
+          //     messages.forEach((message) => toast.error(`${field}: ${message}`));
+          //   } else {
+          //     toast.error(`${field}: ${messages}`);
+          //   }
+          // });
+
+          // // Display general errors
+          // if (response.errors.message) {
+          //   toast.error(response.errors.message);
+          // }
         }
       } catch (error) {
         console.error("Form submission error:", error);
+        toast.error("An unexpected error occurred. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -69,7 +82,20 @@ export default function EditWfoForm({ onUpdate }: Props) {
   });
 
   return (
+    <>
+    {/* <Toaster position="bottom-right"></Toaster> */}
     <form ref={form} method="post">
+        {/* {Object.entries(contextErrors).map(([field, messages]) => (
+          <div key={field} className="text-danger-700">
+              {Array.isArray(messages) ? (
+                messages.map((message, idx) => (
+                  <div key={idx}>{message}</div>
+                ))
+              ) : (
+                <div>{messages}</div>
+              )}
+          </div>
+        ))} */}
       <div
         className={"flex flex-col gap-4"}
       >
@@ -83,7 +109,7 @@ export default function EditWfoForm({ onUpdate }: Props) {
             <TimeInput
               label={"Clock In"}
               name={"clockIn"}
-              defaultValue={selectedRow?.clockIn}
+              defaultValue={selectedRow?.clockIn ?? ""}
             />
             {errors().clockIn && (
               <div className="text-sm p-[10px] bg-danger-50 rounded-md">
@@ -124,7 +150,7 @@ export default function EditWfoForm({ onUpdate }: Props) {
             <TimeInput
               label={"Clock Out"}
               name={"clockOut"}
-              defaultValue={selectedRow?.clockOut}
+              defaultValue={selectedRow?.clockOut ?? ""}
             />
             {errors().clockOut && (
               <div className="text-sm p-[10px] bg-danger-50 rounded-md">
@@ -172,6 +198,7 @@ export default function EditWfoForm({ onUpdate }: Props) {
         </Button>
       </AlertDialogFooter>
     </form>
+    </>
   );
 }
 
@@ -201,7 +228,7 @@ export async function editCKS(formData: FormData, data_id: number) {
     // Parse and return the success response
     const data = await response.json();
 
-    return { success: true, data };
+    return { success: true, message: data.success };
   } catch (error: any) {
     // Handle network or other unexpected errors
     return {

@@ -9,7 +9,7 @@ import Cookies from "js-cookie";
 import { Spinner } from "@/components/ui/spinner";
 
 type Props = {
-//   onUpdate: () => void;
+  onUpdate: () => void;
   handleSaveClick: () => void;
   handleCancelClick: () => void;
   selectedLocation?: {
@@ -20,7 +20,7 @@ type Props = {
 };
 
 const RadiusForm = ({
-//   onUpdate,
+  onUpdate,
   handleSaveClick,
   handleCancelClick,
   selectedLocation,
@@ -55,6 +55,11 @@ console.log("Form lat",selectedLocation?.lng);
 
       const responseData = await response.json();
       console.log("Response:", responseData);
+
+      if (onUpdate) {
+            onUpdate(); 
+            handleCancelClick();
+          }
 
       if (!response.ok) throw new Error("Gagal submit");
 
@@ -110,7 +115,7 @@ console.log("Form lat",selectedLocation?.lng);
           className="flex-1"
         //   onClick={handleSaveClick}
         type="submit"
-          disabled={!selectedLocation || loading}
+          disabled={loading}
           >
           {loading ? <Spinner size={"small"}></Spinner> : "Save"}
         </Button>
