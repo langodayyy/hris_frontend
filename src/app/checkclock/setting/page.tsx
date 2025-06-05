@@ -22,6 +22,7 @@ export default function CheckclockSettingPage() {
     Object.entries(errors).forEach(([messages]) => {
       if (Array.isArray(messages)) {
         messages.forEach((message) => toast.error(`${message}`));
+        console.log(`${messages}`);
       } else {
         // toast.error(`${messages}`);
       }

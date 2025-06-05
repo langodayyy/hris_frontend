@@ -20,12 +20,25 @@ import Cookies from "js-cookie";
 import { Toaster, toast } from "sonner";
 
 const EditCKsSchema = z.object({
-  clockIn: z.string().optional(),
-  clockOut: z.string().optional(),
+  clockIn: z.string().nullable().optional(),
+  clockOut: z.string().nullable().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   radius: z.number().optional(),
-});
+})
+.refine(
+    (data) => {
+      // If clockIn is null, clockOut must also be null
+      if (data.clockIn == "" && data.clockOut != "") {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "If clockIn is empty, clockOut must also be empty.",
+      path: ["clockOut"],
+    }
+  );
 
 type CKsetting = z.infer<typeof EditCKsSchema>;
 
@@ -57,20 +70,7 @@ export default function EditWfoForm({ onUpdate }: Props) {
           }
         } else if (response.errors) {
           console.error(response.errors);
-          setSuccess(response.errors);
-
-          //  Object.entries(response.errors).forEach(([field, messages]) => {
-          //   if (Array.isArray(messages)) {
-          //     messages.forEach((message) => toast.error(`${field}: ${message}`));
-          //   } else {
-          //     toast.error(`${field}: ${messages}`);
-          //   }
-          // });
-
-          // // Display general errors
-          // if (response.errors.message) {
-          //   toast.error(response.errors.message);
-          // }
+          setErrors(response.errors);
         }
       } catch (error) {
         console.error("Form submission error:", error);
@@ -83,19 +83,7 @@ export default function EditWfoForm({ onUpdate }: Props) {
 
   return (
     <>
-    {/* <Toaster position="bottom-right"></Toaster> */}
     <form ref={form} method="post">
-        {/* {Object.entries(contextErrors).map(([field, messages]) => (
-          <div key={field} className="text-danger-700">
-              {Array.isArray(messages) ? (
-                messages.map((message, idx) => (
-                  <div key={idx}>{message}</div>
-                ))
-              ) : (
-                <div>{messages}</div>
-              )}
-          </div>
-        ))} */}
       <div
         className={"flex flex-col gap-4"}
       >

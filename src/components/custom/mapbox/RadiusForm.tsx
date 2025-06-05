@@ -7,6 +7,7 @@ import { EmployeeResponse } from "@/types/employee";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { Spinner } from "@/components/ui/spinner";
+import { useEdit } from "@/context/EditFormContext";
 
 type Props = {
   onUpdate: () => void;
@@ -21,21 +22,15 @@ type Props = {
 
 const RadiusForm = ({
   onUpdate,
-  handleSaveClick,
   handleCancelClick,
   selectedLocation,
   data_id
 }: Props) => {
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(false);
-console.log("Form lat",selectedLocation?.lat);
-console.log("Form lat",selectedLocation?.lng);
+  const { setErrors, setSuccess } = useEdit();
 
   const handleSubmitForm = async () => {
     setLoading(true);
-    setError(false);
-    setSuccess(false);
 
     try {
       const form = document.getElementById("radiusForm") as HTMLFormElement;
@@ -47,7 +42,6 @@ console.log("Form lat",selectedLocation?.lng);
           method: "POST",
           headers: {
             Authorization: `Bearer ${Cookies.get("token")}`,
-            // Jangan tambahkan Content-Type manual di sini!
           },
           body: formData,
         }
@@ -57,25 +51,21 @@ console.log("Form lat",selectedLocation?.lng);
       console.log("Response:", responseData);
 
       if (onUpdate) {
-            onUpdate(); 
+            onUpdate();
+            setSuccess(responseData.success )
             handleCancelClick();
           }
 
-      if (!response.ok) throw new Error("Gagal submit");
+      if (!response.ok) {
+        setErrors(responseData.errors);
+      };
 
-      setSuccess(true);
     } catch (err) {
       console.error("Submit error:", err);
-      setError(true);
+      // setErrors(err);
     } finally {
       setLoading(false);
     }
-  };
-//   const [isDialogAOpen, setDialogAOpen] = useState(false);
-  const handleOkClick = async () => {
-    // onUpdate(); // panggil fetchData() di parent
-    // setDialogAOpen(false);
-    setSuccess(false); // reset state jika perlu
   };
   return (
       <form
