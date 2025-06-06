@@ -24,11 +24,13 @@ type OvertimeRecord = {
   id_emp: string;
   name: string;
   overtime_name: string;
-  overtime_type: "Government Regulation" | "Flat";
+  // overtime_type: "Government Regulation" | "Flat";
+  overtime_type: string;
   date: string;
   hour: number;
   ovt_payroll: number;
-  approval_status: "Approved" | "Pending" | "Rejected";
+  // approval_status: "Approved" | "Pending" | "Rejected";
+  approval_status: string;
 };
 
 
