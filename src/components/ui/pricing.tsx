@@ -7,8 +7,10 @@ interface PriceCardProps {
   price: string;
   description: string;
   imageUrl: string;
-  features: string[];
+  canAccess: string[];
+  canNotAccess?: string[];
   buttonText: string;
+  onClick?: () => void; // Optional onClick handler for the button
 }
 
 const PriceCard: React.FC<PriceCardProps> = ({
@@ -17,14 +19,16 @@ const PriceCard: React.FC<PriceCardProps> = ({
   price,
   description,
   imageUrl,
-  features,
-  buttonText
+  canAccess,
+  canNotAccess,
+  buttonText,
+  onClick = () => {}, // Default to an empty function if not provided
 }) => {
   return (
-    <div className="flex flex-col px-8 py-5 outline-2 outline-gray-200 w-full h-full gap-2.5 text-center rounded-2xl">
+    <div className="flex flex-col px-8 py-5 outline-2 outline-gray-200 w-full h-full gap-2.5 text-center rounded-2xl bg-white">
       <span className="text-[25px] font-sans font-bold">{title}</span>
       <div
-        className="flex w-full h-full bg-cover bg-center items-center py-4 px-10 gap-3.5 flex-col text-center justify-center text-white rounded-2xl"
+        className="flex min-w-[255px] min-h-[214px] bg-cover bg-center items-center py-4 px-10 gap-3.5 flex-col text-center justify-center text-white rounded-2xl"
         style={{ backgroundImage: `url(${imageUrl})` }}
       >
         <div className="flex flex-col gap-0.5">
@@ -38,12 +42,12 @@ const PriceCard: React.FC<PriceCardProps> = ({
       <span>Get started with..</span>
       <div className="border-b border-gray-200" />
       <div className="flex flex-col gap-3">
-        {features.map((feature, index) => (
+        {canAccess.map((feature, index) => (
           <span key={index} className="flex flex-row items-center gap-3">
             <svg
-              width="15"
-              height="13"
-              viewBox="0 0 15 13"
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
@@ -55,15 +59,36 @@ const PriceCard: React.FC<PriceCardProps> = ({
                 strokeLinejoin="round"
               />
             </svg>
-            {feature}
+            <span className="text-start text-sm gap-2">{feature}</span>
+          </span>
+        ))}
+        {(canNotAccess ?? []).map((feature, index) => (
+          <span key={index} className="flex flex-row items-center gap-3">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13 1.00005L1 13M0.999949 1L12.9999 13"
+                stroke="#F51B0D"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="text-start text-sm gap-2">{feature}</span>
           </span>
         ))}
       </div>
+     
 
       <div className="border-b border-gray-200" />
-      <a href="/sign-up">
-        <Button className="text-white px-6 py-3">{buttonText}</Button>
-      </a>
+      
+        <Button className="text-white px-6 py-3" onClick={onClick}>{buttonText}</Button>
+      
     </div>
   );
 };

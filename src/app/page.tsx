@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
 import Link from "next/link";
 
-
 export default function Home() {
   return (
     <div className="flex flex-col bg-white">
@@ -429,25 +428,25 @@ export default function Home() {
                 duration="duration-1000"
                 delay="delay-800"
               >
-                <Tabs defaultValue="kurang" className="w-[400px] h-fit">
+                <Tabs defaultValue="kurang" className="w-[400px] h-fit ">
                   <TabsList className="h-15">
                     <TabsTrigger
-                      className="text-lg h-full w-full "
+                      className="text-lg h-full w-full cursor-pointer "
                       value="kurang"
                     >
-                      For teams{" < "}50
+                      For employees{" < "}50
                     </TabsTrigger>
                     <TabsTrigger
-                      className="text-lg h-full w-full "
+                      className="text-lg h-full w-full cursor-pointer "
                       value="lebih"
                     >
-                      For teams 50+
+                      For employees 50+
                     </TabsTrigger>
                   </TabsList>
 
                   {/* price for employee < 50 */}
                   <TabsContent value="kurang">
-                    <div className="flex flex-row items-start justify-center gap-5 mt-10">
+                    <div className="flex items-start justify-center gap-5 mt-10">
                       {/* free price */}
                       <RevealOnScroll
                         animationType="slide-up"
@@ -461,15 +460,19 @@ export default function Home() {
                             currency="Try Free"
                             price="IDR.0"
                             description="Free trial for 14 days"
-                            features={[
-                              "Employee Management",
-                              "Leave Requests",
-                              "Attendance Tracking",
-                              "Payroll Integration",
-                              "Support via Chat",
-                              "Performance Reviews",
+                            canAccess={[
+                              "Access to employee page (HR)",
+                              "Do check clock for their employee (HR)",
+                            ]}
+                            canNotAccess={[
+                              "Export/Import employee data (HR)",
+                              "Add employee documents (HR)",
+                              "Overtime access (HR)",
+                              "Edit profile (Employee)",
+                              "Do check clock (Employee)",
                             ]}
                             buttonText="Claim Now"
+                             onClick={() => (window.location.href = "/sign-up")}
                             //fungsi klik button ada di komponen tabs
                           />
                         </div>
@@ -483,20 +486,24 @@ export default function Home() {
                       >
                         <div className="flex justify-center items-center h-fit">
                           <PricingCard
-                            title="Essential"
+                            title="Standart"
                             imageUrl="/images/price01.png"
                             currency="IDR"
                             price="10.000"
                             description="Intuitive, world-class support tools for growing teams"
-                            features={[
-                              "Employee Management",
-                              "Leave Requests",
-                              "Attendance Tracking",
-                              "Payroll Integration",
-                              "Support via Chat",
-                              "Performance Reviews",
+                            canAccess={[
+                              "Access to employee page (HR)",
+                              "Do check clock for their employee (HR)",
+                            ]}
+                            canNotAccess={[
+                              "Export/Import employee data (HR)",
+                              "Add employee documents (HR)",
+                              "Overtime access (HR)",
+                              "Edit profile (Employee)",
+                              "Do check clock (Employee)",
                             ]}
                             buttonText="Get Started"
+                             onClick={() => (window.location.href = "/sign-up")}
                             //fungsi klik button ada di komponen tabs
                           />
                         </div>
@@ -510,24 +517,24 @@ export default function Home() {
                       >
                         <div className="flex justify-center items-center h-fit">
                           <PricingCard
-                            title="Professional"
+                            title="Premium"
                             imageUrl="/images/price02.png"
                             currency="IDR"
                             price="15.000"
                             description="Intuitive, world-class support tools for growing teams"
-                            features={[
-                              "Employee Management",
-                              "Leave Requests",
-                              "Attendance Tracking",
-                              "Payroll Integration",
-                              "Support via Chat",
-                              "Performance Reviews",
-                              "Mobile Access",
-                              "Custom Reports",
-                              "Time Off Policies",
-                              "Multi-user Access",
+                            canAccess={[
+                              "Access to employee page (HR)",
+                              "Export/Import employee data (HR)",
+                              "Do check clock for their employee (HR)",
+                              "Add employee documents (HR)",
+                              "Edit profile (Employee)",
+                            ]}
+                            canNotAccess={[
+                              "Overtime access (HR)",
+                              "Do check clock (Employee)",
                             ]}
                             buttonText="Get Started"
+                             onClick={() => (window.location.href = "/sign-up")}
                             //fungsi klik button ada di komponen tabs
                           />
                         </div>
@@ -541,24 +548,22 @@ export default function Home() {
                       >
                         <div className="flex justify-center items-center h-fit">
                           <PricingCard
-                            title="Enterprise"
+                            title="Ultra"
                             imageUrl="/images/price03.png"
                             currency="IDR"
                             price="20.000"
                             description="Intuitive, world-class support tools for growing teams"
-                            features={[
-                              "Employee Management",
-                              "Leave Requests",
-                              "Attendance Tracking",
-                              "Payroll Integration",
-                              "Support via Chat",
-                              "Performance Reviews",
-                              "Mobile Access",
-                              "Custom Reports",
-                              "Time Off Policies",
-                              "Multi-user Access",
+                            canAccess={[
+                              "Access to employee page (HR)",
+                              "Export/Import employee data (HR)",
+                              "Do check clock for their employee (HR)",
+                              "Edit profile (Employee)",
+                              "Add employee documents (HR)",
+                              "Overtime access (HR)",
+                              "Do check clock (Employee)",
                             ]}
                             buttonText="Get Started"
+                             onClick={() => (window.location.href = "/sign-up")}
                             //fungsi klik button ada di komponen tabs
                           />
                         </div>
@@ -585,15 +590,19 @@ export default function Home() {
                             currency="Try Free"
                             price="IDR.0"
                             description="Free trial for 14 days"
-                            features={[
-                              "Employee Management",
-                              "Leave Requests",
-                              "Attendance Tracking",
-                              "Payroll Integration",
-                              "Support via Chat",
-                              "Performance Reviews",
+                            canAccess={[
+                              "Access to employee page (HR)",
+                              "Do check clock for their employee (HR)",
+                            ]}
+                            canNotAccess={[
+                              "Export/Import employee data (HR)",
+                              "Add employee documents (HR)",
+                              "Overtime access (HR)",
+                              "Edit profile (Employee)",
+                              "Do check clock (Employee)",
                             ]}
                             buttonText="Claim Now"
+                             onClick={() => (window.location.href = "/sign-up")}
                             //fungsi klik button ada di komponen tabs
                           />
                         </div>
@@ -607,24 +616,24 @@ export default function Home() {
                       >
                         <div className="flex justify-center items-center h-fit">
                           <PricingCard
-                            title="Essential"
+                            title="Standart"
                             imageUrl="/images/price01.png"
                             currency="IDR"
                             price="9.000"
                             description="Intuitive, world-class support tools for growing teams"
-                            features={[
-                              "Employee Management",
-                              "Leave Requests",
-                              "Attendance Tracking",
-                              "Payroll Integration",
-                              "Support via Chat",
-                              "Performance Reviews",
-                              "Mobile Access",
-                              "Custom Reports",
-                              "Time Off Policies",
-                              "Multi-user Access",
+                            canAccess={[
+                              "Access to employee page (HR)",
+                              "Do check clock for their employee (HR)",
+                            ]}
+                            canNotAccess={[
+                              "Export/Import employee data (HR)",
+                              "Add employee documents (HR)",
+                              "Overtime access (HR)",
+                              "Edit profile (Employee)",
+                              "Do check clock (Employee)",
                             ]}
                             buttonText="Get Started"
+                             onClick={() => (window.location.href = "/sign-up")}
                             //fungsi klik button ada di komponen tabs
                           />
                         </div>
@@ -638,24 +647,25 @@ export default function Home() {
                       >
                         <div className="flex justify-center items-center h-fit">
                           <PricingCard
-                            title="Professional"
+                            title="Premium"
                             imageUrl="/images/price02.png"
                             currency="IDR"
                             price="14.000"
                             description="Intuitive, world-class support tools for growing teams"
-                            features={[
-                              "Employee Management",
-                              "Leave Requests",
-                              "Attendance Tracking",
-                              "Payroll Integration",
-                              "Support via Chat",
-                              "Performance Reviews",
-                              "Mobile Access",
-                              "Custom Reports",
-                              "Time Off Policies",
-                              "Multi-user Access",
+                            canAccess={[
+                              "Access to employee page (HR)",
+                              "Export/Import employee data (HR)",
+                              "Do check clock for their employee (HR)",
+                              "Add employee documents (HR)",
+                              "Edit profile (Employee)",
+                            ]}
+                            canNotAccess={[
+                              "Overtime access (HR)",
+                              "Do check clock (Employee)",
                             ]}
                             buttonText="Get Started"
+                             onClick={() => (window.location.href = "/sign-up")}
+                            
                             //fungsi klik button ada di komponen tabs
                           />
                         </div>
@@ -669,24 +679,22 @@ export default function Home() {
                       >
                         <div className="flex justify-center items-center h-fit">
                           <PricingCard
-                            title="Enterprise"
+                            title="Ultra"
                             imageUrl="/images/price03.png"
                             currency="IDR"
                             price="18.000"
                             description="Intuitive, world-class support tools for growing teams"
-                            features={[
-                              "Employee Management",
-                              "Leave Requests",
-                              "Attendance Tracking",
-                              "Payroll Integration",
-                              "Support via Chat",
-                              "Performance Reviews",
-                              "Mobile Access",
-                              "Custom Reports",
-                              "Time Off Policies",
-                              "Multi-user Access",
+                            canAccess={[
+                              "Access to employee page (HR)",
+                              "Export/Import employee data (HR)",
+                              "Do check clock for their employee (HR)",
+                              "Edit profile (Employee)",
+                              "Add employee documents (HR)",
+                              "Overtime access (HR)",
+                              "Do check clock (Employee)",
                             ]}
                             buttonText="Get Started"
+                             onClick={() => (window.location.href = "/sign-up")}
                             //fungsi klik button ada di komponen tabs
                           />
                         </div>
