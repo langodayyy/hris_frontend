@@ -24,16 +24,12 @@ const EditCKsSchema = z
     clockIn: z.string().nullable().optional(),
     minClockIn: z.string().nullable().optional(),
     maxClockIn: z.string().nullable().optional(),
-    clockOut: z.string().nullable().optional(),
-    maxClockOut: z.string().nullable().optional(),
   })
   .superRefine((data, ctx) => {
     const fields = {
       clockIn: data.clockIn,
       minClockIn: data.minClockIn,
       maxClockIn: data.maxClockIn,
-      clockOut: data.clockOut,
-      maxClockOut: data.maxClockOut,
     };
 
     const hasEmpty = Object.values(fields).some((val) => val == "");
@@ -58,7 +54,7 @@ type Props = {
   onUpdate?: () => void;
 };
 
-export default function EditWfoForm({ onUpdate }: Props) {
+export default function EditWfaForm({ onUpdate }: Props) {
   const { setErrors, setSuccess, selectedRow, setIsOpen } = useEdit();
   const [isLoading, setLoading] = useState(false);
 
@@ -67,8 +63,6 @@ export default function EditWfoForm({ onUpdate }: Props) {
       clockIn: selectedRow?.clockIn ?? "",
       minClockIn: selectedRow?.minClockIn ?? "",
       maxClockIn: selectedRow?.maxClockIn ?? "",
-      clockOut: selectedRow?.clockOut ?? "",
-      maxClockOut: selectedRow?.maxClockOut ?? "",
     },
     extend: [validator({ schema: EditCKsSchema }), reporter()],
     onSubmit: async (values) => {
@@ -141,24 +135,6 @@ export default function EditWfoForm({ onUpdate }: Props) {
                 <span className="text-danger-700">{errors().maxClockIn}</span>
               )}
             </div>
-            <div>
-              <TimeInput
-                label={"Clock Out Time"}
-                name={"clockOut"}
-              />
-              {errors().clockOut && (
-                <span className="text-danger-700">{errors().clockOut}</span>
-              )}
-            </div>
-            <div>
-              <TimeInput
-                label={"Maximum Clock Out Time"}
-                name={"maxClockOut"}
-              />
-              {errors().maxClockOut && (
-                <span className="text-danger-700">{errors().maxClockOut}</span>
-              )}
-            </div>
           </div>
         </div>
         <AlertDialogFooter className="pt-6">
@@ -171,8 +147,6 @@ export default function EditWfoForm({ onUpdate }: Props) {
                 clockIn: "",
                 minClockIn: "",
                 maxClockIn: "",
-                clockOut: "",
-                maxClockOut: "",
               })
             }
           >
