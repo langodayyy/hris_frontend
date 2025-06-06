@@ -83,7 +83,7 @@ const RadiusForm = ({
               name="radius"
               type="number"
               min="1"
-              className="w-full"
+              className="w-full no-spinner"
             />
             <input type="hidden" name="data_id" value={data_id} />
             <input

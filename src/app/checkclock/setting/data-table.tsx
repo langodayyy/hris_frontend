@@ -40,6 +40,8 @@ import { Spinner } from "@/components/ui/spinner";
 import { useEdit } from "@/context/EditFormContext";
 import EditWfoForm from "@/components/custom/ck-setting-form/EditWfoForm";
 import MapboxMap from "@/components/custom/mapbox/MapboxMap";
+import EditWfaForm from "@/components/custom/ck-setting-form/EditWfaFrom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -60,7 +62,7 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
   // context edit form
   const { setSelectedRow, setIsOpen, setWorkType, isOpen } = useEdit();
 
-  const {locationRule, loading, refetch} = useCKSettingData();
+  const { locationRule, loading, refetch } = useCKSettingData();
 
   // Patch columns to override action cell
   const columnsWithAction = columns.map((col) => {
@@ -98,35 +100,7 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
   // console.log("loading fetch", loading);
   if (loading) {
     return (
-      <Card className="flex items-center p-5 gap-6 w-full">
-        <div className="flex justify-between w-full">
-          <span className="w-[187px] text-lg flex-none flex items-center">
-            Checkclock Setting
-          </span>
-          <div className="flex gap-2 w-auto items-center">
-            <Label className="w-full">Work Type</Label>
-            <div className="">
-              <Select
-                value={selectedWorkType}
-                onValueChange={(value: "WFO" | "WFA") =>
-                  setSelectedWorkType(value)
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select work type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="WFO">WFO</SelectItem>
-                  <SelectItem value="WFA">WFA</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-        <div className="w-full">
-          <Spinner></Spinner>
-        </div>
-      </Card>
+      <Skeleton className="w-full h-[550px]"></Skeleton>
     );
   }
 
@@ -158,31 +132,38 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
       </div>
 
       {selectedWorkType === "WFO" && (
-      <div className="grid grid-cols-3 gap-10 w-full">
-        <div className="flex flex-col gap-2">
-          <Label className="h-6">Latitude</Label>
-          <Input value={locationRule?.latitude} readOnly />
+        <div className="grid grid-cols-3 gap-10 w-full">
+          <div className="flex flex-col gap-2">
+            <Label className="h-6">Latitude</Label>
+            <Input value={locationRule?.latitude} readOnly />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label className="h-6">Longitude</Label>
+            <Input value={locationRule?.longitude} readOnly />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label className="h-6">Radius</Label>
+            <Input value={locationRule?.radius} readOnly />
+          </div>
         </div>
-        <div className="flex flex-col gap-2">
-          <Label className="h-6">Longitude</Label>
-          <Input value={locationRule?.longitude} readOnly />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label className="h-6">Radius</Label>
-          <Input value={locationRule?.radius} readOnly />
-        </div>
-      </div>
       )}
 
-      <div className={`gap-2 w-full ${selectedWorkType === "WFO" ? "grid grid-cols-5" : "flex"}`}>
-
+      <div
+        className={`gap-2 w-full ${
+          selectedWorkType === "WFO" ? "grid grid-cols-5" : "flex"
+        }`}
+      >
         {selectedWorkType === "WFO" && (
-        <div className="col-span-2 rounded-md h-fit">
-          <MapboxMap></MapboxMap>
-        </div>
+          <div className="col-span-2 rounded-md h-fit">
+            <MapboxMap></MapboxMap>
+          </div>
         )}
-        
-        <div className={`rounded-md border ${selectedWorkType === "WFO" ? "col-span-3" : "w-full"}`}>
+
+        <div
+          className={`rounded-md border ${
+            selectedWorkType === "WFO" ? "col-span-3" : "w-full"
+          }`}
+        >
           <Table className="h-fit">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -235,11 +216,22 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
           <AlertDialogTitle className="font-medium">
             Edit Checkclock Setting
           </AlertDialogTitle>
-          <EditWfoForm onUpdate={() => {
-            console.log("refetech triggered")
-            refetch();
-          } }></EditWfoForm>
-          
+          {selectedWorkType === "WFO" && (
+            <EditWfoForm
+              onUpdate={() => {
+                console.log("refetech triggered");
+                refetch();
+              }}
+            ></EditWfoForm>
+          )}
+          {selectedWorkType === "WFA" && (
+            <EditWfaForm
+              onUpdate={() => {
+                console.log("refetech triggered");
+                refetch();
+              }}
+            ></EditWfaForm>
+          )}
         </AlertDialogContent>
       </AlertDialog>
     </Card>
