@@ -11,6 +11,8 @@ type EditContextProps = {
   setWorkType: (type: "WFO" | "WFA") => void;
   errors: Record<string, string[]>;
   setErrors: (errors: Record<string, string[]>) => void;
+  success: Record<string, string[]>;
+  setSuccess: (errors: Record<string, string[]>) => void;
 };
 
 const EditContext = createContext<EditContextProps | undefined>(undefined);
@@ -20,6 +22,7 @@ export function EditProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [workType, setWorkType] = useState<"WFO" | "WFA">("WFO");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [success, setSuccess] = useState<Record<string, string[]>>({});
 
   return (
     <EditContext.Provider 
@@ -31,7 +34,9 @@ export function EditProvider({ children }: { children: React.ReactNode }) {
         workType,
         setWorkType,
         errors, 
-        setErrors 
+        setErrors,
+        success,
+        setSuccess 
       }}
     >
       {children}

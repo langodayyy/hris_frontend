@@ -1,17 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "@/components/sidebar";
 import { DataTable } from "./data-table";
 import { checkclockSetting, wfoColumns, wfaColumns } from "./column";
 import { useCKSettingData } from "@/hooks/useCKSettingData";
 import { transformCKData } from "@/utils/transfromCkSData";
+import { Toaster, toast } from "sonner";
+import { useEdit } from "@/context/EditFormContext";
 
 export default function CheckclockSettingPage() {
-  const { ckData, loading, refetch } = useCKSettingData();
+  const { ckData, locationRule } = useCKSettingData();
   const [selectedWorkType, setSelectedWorkType] = useState<"WFO" | "WFA">(
     "WFO"
   );
+
+  const { errors, setErrors, success, setSuccess } = useEdit();
+
+  useEffect(() => {
+  if (errors && Object.keys(errors).length > 0) {
+    Object.entries(errors).forEach(([messages]) => {
+      if (Array.isArray(messages)) {
+        messages.forEach((message) => toast.error(`${message}`));
+        console.log(`${messages}`);
+      } else {
+        // toast.error(`${messages}`);
+      }
+    });
+    setErrors({});
+  }
+  }, [errors]);
+
+  useEffect(() => {
+    if (success && Object.keys(success).length > 0) {
+      toast.success(`${success.message}`);
+      setSuccess({}); 
+    }
+  }, [success]); 
 
   const { wfo, wfa } = transformCKData(Array.isArray(ckData) ? ckData : []);
 
@@ -19,6 +44,7 @@ export default function CheckclockSettingPage() {
 
   return (
     <Sidebar title={"Checkclock"}>
+      <Toaster position="bottom-right" expand={true}></Toaster>
       <DataTable
         columns={selectedWorkType === "WFO" ? wfoColumns : wfaColumns}
         data={filteredData}
