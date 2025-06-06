@@ -5,6 +5,7 @@ import "./globals.css";
 
 import { FormProvider } from "@/context/FormContext";
 import { EditProvider } from "@/context/EditFormContext";
+import React from "react";
 // import { GoogleOAuthProvider } from "@react-oauth/google";
 // import { AuthProvider } from "@/context/AuthContext";
 // import AuthGate from "@/components/custom/authGate";
@@ -60,11 +61,13 @@ export default function RootLayout({
       >
         {/* <AuthProvider> */}
         {/* <AuthGate> */}
+        <React.StrictMode>
         <FormProvider>
           <EditProvider>
             {children}
           </EditProvider>
         </FormProvider>
+        </React.StrictMode>
         {/* </AuthGate> */}
         {/* </AuthProvider> */}
 

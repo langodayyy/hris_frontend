@@ -1,54 +1,45 @@
+"use client";
+import useSWR from 'swr';
 import { useEffect, useState, useCallback } from "react";
 import Cookies from "js-cookie";
 import { CheckclockSetting } from "@/types/cksetting";
 import { redirect } from "next/navigation";
 
+export type LocationRule = {
+  data_id: number;
+  latitude: string;
+  longitude: string;
+  radius: string;
+};
+
+const fetcher = (url: string) => fetch(url, {
+  headers: {
+    Authorization: `Bearer ${Cookies.get("token")}`,
+    "Content-Type": "application/json",
+  }
+}).then(res => res.json());
+
 export function useCKSettingData() {
-  const [ckData, setCkData] = useState<CheckclockSetting | null>(null);
-  const [loading, setLoadingCKS] = useState(true);
+  const { data, error, isLoading, mutate } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/check-clock-setting-times`,
+    fetcher
+  );
 
-  const fetchCkSetting = useCallback(async () => {
-    try {
-      const userCookie = Cookies.get("token");
-      if (!userCookie) {
-        redirect("/sign-in");
-        return;
+  const ckData = data?.ckdata ?? null;
+  const locationRule = data?.location_rule?.[0]
+    ? {
+        data_id: data.location_rule[0].data_id || 0,
+        latitude: data.location_rule[0].latitude || "0",
+        longitude: data.location_rule[0].longitude || "0",
+        radius: data.location_rule[0].radius || "0",
       }
+    : null;
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/check-clock-setting-times`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userCookie}`,
-          },
-        }
-      );
-      const json = await res.json();
-      setCkData(json);
-      setLoadingCKS(false);
-    } catch (error) {
-      console.error("Error initializing get cks data:", error);
-      setLoadingCKS(false); // Make sure to set loading to false even on error
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchCkSetting();
-  }, [fetchCkSetting]);
-
-  // Add effect to watch loading state changes
-  useEffect(() => {
-    if (loading) {
-      fetchCkSetting();
-    }
-  }, [loading, fetchCkSetting]);
-
-  return { 
-    ckData, 
-    loading, 
-    setLoadingCKS,
-    refetch: fetchCkSetting // Expose refetch function
+  return {
+    ckData,
+    locationRule,
+    loading: isLoading,
+    error,
+    refetch: mutate,
   };
 }

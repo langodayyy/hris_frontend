@@ -1,3 +1,4 @@
+import { CheckclockSettingForm } from "@/types/cksettingForm";
 import { data } from "react-router-dom";
 
 type ApiResponse = {
@@ -5,25 +6,15 @@ type ApiResponse = {
   worktype: string;
   worktype_id: number;
   day: string;
+  min_clock_in: string;
   clock_in: string;
+  max_clock_in: string;
   clock_out: string;
+  max_clock_out: string;
   latitude: string | null;
   longitude: string | null;
   radius: string | null;
   created_at: string;
-};
-
-export type CheckclockSetting = {
-  id: string;
-  data_id: number;
-  workType: "WFO" | "WFA";
-  worktype_id: number;
-  clockIn: string;
-  clockOut: string;
-  day: string;
-  latidude?: number;
-  longitude?: number;
-  radius?: number;
 };
 
 const days = [
@@ -41,12 +32,15 @@ export function transformCKData(apiData: ApiResponse[]) {
     id: (index + 1).toString(),
     data_id: 0,
     worktype_id: 0,
+    minClockIn: "",
     clockIn: "",
+    maxClockIn: "",
     clockOut: "",
+    maxClockOut: "",
     day: day.charAt(0).toUpperCase() + day.slice(1),
   }));
 
-  const wfo: CheckclockSetting[] = defaultSettings.map((setting) => ({
+  const wfo: CheckclockSettingForm[] = defaultSettings.map((setting) => ({
     ...setting,
     workType: "WFO",
     latidude: undefined,
@@ -54,7 +48,7 @@ export function transformCKData(apiData: ApiResponse[]) {
     radius: undefined,
   }));
 
-  const wfa: CheckclockSetting[] = defaultSettings.map((setting) => ({
+  const wfa: CheckclockSettingForm[] = defaultSettings.map((setting) => ({
     ...setting,
     workType: "WFA",
   }));
@@ -69,8 +63,11 @@ export function transformCKData(apiData: ApiResponse[]) {
       data_id: item.data_id,
       workType: item.worktype as "WFO" | "WFA",
       worktype_id: item.worktype_id,
-      clockIn: item.clock_in.slice(0, 5),
-      clockOut: item.clock_out.slice(0, 5),
+      minClockIn: item.min_clock_in ? item.min_clock_in.slice(0, 5) : "--:--",
+      clockIn: item.clock_in ? item.clock_in.slice(0, 5) : "--:--",
+      maxClockIn: item.max_clock_in ? item.max_clock_in.slice(0, 5) : "--:--",
+      clockOut: item.clock_out ? item.clock_out.slice(0, 5) : "--:--",
+      maxClockOut: item.max_clock_out ? item.max_clock_out.slice(0, 5) : "--:--",
       day: item.day.charAt(0).toUpperCase() + item.day.slice(1),
       ...(item.worktype === "WFO" && {
         latidude: item.latitude ? parseFloat(item.latitude) : undefined,

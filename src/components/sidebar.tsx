@@ -417,8 +417,9 @@ export default function Sidebar({ children, title }: LayoutProps) {
           <Navbar
             title={title}
             userName="Silfi Nazarina"
-            subsPlan="Free"
-            activePeriod="28 May, 2025"
+            plan="Free"
+            period="28 May, 2025"
+            deadline="28 May, 2025"
           />
           <main className="p-[30px] ">{children}</main>
         </div>

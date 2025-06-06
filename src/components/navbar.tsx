@@ -18,11 +18,13 @@ interface NavbarProps {
   title: string; 
   avatarImage?: string;
   userName: string;
-  subsPlan: string;
-  activePeriod: string;
+  plan: string;
+  period: string;
+  deadline: string;
+  
 }
 
-export default function Navbar({ title, avatarImage, userName, subsPlan, activePeriod }: NavbarProps) {
+export default function Navbar({ title, avatarImage, userName, plan, period, deadline }: NavbarProps) {
   
   // Fungsi untuk mengambil inisial dari nama pengguna
   const getInitials = (name: string) => {
@@ -255,7 +257,9 @@ export default function Navbar({ title, avatarImage, userName, subsPlan, activeP
                 </div>
                 <div className="flex flex-col h-auto w-auto">
                   <span className="text-base font-medium text-neutral-950">
-                    {userName}
+                    {userName.length > 20
+                    ? `${userName.slice(0, 20)}...`
+                    : userName}
                   </span>
                   <span className="text-sm text-start ext-neutral-500">Roles User</span>
                 </div>
@@ -272,27 +276,33 @@ export default function Navbar({ title, avatarImage, userName, subsPlan, activeP
                     )}
                   </div>
                   <div className="flex flex-col items-center">
-                      <span className="text-base font-medium text-neutral-900">
+                      <span className="text-base font-medium text-neutral-900 text-center">
                         Hello, {userName}
                       </span>
                       <span className="text-sm text-neutral-500">Roles User</span>
                   </div>
-                  <div className="flex flex-col">
+                  <div className="flex flex-col justify-start items-start w-full gap-1">
                     <div className="flex flex-row">
                       <span className="font-medium text-neutral-900">Plan:&nbsp;</span>{" "}
-                      <span className="text-neutral-500"> {subsPlan}</span>
+                      <span className="text-neutral-500"> {plan}</span>
                     </div>
                     <div className="flex flex-row w-auto">
                       <span className="font-medium text-neutral-900">Active Until:&nbsp;</span>
-                      <span className="text-neutral-500"> {activePeriod}</span>
+                      <span className="text-neutral-500"> {period}</span>
                     </div>
-                    <Button className="mt-2">Upgrade</Button>
+                    <div className="flex flex-row w-auto">
+                      <span className="font-extrabold text-danger-600">Pay Bill Before:&nbsp;</span>
+                      <span className="text-danger-600 font-extralight"> {deadline}</span>
+                    </div>
+                    <Button className="mt-2">Pay Bill</Button>
                   </div>
                 </div>  
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem >Edit Profile</DropdownMenuItem>
-                <DropdownMenuItem>Subscription</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => (window.location.href = "/profile")}
+              className="cursor-pointer">Profile</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => (window.location.href = "/plan")}
+              className="cursor-pointer">Change Plan</DropdownMenuItem>
                 <DropdownMenuItem>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
