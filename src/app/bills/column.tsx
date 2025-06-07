@@ -12,6 +12,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { BillDetailRow } from "@/components/ui/bill-detail-row";
+import { ApprovalStatusBadge } from "@/components/ui/approval";
+import { BillStatusBadge } from "./BillStatusBadge";
 import { CheckclockSettingForm } from "@/types/cksettingForm";
 import { ColumnDef } from "@tanstack/react-table";
 import React from "react";
@@ -103,7 +106,7 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
     header: ({ column }) => <div className="text-center">Amount</div>,
     cell: ({ row }) => {
       const amount = row.getValue("amount");
-      const formatted = amount ? Number(amount).toLocaleString("id-ID") : "";
+      const formatted = amount ? Number(amount).toLocaleString("en-US") : "";
       return <div className="text-center">IDR {formatted}</div>;
     },
   },
@@ -118,7 +121,7 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
       if (typeof deadline === "string" && /^\d{4}-\d{2}-\d{2}/.test(deadline)) {
         const [year, month, day] = deadline.split("-");
         const date = new Date(Number(year), Number(month) - 1, Number(day));
-        formatted = date.toLocaleDateString("id-ID", {
+        formatted = date.toLocaleDateString("en-US", {
           day: "numeric",
           month: "long",
           year: "numeric",
@@ -140,7 +143,7 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
       if (typeof deadline === "string" && /^\d{4}-\d{2}-\d{2}/.test(deadline)) {
         const [year, month, day] = deadline.split("-");
         const date = new Date(Number(year), Number(month) - 1, Number(day));
-        formatted = date.toLocaleDateString("id-ID", {
+        formatted = date.toLocaleDateString("en-US", {
           day: "numeric",
           month: "long",
           year: "numeric",
@@ -214,15 +217,99 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
           </SheetTrigger>
           <SheetContent className="bg-white">
             <SheetHeader>
-              <SheetTitle>Pay the bill</SheetTitle>
+              <SheetTitle className="text-xl">Pay the bill</SheetTitle>
             </SheetHeader>
-            <SheetDescription className="mt-1">
-              Make changes to your profile here. Click save when you're done.
-            </SheetDescription>
-            <div className="flex w-full flex-col">
-              <div className="flex w-full justify-between px-4">
-                <span>hhjash</span>
-              </div>
+            <div className="px-5 flex flex-col gap-2">
+              <div className="font-semibold ">Bill Details</div>
+              <BillDetailRow
+                label="Payment ID"
+                value={row.getValue("payment_id")}
+              />
+      <BillDetailRow
+        label="Period"
+        value={(() => {
+          const period = row.getValue("period");
+          let formatted = "";
+          if (typeof period === "string") {
+            const parts = period.split("-");
+            let year = "";
+            let month = "";
+            if (parts.length >= 2) {
+              if (parts[0].length === 4) {
+                // Format: YYYY-MM
+                year = parts[0];
+                month = parts[1];
+              } else if (parts[1].length === 4) {
+                // Format: MM-YYYY
+                year = parts[1];
+                month = parts[0];
+              }
+              if (year && month) {
+                const date = new Date(Number(year), Number(month) - 1);
+                formatted = date.toLocaleString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                });
+              } else {
+                formatted = period;
+              }
+            } else {
+              formatted = period;
+            }
+          }
+          return formatted;
+        })()}
+      />
+              <BillDetailRow
+                label="Total Employee"
+                value={row.getValue("total_employee")}
+              />
+              <BillDetailRow
+                label="Amount"
+                value={`IDR ${Number(row.getValue("amount")).toLocaleString(
+                  "en-US"
+                )}`}
+              />
+      <BillDetailRow
+        label="Pay Before"
+        value={(() => {
+          const deadline = row.getValue("deadline");
+          let formatted = "";
+          if (
+            typeof deadline === "string" &&
+            /^\d{4}-\d{2}-\d{2}/.test(deadline)
+          ) {
+            const [year, month, day] = deadline.split("-");
+            const date = new Date(
+              Number(year),
+              Number(month) - 1,
+              Number(day)
+            );
+            formatted = date.toLocaleDateString("en-US", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            });
+          } else {
+            formatted = typeof deadline === "string" ? deadline : "";
+          }
+          return formatted;
+        })()}
+      />
+              <BillDetailRow
+                label="Status"
+                value={
+                  <BillStatusBadge
+                    status={
+                      row.getValue("status") === "paid"
+                        ? "paid"
+                        : row.getValue("status") === "pending"
+                        ? "pending"
+                        : "overdue"
+                    }
+                  />
+                }
+              />
             </div>
             <SheetFooter>
               <SheetClose asChild>
