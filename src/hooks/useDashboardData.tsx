@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { DashboardResponse } from "@/types/dashboard";
+import Cookies from "js-cookie";
+import { redirect } from "next/navigation";
 
 export function useDashboardData() {
   const [dashboardData, setDashboardData] = useState<DashboardResponse|null>(null);
@@ -8,7 +10,19 @@ export function useDashboardData() {
   useEffect(() => {
     async function fetchDashboard() {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboardnologin`);
+            const userCookie = Cookies.get("token");
+            if (!userCookie) {
+              redirect("/sign-in");
+              return;
+            }
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${userCookie}`,
+                },
+              }
+            );
             const json = await res.json();
             console.log(json);
             setDashboardData(json);
