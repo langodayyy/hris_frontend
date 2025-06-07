@@ -25,6 +25,7 @@ import { EmployeeResponse } from "@/types/employee";
 import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import Cookies from "js-cookie";
+import { toast } from "sonner";
 
 type Props = {
     employeeData?: EmployeeResponse;
@@ -73,12 +74,48 @@ const PersonalInformation = ({ employeeData, onUpdate }: Props) => {
             const responseData = await response.json();
             console.log("Response:", responseData);
 
-            if (!response.ok) throw new Error("Gagal submit");
-
+            if (!response.ok) {
+                throw responseData; 
+            }
+            toast.success('Data edited successfully')
+        
             setSuccess(true);
+            handleOkClick()
         } catch (err) {
-            console.error("Submit error:", err);
             setError(true);
+            let message = "Unknown error occurred";
+            let messagesToShow: string[] = [];
+
+            if (
+            err &&
+            typeof err === "object" &&
+            "message" in err &&
+            typeof (err as any).message === "string"
+            ) {
+            const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+            if (backendError.message.toLowerCase().includes("failed to fetch")) {
+                message = "Unknown error occurred";
+            } else {
+                message = backendError.message;
+            }
+
+            messagesToShow = backendError.errors
+                ? Object.values(backendError.errors).flat()
+                : [message];
+            } else {
+            messagesToShow = [message]
+            }
+
+            toast.error(
+            <>
+                <span className="text-red-700 font-bold">Error</span>
+                {messagesToShow.map((msg, idx) => (
+                <div key={idx} className="text-red-700">• {msg}</div>
+                ))}
+            </>,
+            { duration: 30000 }
+            );
         } finally {
             setLoading(false);
         }
@@ -203,10 +240,14 @@ const PersonalInformation = ({ employeeData, onUpdate }: Props) => {
                                                         <SelectItem value="SD">SD</SelectItem>
                                                         <SelectItem value="SMP">SMP</SelectItem>
                                                         <SelectItem value="SMA">SMA</SelectItem>
+                                                        <SelectItem value="D1">D1</SelectItem>
+                                                        <SelectItem value="D2">D2</SelectItem>
                                                         <SelectItem value="D3">D3</SelectItem>
+                                                        <SelectItem value="D4">D4</SelectItem>
                                                         <SelectItem value="S1">S1</SelectItem>
                                                         <SelectItem value="S2">S2</SelectItem>
                                                         <SelectItem value="S3">S3</SelectItem>
+                                                        <SelectItem value="Other">Other</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                                 <input type="hidden" name="education" value={education} />
@@ -252,7 +293,7 @@ const PersonalInformation = ({ employeeData, onUpdate }: Props) => {
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                     <SelectItem value="Islam">Islam</SelectItem>
-                                                    <SelectItem value="Protestant">Christian Protestant</SelectItem>
+                                                    <SelectItem value="Christian">Christian</SelectItem>
                                                     <SelectItem value="Catholic">Catholic</SelectItem>
                                                     <SelectItem value="Hindu">Hindu</SelectItem>
                                                     <SelectItem value="Buddha">Buddha</SelectItem>
@@ -309,40 +350,7 @@ const PersonalInformation = ({ employeeData, onUpdate }: Props) => {
                                                 <Spinner size="small" />
                                             )}
                                             </Button>
-                                            <Dialog
-                                            open={success || error}
-                                            onOpenChange={(open) => {
-                                                if (!open) {
-                                                setSuccess(false);
-                                                setError(false);
-                                                handleOkClick();
-                                                }
-                                            }}
-                                            >
-                                            <DialogContent className="bg-white max-w-sm mx-auto">
-                                                <DialogHeader>
-                                                <DialogTitle>{success ? "Success!" : "Error"}</DialogTitle>
-                                                </DialogHeader>
-                                                <div className="mt-2">
-                                                {success && <p className="text-green-700">Successfully!</p>}
-                                                {error && <p className="text-red-600">There was an error submitting the form.</p>}
-                                                </div>
-                                                <DialogFooter className="mt-4 flex gap-2 justify-end">
-                                                {success && (
-                                                    <div className="flex gap-2 justify-end w-full">
-                                                    <DialogClose asChild>
-                                                        <Button onClick={handleOkClick} variant="default" className="max-w-[180px] whitespace-nowrap">Ok</Button>
-                                                    </DialogClose>
-                                                    </div>
-                                                )}
-                                                {error && (
-                                                    <DialogClose asChild>
-                                                        <Button onClick={handleOkClick} variant="default" className="max-w-[180px] whitespace-nowrap">OK</Button>
-                                                    </DialogClose>
-                                                )}
-                                                </DialogFooter>
-                                            </DialogContent>
-                                            </Dialog>
+                                          
                                         </div>
                                     </div>
                                 </form>

@@ -71,9 +71,6 @@ importers:
       '@turf/turf':
         specifier: ^7.2.0
         version: 7.2.0
-      '@turf/turf':
-        specifier: ^7.2.0
-        version: 7.2.0
       '@types/file-saver':
         specifier: ^2.0.7
         version: 2.0.7

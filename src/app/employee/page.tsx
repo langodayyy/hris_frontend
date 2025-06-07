@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import React, { useRef, useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import Cookies from "js-cookie";
+import { Toaster, toast } from "sonner";
 
 export default function Employee() {
   const [employees, setEmployees] = useState<Employees[]>([])
@@ -25,14 +26,47 @@ export default function Employee() {
           }
         })
 
-        if (!res.ok) throw new Error("Failed to fetch employees")
-
         const data = await res.json()
+        if (!res.ok) {
+          throw data; 
+        }
         setEmployees(data.employees)
         setSummary(data.summary)
         setPeriode(data.periode)
-      } catch (error) {
-        console.error("Error fetching data:", error)
+      } catch (err) {
+        let message = "Unknown error occurred";
+        let messagesToShow: string[] = [];
+
+        if (
+        err &&
+        typeof err === "object" &&
+        "message" in err &&
+        typeof (err as any).message === "string"
+        ) {
+        const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+        if (backendError.message.toLowerCase().includes("failed to fetch")) {
+            message = "Unknown error occurred";
+        } else {
+            message = backendError.message;
+        }
+
+        messagesToShow = backendError.errors
+            ? Object.values(backendError.errors).flat()
+            : [message];
+        } else {
+        messagesToShow = [message]
+        }
+
+        toast.error(
+            <>
+                <p className="text-red-700 font-bold">Error</p>
+                {messagesToShow.map((msg, idx) => (
+                <div key={idx} className="text-red-700">• {msg}</div>
+                ))}
+            </>,
+            { duration: 30000 }
+        );
       } finally {
         setIsLoading(false);
       }
@@ -40,8 +74,23 @@ export default function Employee() {
 
     fetchData()
   }, [])
+
+  useEffect(() => {
+    const msgdelete = sessionStorage.getItem("toastdeleteemployee");
+    if (msgdelete) {
+        toast.success(msgdelete);
+        sessionStorage.removeItem("toastdeleteemployee");
+    }
+    const msgimport = sessionStorage.getItem("toastimportemployee");
+    if (msgimport) {
+        toast.success(msgimport);
+        sessionStorage.removeItem("toastimportemployee");
+    }
+  }, []);
+
   return (
     <Sidebar title="Employee Database">
+      <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
       <div className="w-full">
         <div className="flex flex-wrap justify-center gap-[30px] min-h-[141px] w-full mx-auto">
           <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
