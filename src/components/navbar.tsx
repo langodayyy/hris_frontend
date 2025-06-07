@@ -62,7 +62,7 @@ export default function Navbar({ title, avatarImage, userName, plan, period, dea
       </div>
 
     {/* notification */}
-      <div className="flex flex-row gap-[24px] w-auto h-auto justify-end">
+      <div className="flex flex-row gap-[24px] max-w-[450px] min-w-[300px] h-auto justify-end ">
         <DropdownMenu>
         <DropdownMenuTrigger>
         <div className="relative flex items-center">

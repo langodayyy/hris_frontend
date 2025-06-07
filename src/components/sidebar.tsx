@@ -12,6 +12,7 @@ type NavItemProps = {
   text?: string;
   isOpen?: boolean;
   submenu?: { label: string; href: string }[];
+  className?: string;
 };
 
 type LayoutProps = {
@@ -26,6 +27,7 @@ function NavItem({
   text,
   isOpen,
   submenu,
+  className = "",
 }: NavItemProps) {
   const pathname = usePathname(); // Ensure this hook is always called at the top level
 
@@ -56,8 +58,8 @@ function NavItem({
                   : "bg-white text-neutral-900 hover:bg-primary-950 hover:text-white"
               }`}
             >
-              <div className="flex items-center gap-2">
-                <span className="text-base font-medium">{svgIcon}</span>
+              <div className="flex items-center gap-4">
+                <span className="text-base font-medium p-0 m-0">{svgIcon}</span>
                 {isOpen && text && (
                   <span className="text-base font-medium">{text}</span>
                 )}
@@ -97,8 +99,8 @@ function NavItem({
                   : "bg-white text-neutral-900 hover:bg-primary-950 hover:text-white"
               }`}
             >
-              <div className="flex items-center gap-2">
-                <span className="text-base font-medium">{svgIcon}</span>
+              <div className={`flex items-center gap-4 ${className}`}>
+                <span className="text-base font-medium p-0 m-0">{svgIcon}</span>
                 {isOpen && text && (
                   <span className="text-base font-medium">{text}</span>
                 )}
@@ -372,7 +374,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
               url="/overtime/management"
               isOpen={isOpen}
               isSelected={pathname.startsWith("/overtime")}
-              text="Overtime"
+              text=" Overtime"
               submenu={[
                 { label: "Management", href: "/overtime/management" },
                 { label: "Setting", href: "/overtime/setting" },
@@ -400,6 +402,84 @@ export default function Sidebar({ children, title }: LayoutProps) {
                       <rect width="16" height="16" fill="white" />
                     </clipPath>
                   </defs>
+                </svg>
+              }
+            />
+            <NavItem
+              url="/bills"
+              isSelected={pathname.startsWith("/bills")}
+              text="Bills"
+              isOpen={isOpen}
+              svgIcon={
+                <svg
+                  width="16"
+                  height="20"
+                  viewBox="0 0 16 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M10 1V5C10 5.26522 10.1054 5.51957 10.2929 5.70711C10.4804 5.89464 10.7348 6 11 6H15"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M13 19H3C2.46957 19 1.96086 18.7893 1.58579 18.4142C1.21071 18.0391 1 17.5304 1 17V3C1 2.46957 1.21071 1.96086 1.58579 1.58579C1.96086 1.21071 2.46957 1 3 1H10L15 6V17C15 17.5304 14.7893 18.0391 14.4142 18.4142C14.0391 18.7893 13.5304 19 13 19Z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M10 9H7.5C7.10218 9 6.72064 9.15804 6.43934 9.43934C6.15804 9.72064 6 10.1022 6 10.5C6 10.8978 6.15804 11.2794 6.43934 11.5607C6.72064 11.842 7.10218 12 7.5 12H8.5C8.89782 12 9.27936 12.158 9.56066 12.4393C9.84196 12.7206 10 13.1022 10 13.5C10 13.8978 9.84196 14.2794 9.56066 14.5607C9.27936 14.842 8.89782 15 8.5 15H6"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M8 15V16M8 8V9"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              }
+            />
+            <NavItem
+              url="/settings/profile"
+              isOpen={isOpen}
+              isSelected={pathname.startsWith("/settings")}
+              text="Settings"
+              submenu={[
+                { label: "Profile", href: "/settings/profile" },
+                { label: "Change Plan", href: "/settings/plan" },
+              ]}
+              svgIcon={
+                <svg
+                  width="20"
+                  height="21"
+                  viewBox="0 0 20 21"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8.325 2.6422C8.751 0.886195 11.249 0.886195 11.675 2.6422C11.7389 2.90599 11.8642 3.15097 12.0407 3.35719C12.2172 3.56342 12.4399 3.72505 12.6907 3.82894C12.9414 3.93283 13.2132 3.97605 13.4838 3.95506C13.7544 3.93408 14.0162 3.8495 14.248 3.7082C15.791 2.7682 17.558 4.5342 16.618 6.0782C16.4769 6.30985 16.3924 6.57153 16.3715 6.84197C16.3506 7.1124 16.3938 7.38396 16.4975 7.63457C16.6013 7.88519 16.7627 8.10777 16.9687 8.28425C17.1747 8.46072 17.4194 8.5861 17.683 8.6502C19.439 9.0762 19.439 11.5742 17.683 12.0002C17.4192 12.0641 17.1742 12.1894 16.968 12.3659C16.7618 12.5424 16.6001 12.7651 16.4963 13.0158C16.3924 13.2666 16.3491 13.5384 16.3701 13.809C16.3911 14.0796 16.4757 14.3414 16.617 14.5732C17.557 16.1162 15.791 17.8832 14.247 16.9432C14.0153 16.8021 13.7537 16.7176 13.4832 16.6967C13.2128 16.6758 12.9412 16.719 12.6906 16.8227C12.44 16.9265 12.2174 17.0879 12.0409 17.2939C11.8645 17.4999 11.7391 17.7446 11.675 18.0082C11.249 19.7642 8.751 19.7642 8.325 18.0082C8.26108 17.7444 8.13578 17.4994 7.95929 17.2932C7.7828 17.087 7.56011 16.9253 7.30935 16.8214C7.05859 16.7176 6.78683 16.6743 6.51621 16.6953C6.24559 16.7163 5.98375 16.8009 5.752 16.9422C4.209 17.8822 2.442 16.1162 3.382 14.5722C3.5231 14.3405 3.60755 14.0789 3.62848 13.8084C3.64942 13.538 3.60624 13.2664 3.50247 13.0158C3.3987 12.7652 3.23726 12.5426 3.03127 12.3661C2.82529 12.1897 2.58056 12.0643 2.317 12.0002C0.561 11.5742 0.561 9.0762 2.317 8.6502C2.5808 8.58628 2.82578 8.46097 3.032 8.28448C3.23822 8.108 3.39985 7.88531 3.50375 7.63454C3.60764 7.38378 3.65085 7.11203 3.62987 6.84141C3.60889 6.57079 3.5243 6.30895 3.383 6.0772C2.443 4.5342 4.209 2.7672 5.753 3.7072C6.753 4.3152 8.049 3.7772 8.325 2.6422Z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M7 10.3252C7 11.1208 7.31607 11.8839 7.87868 12.4465C8.44129 13.0091 9.20435 13.3252 10 13.3252C10.7956 13.3252 11.5587 13.0091 12.1213 12.4465C12.6839 11.8839 13 11.1208 13 10.3252C13 9.52955 12.6839 8.76648 12.1213 8.20387C11.5587 7.64127 10.7956 7.3252 10 7.3252C9.20435 7.3252 8.44129 7.64127 7.87868 8.20387C7.31607 8.76648 7 9.52955 7 10.3252Z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               }
             />
