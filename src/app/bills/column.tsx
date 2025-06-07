@@ -18,7 +18,18 @@ import { BillStatusBadge } from "./BillStatusBadge";
 import { CheckclockSettingForm } from "@/types/cksettingForm";
 import { ColumnDef } from "@tanstack/react-table";
 import React from "react";
-import { Label } from "recharts";
+import Cookies from "js-cookie";
+import { useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
+
+const fetcher = (url: string) =>
+  fetch(url, {
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+  }).then((res) => res.json());
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -208,6 +219,41 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
       return <div className="text-center">Detail</div>;
     },
     cell: ({ row }) => {
+      const [isLoading, setLoading] = React.useState(false);
+      const handleRedirect = async (paymentId: string) => {
+        const storageKey = `invoice_url_${paymentId}`;
+        const storageExpKey = `invoice_url_exp_${paymentId}`;
+        const now = Date.now();
+        const exp = localStorage.getItem(storageExpKey);
+        const url = localStorage.getItem(storageKey);
+        setLoading(true);
+        if (url && exp && now < Number(exp)) {
+          // Use cached invoice_url
+          window.open(url, "_blank", "noopener,noreferrer");
+          setLoading(false);
+          return;
+        }
+        try {
+          const data = await fetcher(
+            `${process.env.NEXT_PUBLIC_API_URL}/payment/`
+          );
+          if (data.invoice_url) {
+            localStorage.setItem(storageKey, data.invoice_url);
+            localStorage.setItem(
+              storageExpKey,
+              (now + 24 * 60 * 60 * 1000).toString()
+            );
+            window.open(data.invoice_url, "_blank", "noopener,noreferrer");
+          } else {
+            console.error("No invoice_url found in response");
+          }
+        } catch (error) {
+          console.error("Failed to get redirect link:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
       return (
         <Sheet>
           <SheetTrigger asChild>
@@ -225,41 +271,41 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
                 label="Payment ID"
                 value={row.getValue("payment_id")}
               />
-      <BillDetailRow
-        label="Period"
-        value={(() => {
-          const period = row.getValue("period");
-          let formatted = "";
-          if (typeof period === "string") {
-            const parts = period.split("-");
-            let year = "";
-            let month = "";
-            if (parts.length >= 2) {
-              if (parts[0].length === 4) {
-                // Format: YYYY-MM
-                year = parts[0];
-                month = parts[1];
-              } else if (parts[1].length === 4) {
-                // Format: MM-YYYY
-                year = parts[1];
-                month = parts[0];
-              }
-              if (year && month) {
-                const date = new Date(Number(year), Number(month) - 1);
-                formatted = date.toLocaleString("en-US", {
-                  month: "long",
-                  year: "numeric",
-                });
-              } else {
-                formatted = period;
-              }
-            } else {
-              formatted = period;
-            }
-          }
-          return formatted;
-        })()}
-      />
+              <BillDetailRow
+                label="Period"
+                value={(() => {
+                  const period = row.getValue("period");
+                  let formatted = "";
+                  if (typeof period === "string") {
+                    const parts = period.split("-");
+                    let year = "";
+                    let month = "";
+                    if (parts.length >= 2) {
+                      if (parts[0].length === 4) {
+                        // Format: YYYY-MM
+                        year = parts[0];
+                        month = parts[1];
+                      } else if (parts[1].length === 4) {
+                        // Format: MM-YYYY
+                        year = parts[1];
+                        month = parts[0];
+                      }
+                      if (year && month) {
+                        const date = new Date(Number(year), Number(month) - 1);
+                        formatted = date.toLocaleString("en-US", {
+                          month: "long",
+                          year: "numeric",
+                        });
+                      } else {
+                        formatted = period;
+                      }
+                    } else {
+                      formatted = period;
+                    }
+                  }
+                  return formatted;
+                })()}
+              />
               <BillDetailRow
                 label="Total Employee"
                 value={row.getValue("total_employee")}
@@ -270,32 +316,32 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
                   "en-US"
                 )}`}
               />
-      <BillDetailRow
-        label="Pay Before"
-        value={(() => {
-          const deadline = row.getValue("deadline");
-          let formatted = "";
-          if (
-            typeof deadline === "string" &&
-            /^\d{4}-\d{2}-\d{2}/.test(deadline)
-          ) {
-            const [year, month, day] = deadline.split("-");
-            const date = new Date(
-              Number(year),
-              Number(month) - 1,
-              Number(day)
-            );
-            formatted = date.toLocaleDateString("en-US", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            });
-          } else {
-            formatted = typeof deadline === "string" ? deadline : "";
-          }
-          return formatted;
-        })()}
-      />
+              <BillDetailRow
+                label="Pay Before"
+                value={(() => {
+                  const deadline = row.getValue("deadline");
+                  let formatted = "";
+                  if (
+                    typeof deadline === "string" &&
+                    /^\d{4}-\d{2}-\d{2}/.test(deadline)
+                  ) {
+                    const [year, month, day] = deadline.split("-");
+                    const date = new Date(
+                      Number(year),
+                      Number(month) - 1,
+                      Number(day)
+                    );
+                    formatted = date.toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    });
+                  } else {
+                    formatted = typeof deadline === "string" ? deadline : "";
+                  }
+                  return formatted;
+                })()}
+              />
               <BillDetailRow
                 label="Status"
                 value={
@@ -311,9 +357,21 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
                 }
               />
             </div>
-            <SheetFooter>
+            <SheetFooter className="mt-4">
+              {row.getValue("status") === "pending" && (
+                <Button
+                  type="submit"
+                  onClick={() => {
+                    console.log("Pay Bill clicked");
+                    handleRedirect(row.getValue("payment_id"));
+                  }}
+                  disabled={isLoading}
+                >
+                  {isLoading ? <Spinner size={"small"} /> : "Pay Bill"}
+                </Button>
+              )}
               <SheetClose asChild>
-                <Button type="submit">Save changes</Button>
+                <Button variant={"outline"}>Close</Button>
               </SheetClose>
             </SheetFooter>
           </SheetContent>
