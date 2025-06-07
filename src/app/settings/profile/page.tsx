@@ -78,14 +78,14 @@ export default function Profile() {
   const [inUseMessage, setInUseMessage] = useState("");
 
   useEffect(() => {
-    // --- Simulasi Data yang Sedang Digunakan ---
+    // --- SIMULASI DATA YANG SEDANG DIGUNAKAN ---
     // Misalnya, anggap departemen dengan ID 1 tidak bisa dihapus
-    setDepartmentsInUse([1]);
+    setDepartmentsInUse([2]);
 
     // Anggap posisi "Software Engineer" di departemen ID 2 tidak bisa dihapus
     setPositionsInUse([
-      { deptId: 2, positionName: "Software Engineer" },
-      { deptId: 3, positionName: "Manager" },
+      // { deptId: 1, positionName: "Software Engineer" },
+      { deptId: 2, positionName: "Manager" },
       { deptId: 2, positionName: "Frontend Engineer" },
       // Anda bisa menambahkan simulasi lain di sini
     ]);
@@ -147,6 +147,23 @@ export default function Profile() {
     deptId: number;
     positionIndex: number;
     positionName: string;
+  } | null>(null);
+
+  // Add these new state variables alongside your other UI state variables
+  const [showEditDepartmentInUseDialog, setShowEditDepartmentInUseDialog] =
+    useState(false);
+  const [showEditPositionInUseDialog, setShowEditPositionInUseDialog] =
+    useState(false);
+  const [departmentToEditInfo, setDepartmentToEditInfo] = useState<{
+    id: number | null;
+    oldName: string;
+    newName: string;
+  } | null>(null);
+  const [positionToEditInfo, setPositionToEditInfo] = useState<{
+    deptId: number;
+    positionIndex: number;
+    oldName: string;
+    newName: string;
   } | null>(null);
 
   // --- Handlers ---
@@ -275,18 +292,60 @@ export default function Profile() {
   const handleSaveEditDepartment = useCallback(
     (deptId: number) => {
       const newName = editDepartmentName[deptId]?.trim();
-      if (newName && newName !== "") {
-        setDepartments((prev) =>
-          prev.map((dept) =>
-            dept.id === deptId ? { ...dept, name: newName } : dept
-          )
-        );
+      const departmentToEdit = departments.find((dept) => dept.id === deptId);
+      const oldName = departmentToEdit ? departmentToEdit.name : "";
+
+      // Tambahkan kondisi ini: Jika nama baru sama dengan nama lama, langsung batalkan edit
+      if (newName === oldName) {
         setShowEditDepartmentForm((prev) => ({ ...prev, [deptId]: false }));
         setEditDepartmentName((prev) => ({ ...prev, [deptId]: "" }));
+        return; // Keluar dari fungsi
+      }
+
+      if (newName && newName !== "") {
+        // ... (logika yang sudah ada)
+
+        // Check if the department (or any of its positions) is in use
+        const isDepartmentDirectlyInUse = departmentsInUse.includes(deptId);
+        const areAnyPositionsInUse = positionsInUse.some(
+          (pos) => pos.deptId === deptId
+        );
+
+        if (isDepartmentDirectlyInUse || areAnyPositionsInUse) {
+          setDepartmentToEditInfo({ id: deptId, oldName, newName });
+          setShowEditDepartmentInUseDialog(true); // Show the new confirmation dialog
+        } else {
+          // If not in use, proceed with saving directly
+          setDepartments((prev) =>
+            prev.map((dept) =>
+              dept.id === deptId ? { ...dept, name: newName } : dept
+            )
+          );
+          setShowEditDepartmentForm((prev) => ({ ...prev, [deptId]: false }));
+          setEditDepartmentName((prev) => ({ ...prev, [deptId]: "" }));
+        }
       }
     },
-    [editDepartmentName]
+    [editDepartmentName, departments, departmentsInUse, positionsInUse]
   );
+
+  const confirmSaveEditDepartment = useCallback(() => {
+    if (departmentToEditInfo && departmentToEditInfo.id !== null) {
+      const { id: deptId, newName } = departmentToEditInfo;
+      setDepartments((prev) =>
+        prev.map((dept) =>
+          dept.id === deptId ? { ...dept, name: newName } : dept
+        )
+      );
+      // You might want to update positionsInUse to reflect the new department name if it's part of the position name
+      // For example, if position names were like "Marketing - Software Engineer"
+
+      setShowEditDepartmentForm((prev) => ({ ...prev, [deptId]: false }));
+      setEditDepartmentName((prev) => ({ ...prev, [deptId]: "" }));
+    }
+    setDepartmentToEditInfo(null);
+    setShowEditDepartmentInUseDialog(false);
+  }, [departmentToEditInfo]);
 
   const handleCancelEditDepartment = useCallback((deptId: number) => {
     setShowEditDepartmentForm((prev) => ({ ...prev, [deptId]: false }));
@@ -361,19 +420,11 @@ export default function Profile() {
   const handleSaveEditPosition = useCallback(
     (deptId: number, positionIndex: number) => {
       const newPosition = editPositionName[deptId]?.[positionIndex]?.trim();
-      if (newPosition && newPosition !== "") {
-        setDepartments((prev) =>
-          prev.map((dept) =>
-            dept.id === deptId
-              ? {
-                  ...dept,
-                  positions: dept.positions.map((pos, idx) =>
-                    idx === positionIndex ? newPosition : pos
-                  ),
-                }
-              : dept
-          )
-        );
+      const department = departments.find((dept) => dept.id === deptId);
+      const oldPosition = department ? department.positions[positionIndex] : "";
+
+      // Tambahkan kondisi ini: Jika nama posisi baru sama dengan nama posisi lama, langsung batalkan edit
+      if (newPosition === oldPosition) {
         setShowEditPositionForm((prev) => ({
           ...prev,
           [deptId]: { ...prev[deptId], [positionIndex]: false },
@@ -382,9 +433,51 @@ export default function Profile() {
           ...prev,
           [deptId]: { ...prev[deptId], [positionIndex]: "" },
         }));
+        return; // Keluar dari fungsi
+      }
+
+      if (newPosition && newPosition !== "") {
+        // ... (logika yang sudah ada)
+
+        // Check if the specific position is in use
+        const isPositionCurrentlyInUse = positionsInUse.some(
+          (info) => info.deptId === deptId && info.positionName === oldPosition
+        );
+
+        if (isPositionCurrentlyInUse) {
+          setPositionToEditInfo({
+            deptId,
+            positionIndex,
+            oldName: oldPosition,
+            newName: newPosition,
+          });
+          setShowEditPositionInUseDialog(true); // Show the new confirmation dialog
+        } else {
+          // If not in use, proceed with saving directly
+          setDepartments((prev) =>
+            prev.map((dept) =>
+              dept.id === deptId
+                ? {
+                    ...dept,
+                    positions: dept.positions.map((pos, idx) =>
+                      idx === positionIndex ? newPosition : pos
+                    ),
+                  }
+                : dept
+            )
+          );
+          setShowEditPositionForm((prev) => ({
+            ...prev,
+            [deptId]: { ...prev[deptId], [positionIndex]: false },
+          }));
+          setEditPositionName((prev) => ({
+            ...prev,
+            [deptId]: { ...prev[deptId], [positionIndex]: "" },
+          }));
+        }
       }
     },
-    [editPositionName]
+    [editPositionName, departments, positionsInUse]
   );
 
   const handleCancelEditPosition = useCallback(
@@ -401,11 +494,43 @@ export default function Profile() {
     []
   );
 
+  const confirmSaveEditPosition = useCallback(() => {
+    if (positionToEditInfo) {
+      const { deptId, positionIndex, newName } = positionToEditInfo;
+      setDepartments((prev) =>
+        prev.map((dept) =>
+          dept.id === deptId
+            ? {
+                ...dept,
+                positions: dept.positions.map((pos, idx) =>
+                  idx === positionIndex ? newName : pos
+                ),
+              }
+            : dept
+        )
+      );
+      // In a real application, you'd also send an API call here
+      // to update all employees whose position was `positionToEditInfo.oldName`
+      // in `positionToEditInfo.deptId` to `positionToEditInfo.newName`.
+
+      setShowEditPositionForm((prev) => ({
+        ...prev,
+        [deptId]: { ...prev[deptId], [positionIndex]: false },
+      }));
+      setEditPositionName((prev) => ({
+        ...prev,
+        [deptId]: { ...prev[deptId], [positionIndex]: "" },
+      }));
+    }
+    setPositionToEditInfo(null);
+    setShowEditPositionInUseDialog(false);
+  }, [positionToEditInfo]);
+
   const openDeletePositionDialog = useCallback(
     (deptId: number, positionIndex: number, positionName: string) => {
       setPositionToDeleteInfo({ deptId, positionIndex, positionName });
       setShowDeletePositionConfirmDialog(true);
-      setOpenDepartmentDropdownId(null); 
+      setOpenDepartmentDropdownId(null);
     },
     []
   );
@@ -695,10 +820,11 @@ export default function Profile() {
                   {isProfileEditing ? (
                     <FormPhoneInput
                       placeholder="Enter employee phone number"
-                      value={profileData.phoneNumber}
-                      onChange={(value) =>
-                        setProfileData({ ...profileData, phoneNumber: value })
-                      }
+                      // value={profileData.phoneNumber}
+                      // onChange={(value) =>
+                      //   setProfileData({ ...profileData, phoneNumber: value })
+                      // }
+                      // value belum diambil
                     />
                   ) : (
                     <>
@@ -971,18 +1097,6 @@ export default function Profile() {
                                 >
                                   Edit Department
                                 </DropdownMenuItem>
-                                {/* <DropdownMenuItem
-                                  className="w-full h-fit cursor-pointer text-danger-900"
-                                  onSelect={(e) => {
-                                    e.preventDefault();
-                                    openDeleteDepartmentDialog(
-                                      dept.id,
-                                      dept.name
-                                    );
-                                  }}
-                                >
-                                  Delete Department
-                                </DropdownMenuItem> */}
                                 <DropdownMenuItem
                                   className="w-full h-fit cursor-pointer text-danger-900"
                                   onSelect={(e) => {
@@ -1005,12 +1119,14 @@ export default function Profile() {
                                     ) {
                                       if (isDepartmentDirectlyInUse) {
                                         setInUseMessage(
-                                          `Departemen "${dept.name}" tidak dapat dihapus karena sedang digunakan oleh karyawan.`
+                                          // `Departemen "${dept.name}" tidak dapat dihapus karena sedang digunakan oleh karyawan.`
+                                          `Department "${dept.name}" cannot be deleted because it is being used by an employee.`
                                         );
                                       } else if (areAnyPositionsInUse) {
                                         // Anda dapat membuat pesan ini lebih spesifik dengan mencantumkan posisi jika diperlukan
                                         setInUseMessage(
-                                          `Departemen "${dept.name}" tidak dapat dihapus karena beberapa posisinya sedang digunakan oleh karyawan.`
+                                          // `Departemen "${dept.name}" tidak dapat dihapus karena beberapa posisinya sedang digunakan oleh karyawan.`
+                                          `The department "${dept.name}" cannot be deleted because some of its positions are already occupied by employees.`
                                         );
                                       }
                                       setShowInUseAlertDialog(true); // Tampilkan dialog peringatan
@@ -1153,7 +1269,8 @@ export default function Profile() {
 
                                             if (isPositionCurrentlyInUse) {
                                               setInUseMessage(
-                                                `Posisi "${position}" di departemen "${dept.name}" tidak dapat dihapus karena sedang digunakan oleh karyawan.`
+                                                // `Posisi "${position}" di departemen "${dept.name}" tidak dapat dihapus karena sedang digunakan oleh karyawan.`
+                                                `The position "${position}" in the department "${dept.name}" cannot be deleted because it is being used by an employee.`
                                               );
                                               setShowInUseAlertDialog(true); // Tampilkan dialog peringatan
                                             } else {
@@ -1294,16 +1411,118 @@ export default function Profile() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Penghapusan Tidak Diizinkan</AlertDialogTitle>
+            <AlertDialogTitle>Deletion Not Allowed</AlertDialogTitle>
             <AlertDialogDescription>
               {inUseMessage}
               <br />
-              Mohon pastikan tidak ada karyawan yang terkait dengan item ini
-              sebelum mencoba menghapusnya.
+              Please make sure there are no employees associated with this item
+              before attempting to delete it.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction className="w-fit">Oke</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Department In Use Confirmation Dialog */}
+      <AlertDialog
+        open={showEditDepartmentInUseDialog}
+        onOpenChange={(open) => {
+          setShowEditDepartmentInUseDialog(open);
+          if (!open) {
+            setDepartmentToEditInfo(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Department Name Change</AlertDialogTitle>
+            <AlertDialogDescription>
+              <br />
+              This action will update all associated employee records from 
+              <span className="font-semibold">
+                {departmentToEditInfo?.oldName}
+              </span>
+               department to 
+              <span className="font-semibold">
+                {departmentToEditInfo?.newName}
+              </span>
+              department.
+              <br />
+              Are you sure you want to proceed?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              className="w-fit"
+              onClick={() => {
+                // Reset the edit form state if cancelled from this dialog
+                if (departmentToEditInfo?.id !== null) {
+                  handleCancelEditDepartment(departmentToEditInfo!.id);
+                }
+              }}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="w-auto bg-warning-500 text-white hover:bg-warning-600"
+              onClick={confirmSaveEditDepartment}
+            >
+              Continue Saving
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Position In Use Confirmation Dialog */}
+      <AlertDialog
+        open={showEditPositionInUseDialog}
+        onOpenChange={(open) => {
+          setShowEditPositionInUseDialog(open);
+          if (!open) {
+            setPositionToEditInfo(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Position Name Change</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action will update all associated employee records from
+              <span className="font-semibold">
+                {"}{positionToEditInfo?.oldName}{"}
+              </span>{" "}
+              position to{" "}
+              <span className="font-semibold">
+                {"}{positionToEditInfo?.newName}{"}
+              </span>{" "}
+              position.
+              <br />
+              Are you sure you want to proceed?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              className="w-fit"
+              onClick={() => {
+                // Reset the edit form state if cancelled from this dialog
+                if (positionToEditInfo) {
+                  handleCancelEditPosition(
+                    positionToEditInfo.deptId,
+                    positionToEditInfo.positionIndex
+                  );
+                }
+              }}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="w-auto bg-warning-500 text-white hover:bg-warning-600"
+              onClick={confirmSaveEditPosition}
+            >
+              Continue Saving
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
