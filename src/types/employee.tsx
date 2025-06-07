@@ -27,6 +27,7 @@ export type Employee = {
   account_number: string | null;
   join_date: string | null;
   exit_date: string | null | null;
+  errors?: string;
   employee_photo: string | null;
   employee_status: string | null;
   created_at: string | null;

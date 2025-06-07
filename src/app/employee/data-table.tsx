@@ -70,6 +70,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useNavigate } from "react-router-dom";
 import { useRouter } from 'next/navigation';
 import Cookies from "js-cookie";
+import { toast } from "sonner";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -249,24 +250,27 @@ export function DataTable<TData, TValue>({
                 params.append("employee_status", employeeStatus);
             }
             if (contractType && contractType !== "All") {
-                params.append("work_type", contractType);
+                params.append("contract_type", contractType);
             }
 
             
 
             const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
-            
-            console.log(departments);
-            console.log(url);
+           
             const response = await fetch(url, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${Cookies.get("token")}`,
             },
             });
-
-            if (!response.ok) throw new Error("Gagal mengunduh file");
-
+            
+            if (!response.ok) {
+                const responseData = await response.json();
+                throw responseData; 
+                }
+            toast.success('Data exported successfully')
+            
+            setSuccess(true);
             const blob = await response.blob();
             const downloadUrl = window.URL.createObjectURL(blob);
 
@@ -278,10 +282,41 @@ export function DataTable<TData, TValue>({
             a.remove();
             window.URL.revokeObjectURL(downloadUrl);
 
-            setSuccess(true);
         } catch (err) {
-            console.error("Submit error:", err);
-            setError(true);
+            let message = "Unknown error occurred";
+            let messagesToShow: string[] = [];
+
+            if (
+            err &&
+            typeof err === "object" &&
+            "message" in err &&
+            typeof (err as any).message === "string"
+            ) {
+            const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+            if (backendError.message.toLowerCase().includes("failed to fetch")) {
+                message = "Unknown error occurred";
+            } else {
+                message = backendError.message;
+            }
+
+            messagesToShow = backendError.errors
+                ? Object.values(backendError.errors).flat()
+                : [message];
+            } else {
+            messagesToShow = [message]
+            }
+
+            toast.error(
+                <>
+                    <p className="text-red-700 font-bold">Error</p>
+                    {messagesToShow.map((msg, idx) => (
+                    <div key={idx} className="text-red-700">• {msg}</div>
+                    ))}
+                </>,
+                { duration: 30000 }
+            );
+            
         } finally {
             setLoading(false);
         }

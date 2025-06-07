@@ -2,6 +2,7 @@
 import { Metadata } from "next";
 import Sidebar from "@/components/sidebar";
 import { columns } from "./column";
+import { columns_invalid } from "./column_invalid";
 import { DataTable } from "./data-table"
 import { Card, CardContent } from "@/components/ui/card";
 import React, { useRef, useState, useEffect } from "react";
@@ -14,6 +15,7 @@ import Link from "next/link";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useRouter } from 'next/navigation';
 import Cookies from "js-cookie";
+import { toast, Toaster } from "sonner";
 
 export default function Employee() {
   const [isLoading, setIsLoading] = useState(true);
@@ -51,6 +53,19 @@ export default function Employee() {
         ["Active", "Retire", "Fired", "Resign"].includes(rawStatus as any)
             ? (rawStatus as "Active" | "Retire" | "Fired" | "Resign")
             : "Active";
+       const errorMessages = employeeData.errors
+        ? Object.entries(employeeData.errors).map(([field, messages]) => {
+            if (Array.isArray(messages)) {
+                return messages.map((msg, idx) => (
+                <li key={`${field}-${idx}`}>{field}: {msg}</li>
+                ));
+            } else {
+                return <li key={field}>{field}: {String(messages)}</li>;
+            }
+            }).flat()
+        : null;
+
+
 
 
         return {
@@ -65,6 +80,7 @@ export default function Employee() {
         contract_type,
         workType,
         status,
+        errors: errorMessages,
         };
     });
     };
@@ -79,7 +95,12 @@ export default function Employee() {
 
     try {
         if (!previewData) {
-            console.error("previewData is null");
+            toast.error(
+            <>
+                Data is required
+            </>,
+            { duration: 30000 }
+            );
             setLoading(false);
             return;
         }
@@ -97,15 +118,49 @@ export default function Employee() {
 
         if (!response.ok) {
             const errorData = await response.json();
-            console.error("Server Error:", errorData);
-            throw new Error("Server returned an error");
+            throw errorData; 
         }
 
         setSuccess(true);
-
+        setSuccess(false);
+        sessionStorage.setItem("toastimportemployee", "Employee imported successfully");
+        router.push("/employee");
     } catch (err) {
-        console.error("Submit error:", err);
         setError(true);
+        let message = "Unknown error occurred";
+        let messagesToShow: string[] = [];
+
+        if (
+          err &&
+          typeof err === "object" &&
+          "message" in err &&
+          typeof (err as any).message === "string"
+        ) {
+          const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+          if (backendError.message.toLowerCase().includes("failed to fetch")) {
+            message = "Unknown error occurred";
+          } else {
+            message = backendError.message;
+          }
+
+          messagesToShow = backendError.errors
+            ? Object.values(backendError.errors).flat()
+            : [message];
+        } else {
+          messagesToShow = [message]
+        }
+
+        toast.error(
+          <>
+            <p className="text-red-700 font-bold">Error</p>
+            {messagesToShow.map((msg, idx) => (
+              <div key={idx} className="text-red-700">• {msg}</div>
+            ))}
+          </>,
+          { duration: 30000 }
+        );
+
     } finally {
         setLoading(false);
     }
@@ -116,6 +171,7 @@ const mappedValidRows = previewData?.valid_rows ? mapEmployeeDataToEmployees(pre
 const mappedInValidRows = previewData?.invalid_rows ? mapEmployeeDataToEmployees(previewData.invalid_rows) : [];
   return (
     <Sidebar title="Import Employee Data">
+        <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
       <div className="w-full">
         <div className="w-full overflow-x-auto flex flex-col gap-[20px]">
             <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-md overflow-hidden">
@@ -143,14 +199,6 @@ const mappedInValidRows = previewData?.invalid_rows ? mapEmployeeDataToEmployees
                             Cancel
                         </Button>
                     </Link>
-                    {/* <Button className="w-[100px] h-[40px]" variant="default" disabled={previewData?.invalid_rows_count !== undefined && previewData.invalid_rows_count > 0} onClick={handleSavetButton}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M17 21V13H7V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M7 3V8H15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        Save
-                    </Button> */}
                     <Button className="w-[100px] h-[40px]" variant="default" disabled={previewData?.invalid_rows_count !== undefined && previewData.invalid_rows_count > 0} onClick={handleSavetButton}>
                     {!loading ? (
                         <>
@@ -165,7 +213,7 @@ const mappedInValidRows = previewData?.invalid_rows ? mapEmployeeDataToEmployees
                         <Spinner size="small" />
                     )}
                     </Button>
-                    <Dialog
+                    {/* <Dialog
                     open={success || error}
                     onOpenChange={(open) => {
                         if (!open) {
@@ -206,7 +254,7 @@ const mappedInValidRows = previewData?.invalid_rows ? mapEmployeeDataToEmployees
                         )}
                         </DialogFooter>
                     </DialogContent>
-                    </Dialog>
+                    </Dialog> */}
                 </div>
                 </CardContent>
             </Card>
@@ -221,9 +269,9 @@ const mappedInValidRows = previewData?.invalid_rows ? mapEmployeeDataToEmployees
             <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
                 <CardContent className="overflow-x-auto">
                 
-                    <DataTable columns={columns} data={mappedInValidRows} isLoading={isLoading} tableTitle="Invalid Employee Data"/>
+                    <DataTable columns={columns_invalid} data={mappedInValidRows} isLoading={isLoading} tableTitle="Invalid Employee Data"/>
                 
-              
+                        
                 </CardContent>
             </Card>
             

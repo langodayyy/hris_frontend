@@ -17,6 +17,7 @@ import { EmployeeResponse } from "@/types/employee";
 import { Spinner } from "@/components/ui/spinner";
 import Cookies from "js-cookie";
 import React from "react";
+import { Toaster, toast } from "sonner";
 
 export default function EmployeeDetails(){
     const [employeeData, setEmployeeData] = useState<EmployeeResponse | undefined>(undefined);
@@ -75,59 +76,124 @@ export default function EmployeeDetails(){
         );
 
         const responseData = await response.json();
-        console.log("Response:", responseData);
 
-        if (!response.ok) throw new Error("Gagal submit");
-
+        if (!response.ok) {
+            throw responseData; 
+        }
+        toast.success('Photo updated successfully')
         setSuccessPhoto(true);
         fetchData()
         setAvatarPreview(null);
         } catch (err) {
-        console.error("Submit error:", err);
-        setErrorPhoto(true);
+            setErrorPhoto(true);
+            let message = "Unknown error occurred";
+            let messagesToShow: string[] = [];
+
+            if (
+            err &&
+            typeof err === "object" &&
+            "message" in err &&
+            typeof (err as any).message === "string"
+            ) {
+            const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+            if (backendError.message.toLowerCase().includes("failed to fetch")) {
+                message = "Unknown error occurred";
+            } else {
+                message = backendError.message;
+            }
+
+            messagesToShow = backendError.errors
+                ? Object.values(backendError.errors).flat()
+                : [message];
+            } else {
+            messagesToShow = [message]
+            }
+
+            toast.error(
+                <>
+                    <p className="text-red-700 font-bold">Error</p>
+                    {messagesToShow.map((msg, idx) => (
+                    <div key={idx} className="text-red-700">• {msg}</div>
+                    ))}
+                </>,
+                { duration: 30000 }
+            );
         } finally {
 
         setLoadingPhoto(false);
         }
     };
-    const [isDialogAOpen, setDialogAOpen] = useState(false);
-    const handleOkClick = async () => {
-         // panggil fetchData()
-        setDialogAOpen(false);
-        setSuccess(false); // reset state jika perlu
-    };
-    // const [isDialogOpen, setIsDialogOpen] = useState(false);
-    
-    // const handleChangeStatus = () => {
-    //     setIsDialogOpen(true);
-    // };
+  
     const params = useParams();
     const id = params.id;
 
     const [isLoading, setIsLoading] = useState(true);
     const fetchData = async () => {
+        setIsLoading(true);
+        setError(false);
+        setSuccess(false);
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees/${id}`, {
+                method: "GET",
             headers: {
                 "Authorization": `Bearer ${Cookies.get("token")}`,
-                "Content-Type": "application/json"
-            }
+                // "Content-Type": "application/json"
+                }
             });
 
-            if (!res.ok) throw new Error("Failed to fetch employee");
-
+           
+            
             const data: EmployeeResponse = await res.json();
+
+            if (!res.ok) {
+                throw data; 
+            }
             setEmployeeData(data);
-        } catch (error) {
-            console.error("Error fetching data:", error);
+        } catch (err: any) {
+            setError(true);
+            let message = "Unknown error occurred";
+            let messagesToShow: string[] = [];
+
+            if (
+            err &&
+            typeof err === "object" &&
+            "message" in err &&
+            typeof (err as any).message === "string"
+            ) {
+            const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+            if (backendError.message.toLowerCase().includes("failed to fetch")) {
+                message = "Unknown error occurred";
+            } else {
+                message = backendError.message;
+            }
+
+            messagesToShow = backendError.errors
+                ? Object.values(backendError.errors).flat()
+                : [message];
+            } else {
+            messagesToShow = [message]
+            }
+              
+            toast.error(
+            <>
+                <p className="text-red-700 font-bold">Error</p>
+                {messagesToShow.map((msg, idx) => (
+                <div key={idx} className="text-red-700">• {msg}</div>
+                ))}
+            </>,
+            { duration: 30000 }
+            );
+
         } finally {
             setIsLoading(false);
         }
     };
 
     useEffect(() => {
-    fetchData();
+        fetchData();
     }, []);
 
     const [loading, setLoading] = useState(false);
@@ -153,8 +219,11 @@ export default function EmployeeDetails(){
                     "Authorization": `Bearer ${Cookies.get("token")}`,
                 },
                 });
-
-                if (!response.ok) throw new Error("Gagal mengunduh file");
+            
+                if (!response.ok) {
+                    throw response; 
+                }
+                // if (!response.ok) throw new Error("Gagal mengunduh file");
 
                 const blob = await response.blob();
                 const downloadUrl = window.URL.createObjectURL(blob);
@@ -166,24 +235,56 @@ export default function EmployeeDetails(){
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(downloadUrl);
-
+                toast.success('Export employee data successfully')
                 // setSuccess(true);
             }
             
         } catch (err) {
-            console.error("Submit error:", err);
-            setError(true);
+             setError(true);
+            let message = "Unknown error occurred";
+            let messagesToShow: string[] = [];
+
+            if (
+            err &&
+            typeof err === "object" &&
+            "message" in err &&
+            typeof (err as any).message === "string"
+            ) {
+            const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+            if (backendError.message.toLowerCase().includes("failed to fetch")) {
+                message = "Unknown error occurred";
+            } else {
+                message = backendError.message;
+            }
+
+            messagesToShow = backendError.errors
+                ? Object.values(backendError.errors).flat()
+                : [message];
+            } else {
+            messagesToShow = [message]
+            }
+
+            toast.error(
+                <>
+                    <p className="text-red-700 font-bold">Error</p>
+                    {messagesToShow.map((msg, idx) => (
+                    <div key={idx} className="text-red-700">• {msg}</div>
+                    ))}
+                </>,
+                { duration: 30000 }
+            );
         } finally {
             setLoading(false);
         }
     };
-    const handleSubmitForm = async () => {
+    const handleSubmitStatusForm = async () => {
         setLoading(true);
         setError(false);
         setSuccess(false);
 
         try {
-            const form = document.getElementById("employeeForm") as HTMLFormElement;
+            const form = document.getElementById("employeeStatusForm") as HTMLFormElement;
             const formData = new FormData(form);
 
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees/${employeeData?.employee.employee_id}?_method=PATCH`, {
@@ -197,13 +298,49 @@ export default function EmployeeDetails(){
 
             const responseData = await response.json();
             console.log("Response:", responseData);
-
-            if (!response.ok) throw new Error("Gagal submit");
-
+            
+            if (!response.ok) {
+                throw responseData; 
+            }
+            toast.success('Employee change status successfully')
+        
             setSuccess(true);
+            handleOkClickEmployeeStatus();
         } catch (err) {
-            console.error("Submit error:", err);
-            setError(true);
+           setError(true);
+            let message = "Unknown error occurred";
+            let messagesToShow: string[] = [];
+
+            if (
+            err &&
+            typeof err === "object" &&
+            "message" in err &&
+            typeof (err as any).message === "string"
+            ) {
+            const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+            if (backendError.message.toLowerCase().includes("failed to fetch")) {
+                message = "Unknown error occurred";
+            } else {
+                message = backendError.message;
+            }
+
+            messagesToShow = backendError.errors
+                ? Object.values(backendError.errors).flat()
+                : [message];
+            } else {
+            messagesToShow = [message]
+            }
+
+            toast.error(
+                <>
+                    <p className="text-red-700 font-bold">Error</p>
+                    {messagesToShow.map((msg, idx) => (
+                    <div key={idx} className="text-red-700">• {msg}</div>
+                    ))}
+                </>,
+                { duration: 30000 }
+            );
         } finally {
             setLoading(false);
         }
@@ -226,12 +363,50 @@ export default function EmployeeDetails(){
             const responseData = await response.json();
             console.log("Response:", responseData);
 
-            if (!response.ok) throw new Error("Gagal submit");
-
+            if (!response.ok) {
+            throw responseData; 
+            }
+            toast.success('Employee password reset successfully')
+        
             setSuccess(true);
+            handleOkClickResetPassword()
         } catch (err) {
-            console.error("Submit error:", err);
             setError(true);
+            let message = "Unknown error occurred";
+            let messagesToShow: string[] = [];
+
+            if (
+            err &&
+            typeof err === "object" &&
+            "message" in err &&
+            typeof (err as any).message === "string"
+            ) {
+            const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+            if (backendError.message.toLowerCase().includes("failed to fetch")) {
+                message = "Unknown error occurred";
+            } else {
+                message = backendError.message;
+            }
+
+            messagesToShow = backendError.errors
+                ? Object.values(backendError.errors).flat()
+                : [message];
+            } else {
+            messagesToShow = [message]
+            }
+
+            toast.error(
+                <>
+                    <p className="text-red-700 font-bold">Error</p>
+                    {messagesToShow.map((msg, idx) => (
+                    <div key={idx} className="text-red-700">• {msg}</div>
+                    ))}
+                </>,
+                { duration: 30000 }
+            );
+
+
         } finally {
             setLoading(false);
         }
@@ -255,12 +430,47 @@ export default function EmployeeDetails(){
             const responseData = await response.json();
             console.log("Response:", responseData);
 
-            if (!response.ok) throw new Error("Gagal submit");
+            if (!response.ok) {
+                throw responseData; 
+            }
             
             setSuccess(true);
+            handleOkClickDelete();
         } catch (err) {
-            console.error("Submit error:", err);
             setError(true);
+            let message = "Unknown error occurred";
+            let messagesToShow: string[] = [];
+
+            if (
+            err &&
+            typeof err === "object" &&
+            "message" in err &&
+            typeof (err as any).message === "string"
+            ) {
+            const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+            if (backendError.message.toLowerCase().includes("failed to fetch")) {
+                message = "Unknown error occurred";
+            } else {
+                message = backendError.message;
+            }
+
+            messagesToShow = backendError.errors
+                ? Object.values(backendError.errors).flat()
+                : [message];
+            } else {
+            messagesToShow = [message]
+            }
+
+            toast.error(
+                <>
+                    <p className="text-red-700 font-bold">Error</p>
+                    {messagesToShow.map((msg, idx) => (
+                    <div key={idx} className="text-red-700">• {msg}</div>
+                    ))}
+                </>,
+                { duration: 30000 }
+            );
         } finally {
             setLoading(false);
         }
@@ -283,10 +493,13 @@ export default function EmployeeDetails(){
         setSuccess(false);
 
     };
-    const handleOkClickDelete = async () => {
+   const handleOkClickDelete = async () => {
         setDialogDeleteOpen(false)
         setSuccess(false);
+        sessionStorage.setItem("toastdeleteemployee", "Employee deleted successfully");
         router.push("/employee");
+
+
 
     };
     const handleChangeStatus = () => {
@@ -302,16 +515,18 @@ export default function EmployeeDetails(){
 
     return (
         <Sidebar title="Employee Details">
+            <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
             <div className="flex flex-col gap-[30px]">
                 {/* <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
                     <div className="w-full mx-[20px] mb-[-10px]">
                             <h2 className="justify-center w-full text-lg font-medium whitespace-nowrap mx-[10px]">Employee Details</h2>
                     </div> */}
                     {isLoading ? ( 
-                        <Card className="flex-1 gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
-                                    <Spinner className="w-full mx-[20px] my-[10px]" size="medium" />
-                                    </Card>
-                                  ) : (
+                        <Card className="min-h-screen flex items-center justify-center rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
+                            <Spinner size="large" />
+                        </Card>
+
+                    ) : (
                     <div>
                         <Card className="flex-1 gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
                        
@@ -450,9 +665,9 @@ export default function EmployeeDetails(){
                                                 </DialogDescription>
                                             </DialogHeader>
                                             <div>
-                                                <form id="employeeForm" onSubmit={(e) => {
+                                                <form id="employeeStatusForm" onSubmit={(e) => {
                                                     e.preventDefault(); // mencegah reload halaman
-                                                    handleSubmitForm();
+                                                    handleSubmitStatusForm();
                                                 }}>
                                                     <div className="flex flex-col gap-[15px] mt-[15px]">
                                                         <div className="flex gap-[10px]">
@@ -492,7 +707,7 @@ export default function EmployeeDetails(){
                                                                 <span>Please type <strong>{employeeData?.employee.first_name} {employeeData?.employee.last_name}</strong> to confirm this action. This action cannot be undone.</span>
                                                                 <input
                                                                 type="text"
-                                                                placeholder="Type DELETE to confirm"
+                                                                placeholder={`Type ${employeeData?.employee.first_name} ${employeeData?.employee.last_name} to confirm`}
                                                                 className="border px-3 py-2 rounded-md"
                                                                 value={confirmationTextStatus}
                                                                 onChange={(e) => setConfirmationTextStatus(e.target.value)}
@@ -524,41 +739,6 @@ export default function EmployeeDetails(){
                                                                     <Spinner size="small" />
                                                                 )}
                                                                 </Button>
-                                                                <Dialog
-                                                                open={success || error}
-                                                                onOpenChange={(open) => {
-                                                                    if (!open) {
-                                                                    setSuccess(false);
-                                                                    setError(false);
-                                                                    handleOkClickEmployeeStatus();
-
-                                                                    }
-                                                                }}
-                                                                >
-                                                                <DialogContent className="bg-white max-w-sm mx-auto">
-                                                                    <DialogHeader>
-                                                                    <DialogTitle>{success ? "Success!" : "Error"}</DialogTitle>
-                                                                    </DialogHeader>
-                                                                    <div className="mt-2">
-                                                                    {success && <p className="text-green-700">Successfully!</p>}
-                                                                    {error && <p className="text-red-600">There was an error submitting the form.</p>}
-                                                                    </div>
-                                                                    <DialogFooter className="mt-4 flex gap-2 justify-end">
-                                                                    {success && (
-                                                                        <div className="flex gap-2 justify-end w-full">
-                                                                        <DialogClose asChild>
-                                                                            <Button onClick={handleOkClickEmployeeStatus} variant="default" className="max-w-[180px] whitespace-nowrap">Ok</Button>
-                                                                        </DialogClose>
-                                                                        </div>
-                                                                    )}
-                                                                    {error && (
-                                                                        <DialogClose asChild>
-                                                                            <Button onClick={handleOkClickEmployeeStatus} variant="default" className="max-w-[180px] whitespace-nowrap">OK</Button>
-                                                                        </DialogClose>
-                                                                    )}
-                                                                    </DialogFooter>
-                                                                </DialogContent>
-                                                                </Dialog>
                                                         </div>
                                                     </div>
                                                 </form>
@@ -593,7 +773,7 @@ export default function EmployeeDetails(){
                                                                     <Spinner size="small" />
                                                                 )}
                                                                 </Button>
-                                                                <Dialog
+                                                                {/* <Dialog
                                                                 open={success || error}
                                                                 onOpenChange={(open) => {
                                                                     if (!open) {
@@ -627,7 +807,7 @@ export default function EmployeeDetails(){
                                                                     )}
                                                                     </DialogFooter>
                                                                 </DialogContent>
-                                                                </Dialog>
+                                                                </Dialog> */}
                                                         </div>
                                                     </div>
                                        
@@ -648,7 +828,7 @@ export default function EmployeeDetails(){
                                                 <span>Please type <strong>`{employeeData?.employee.first_name} {employeeData?.employee.last_name}`</strong> to confirm this action. This action cannot be undone.</span>
                                                 <input
                                                 type="text"
-                                                placeholder="Type DELETE to confirm"
+                                                placeholder={`Type ${employeeData?.employee.first_name} ${employeeData?.employee.last_name} to confirm`}
                                                 className="border px-3 py-2 rounded-md"
                                                 value={confirmationTextDelete}
                                                 onChange={(e) => setConfirmationTextDelete(e.target.value)}
@@ -676,32 +856,6 @@ export default function EmployeeDetails(){
                                                 </div>
                                             </div>
                                             </div>
-
-                                            {/* Success/Error Dialog */}
-                                            <Dialog open={success || error} onOpenChange={(open) => {
-                                            if (!open) {
-                                                setSuccess(false);
-                                                setError(false);
-                                                handleOkClickDelete();
-                                            }
-                                            }}>
-                                            <DialogContent className="bg-white max-w-sm mx-auto">
-                                                <DialogHeader>
-                                                <DialogTitle>{success ? "Success!" : "Error"}</DialogTitle>
-                                                </DialogHeader>
-                                                <div className="mt-2">
-                                                {success && <p className="text-green-700">Successfully!</p>}
-                                                {error && <p className="text-red-600">There was an error.</p>}
-                                                </div>
-                                                <DialogFooter className="mt-4 flex gap-2 justify-end">
-                                                <DialogClose asChild>
-                                                    <Button onClick={handleOkClickDelete} variant="default" className="max-w-[180px] whitespace-nowrap">
-                                                    OK
-                                                    </Button>
-                                                </DialogClose>
-                                                </DialogFooter>
-                                            </DialogContent>
-                                            </Dialog>
                                         </DialogContent>
                                         </Dialog>
                                 </div>

@@ -121,33 +121,6 @@ export function DataTable<TData, TValue>({
             fileInputRef.current.files = dataTransfer.files;
         }
     };
-
-    useEffect(() => {
-        const fetchData = async () => {
-        try {
-           
-            const resDepPos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/department-position`, {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("token")}`,
-                "Content-Type": "application/json"
-            }
-            })
-    
-
-
-            if (!resDepPos.ok) throw new Error("Failed to fetch Department & Position")
-        
-
-
-        } catch (error) {
-            console.error("Error fetching data:", error)
-        }
-        }
-    
-        fetchData()
-    }, []
-    )
-
     const params = useParams<{ id: string }>();
     const employeeId = params.id;
   return (

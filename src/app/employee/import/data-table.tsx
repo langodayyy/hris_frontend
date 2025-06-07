@@ -45,10 +45,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import Cookies from "js-cookie";
+import { toast, Toaster } from "sonner";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -63,7 +63,7 @@ export function DataTable<TData, TValue>({
   isLoading,
   tableTitle
 }: DataTableProps<TData, TValue>) {
-    console.log("Data struktur:", data);
+    // console.log("Data struktur:", data);
 
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -149,9 +149,11 @@ export function DataTable<TData, TValue>({
     
 
 
-            if (!resDepPos.ok) throw new Error("Failed to fetch Department & Position")
+            // if (!resDepPos.ok) throw new Error("Failed to fetch Department & Position")
             const dataDepPos: DepartmentPosition[] = await resDepPos.json();
-
+            if (!resDepPos.ok) {
+                throw dataDepPos; 
+            }
             // setDepPosData(dataDepPos);
 
 
@@ -166,10 +168,43 @@ export function DataTable<TData, TValue>({
             setDepartments(uniqueDepartments);
 
 
-        } catch (error) {
-            console.error("Error fetching data:", error)
+        } catch (err) {
+            let message = "Unknown error occurred";
+            let messagesToShow: string[] = [];
+
+            if (
+            err &&
+            typeof err === "object" &&
+            "message" in err &&
+            typeof (err as any).message === "string"
+            ) {
+            const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+            if (backendError.message.toLowerCase().includes("failed to fetch")) {
+                message = "Unknown error occurred";
+            } else {
+                message = backendError.message;
+            }
+
+            messagesToShow = backendError.errors
+                ? Object.values(backendError.errors).flat()
+                : [message];
+            } else {
+            messagesToShow = [message]
+            }
+
+            toast.error(
+            <>
+                <p className="text-red-700 font-bold">Error</p>
+                {messagesToShow.map((msg, idx) => (
+                <div key={idx} className="text-red-700">• {msg}</div>
+                ))}
+            </>,
+            { duration: 30000 }
+            );
+
         }
-        }
+    }
     
         fetchData()
     }, []
@@ -177,6 +212,7 @@ export function DataTable<TData, TValue>({
   
   return (
     <>
+    <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
     <div className="flex items-center py-4 gap-[10px]">
     <span className="text-lg flex-none">{tableTitle}</span>
     <Input
