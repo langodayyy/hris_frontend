@@ -75,7 +75,7 @@ const employeesSample = [
 const attendanceType = [
   { label: "Clock In", value: "clockIn" },
   { label: "Clock Out", value: "clockOut" },
-  { label: "Anual Leave", value: "anualLeave" },
+  { label: "Annual Leave", value: "annualLeave" },
   { label: "Sick Leave", value: "sickLeave" },
 ];
 
@@ -94,7 +94,7 @@ export default function AddCheckclockPage() {
     (employee) => employee.Name === valueEmployee
   );
   const validateAttendanceType =
-    valueAttendanceType === "Anual Leave" ||
+    valueAttendanceType === "Annual Leave" ||
     valueAttendanceType === "Sick Leave";
   const filteredAttendanceType = attendanceType.filter((type) => {
     // Hilangkan opsi "Clock In" jika employee memiliki data clockIn
@@ -108,8 +108,8 @@ export default function AddCheckclockPage() {
   });
 
   const [date, setDate] = React.useState<DateRange | undefined>(undefined);
-  const anual =
-    valueAttendanceType === "Anual Leave" ||
+  const annual =
+    valueAttendanceType === "Annual Leave" ||
     valueAttendanceType === "Sick Leave";
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -347,6 +347,7 @@ export default function AddCheckclockPage() {
                     </Popover>
                   ) : (
                     <Input
+                      readOnly
                       name="date"
                       type="date"
                       defaultValue={`${new Date().getFullYear()}-${String(
@@ -374,7 +375,7 @@ export default function AddCheckclockPage() {
                   </Select>
                 </div>
 
-                {!anual ? (
+                {!annual ? (
                   <div
                     className={cn(
                       "grid gap-[10px]",
