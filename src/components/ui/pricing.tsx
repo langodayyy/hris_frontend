@@ -1,5 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "./button";
+import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "./alert-dialog";
 
 interface PriceCardProps {
   title: string;
@@ -10,7 +22,8 @@ interface PriceCardProps {
   canAccess: string[];
   canNotAccess?: string[];
   buttonText: string;
-  onClick?: () => void; // Optional onClick handler for the button
+  onClick?: boolean; // Jika true, navigate ke /sign-up
+  alertDialog?: boolean; // Jika true, tampilkan alert dialog
 }
 
 const PriceCard: React.FC<PriceCardProps> = ({
@@ -22,8 +35,20 @@ const PriceCard: React.FC<PriceCardProps> = ({
   canAccess,
   canNotAccess,
   buttonText,
-  onClick = () => {}, // Default to an empty function if not provided
+  onClick = false,
+  alertDialog = false,
 }) => {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+
+  const handleButtonClick = () => {
+    if (onClick) {
+      router.push("/sign-up");
+    } else if (alertDialog) {
+      setOpen(true);
+    }
+  };
+
   return (
     <div className="flex flex-col px-8 py-5 outline-2 outline-gray-200 w-full h-full gap-2.5 text-center rounded-2xl bg-white">
       <span className="text-[25px] font-sans font-bold">{title}</span>
@@ -83,12 +108,34 @@ const PriceCard: React.FC<PriceCardProps> = ({
           </span>
         ))}
       </div>
-     
-
       <div className="border-b border-gray-200" />
-      
-        <Button className="text-white px-6 py-3" onClick={onClick}>{buttonText}</Button>
-      
+      {alertDialog ? (
+        <AlertDialog open={open} onOpenChange={setOpen}>
+          <AlertDialogTrigger asChild>
+            <Button
+              className="text-white px-6 py-3"
+              onClick={handleButtonClick}
+            >
+              {buttonText}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Change Plan</AlertDialogTitle>
+              <AlertDialogDescription>
+                You can change your plan after paying this month's bill.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="w-fit">Close</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      ) : (
+        <Button className="text-white px-6 py-3" onClick={handleButtonClick}>
+          {buttonText}
+        </Button>
+      )}
     </div>
   );
 };
