@@ -142,6 +142,8 @@ export default function CheckclockSettingPage({
               className="w-auto"
               onClick={() => {
                 handleClosePaidDialog();
+                // Set allowPlanAccess agar halaman /plan bisa diakses
+                localStorage.setItem("allowPlanAccess", "1");
                 window.location.href = "/plan";
               }}
             >

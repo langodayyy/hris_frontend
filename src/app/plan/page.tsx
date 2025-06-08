@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PricingCard from "../../components/ui/pricing";
 import {
@@ -18,8 +18,19 @@ import {
 
 export default function Subscription() {
   const [activeTab, setActiveTab] = useState("kurang");
-  // currentPlan hanya menyimpan nama plan yang aktif
   const [currentPlan] = useState({ name: "Ultra" });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const allow = window.localStorage.getItem("allowPlanAccess");
+      if (allow === "1") {
+        // Hapus flag setelah akses pertama agar hanya bisa sekali akses
+        window.localStorage.removeItem("allowPlanAccess");
+      } else {
+        window.location.replace("/bills");
+      }
+    }
+  }, []);
 
   return (
     <>
@@ -52,7 +63,8 @@ export default function Subscription() {
               Are you sure you want to cancel the plan change?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action will keep your current subscription as it is.
+              This action will keep your current subscription as it is And you
+              can change your plan again after paying next month's bill.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

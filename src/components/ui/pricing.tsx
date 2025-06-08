@@ -124,13 +124,17 @@ const PriceCard: React.FC<PriceCardProps> = ({
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Change Plan</AlertDialogTitle>
+              <AlertDialogTitle>Are you sure you want to change your current plan? </AlertDialogTitle>
               <AlertDialogDescription>
-                You can change your plan after paying this month's bill.
+               This change will take effect and will impact your bill next month.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="w-fit">Close</AlertDialogCancel>
+              <AlertDialogCancel className="w-fit">No</AlertDialogCancel>
+              <AlertDialogAction
+              className="w-auto"
+              onClick={() => window.history.back()}
+            >Yes</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
