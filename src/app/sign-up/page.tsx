@@ -7,10 +7,19 @@ import SignupForm from "../../components/custom/signupForm";
 import { useFormContext } from "@/context/FormContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import GoogleAuthUpButton from "@/components/custom/googleAuthUp";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import Cookies from "js-cookie";
 
 export default function SignUp() {
   const { errors } = useFormContext();
-
+  const router = useRouter();
+  
+  useEffect(() => {
+    if(Cookies.get("token")){
+      router.push("dashboard");
+    }
+  }, []);
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
     <div className="p-[23px] w-screen h-screen bg-white">
