@@ -9,16 +9,70 @@ import Seat from "./seat";
 import { useState } from "react";
 import RevealOnScroll from "@/components/ui/reveal-on-scroll";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PricingCard from "../../../components/ui/pricing";
+import PricingCard from "../../components/ui/pricing";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function Subscription() {
   const [activeMenu, setActiveMenu] = useState("package");
   return (
-    <Sidebar title="Change Plan">
-      <div className="flex flex-col gap-[15px] text-center ">
+    <>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button
+            variant={"close"}
+            className="absolute top-4 right-4 rounded-full p-2 w-12 h-12"
+          >
+            <svg
+              width="30"
+              height="30"
+              viewBox="0 0 14 14"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13 1.00005L1 13M0.999949 1L12.9999 13"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to cancel the plan change?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action will keep your current subscription as it is.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="w-fit">No</AlertDialogCancel>
+            <AlertDialogAction
+              className="w-fit"
+              onClick={() => window.history.back()}
+            >
+              Yes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <div className="flex flex-col gap-[15px] text-center py-10 ">
         {/* title */}
         <span className="text-[40px] font-bold font-sans text-neutral-900">
-          Change your plan and unlock more HRIS's canAccess.
+          Change your plan and unlock more HRIS's features.
         </span>
 
         <div className="flex justify-center">
@@ -62,7 +116,7 @@ export default function Subscription() {
                       "Do check clock (Employee)",
                     ]}
                     buttonText="Change Plan"
-                     alertDialog={true}
+                    alertDialog={true}
                   />
                 </div>
                 <div className="flex justify-center items-center h-fit">
@@ -84,7 +138,7 @@ export default function Subscription() {
                       "Do check clock (Employee)",
                     ]}
                     buttonText="Change Plan"
-                     alertDialog={true}
+                    alertDialog={true}
                   />
                 </div>
                 <div className="flex justify-center items-center h-fit">
@@ -104,7 +158,7 @@ export default function Subscription() {
                       "Do check clock (Employee)",
                     ]}
                     buttonText="Change Plan"
-                     alertDialog={true}
+                    alertDialog={true}
                   />
                 </div>
               </div>
@@ -130,7 +184,7 @@ export default function Subscription() {
                       "Do check clock (Employee)",
                     ]}
                     buttonText="Change Plan"
-                     alertDialog={true}
+                    alertDialog={true}
                   />
                 </div>
                 <div className="flex justify-center items-center h-fit">
@@ -152,7 +206,7 @@ export default function Subscription() {
                       "Do check clock (Employee)",
                     ]}
                     buttonText="Change Plan"
-                     alertDialog={true}
+                    alertDialog={true}
                   />
                 </div>
                 <div className="flex justify-center items-center h-fit">
@@ -172,8 +226,7 @@ export default function Subscription() {
                       "Do check clock (Employee)",
                     ]}
                     buttonText="Change Plan"
-                   alertDialog={true}
-                    
+                    alertDialog={true}
                   />
                 </div>
               </div>
@@ -181,6 +234,6 @@ export default function Subscription() {
           </Tabs>
         </div>
       </div>
-    </Sidebar>
+    </>
   );
 }
