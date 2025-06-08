@@ -49,6 +49,13 @@ export default function SigninForm() {
           Cookies.remove("token");
         }
         Cookies.set("token", response.data.token, { expires:7, secure:true });
+        // Cookies.set("full_name", response.data.full_name, {expires:7, secure:true})
+        // Cookies.set("user_role", response.data.user_role, {expires:7, secure:true})
+        // Cookies.set("company_name", response.data.company_name, {expires:7, secure:true})
+        // Cookies.set("plan_name", response.data.plan_name, {expires:7, secure:true})
+        // Cookies.set("bill_period", response.data.bill_period, {expires:7, secure:true})
+        // Cookies.set("bill_status", response.data.bill_status, {expires:7, secure:true})
+        // Cookies.set("bill_deadline", response.data.bill_deadline, {expires:7, secure:true})
 
         if (response.data.is_profile_complete) {
           router.push("dashboard");

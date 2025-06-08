@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import { useParams } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import { toast, Toaster } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const EmployeeDocuments = ({ isActive }: { isActive: boolean }) => {
     const [documents, setDocuments] = useState<Documents[]>([])
@@ -141,10 +142,7 @@ const EmployeeDocuments = ({ isActive }: { isActive: boolean }) => {
         <>
           <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
          {isLoading ? ( 
-            <Card className=" flex items-center justify-center rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
-                <Spinner size="medium" />
-            </Card>
-
+            <Skeleton className="min-h-[141px]"></Skeleton>
             ) : (
             <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
               <CardContent>

@@ -77,7 +77,7 @@ const PersonalInformation = ({ employeeData, onUpdate }: Props) => {
             if (!response.ok) {
                 throw responseData; 
             }
-            toast.success('Data edited successfully')
+            toast.success('Data updated successfully')
         
             setSuccess(true);
             handleOkClick()
