@@ -20,6 +20,8 @@ const buttonVariants = cva(
           "cursor-pointer bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
         ghost:
           "cursor-pointer hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        close:
+          "cursor-pointer hover:text-black text-neutral-600 dark:hover:bg-accent/50",
         link: "cursor-pointer text-info-500 underline-offset-4 hover:underline",
         calendar:
         "border border-neutral-300 text-primary-900 bg-white shadow-xs hover:bg-primary-950 hover:text-white dark:bg-input/30 dark:border-input dark:hover:bg-input/50 cursor-pointer",

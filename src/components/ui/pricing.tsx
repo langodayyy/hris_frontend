@@ -24,6 +24,7 @@ interface PriceCardProps {
   buttonText: string;
   onClick?: boolean; // Jika true, navigate ke /sign-up
   alertDialog?: boolean; // Jika true, tampilkan alert dialog
+  isCurrentPlan?: boolean; // Menandai plan aktif
 }
 
 const PriceCard: React.FC<PriceCardProps> = ({
@@ -37,6 +38,7 @@ const PriceCard: React.FC<PriceCardProps> = ({
   buttonText,
   onClick = false,
   alertDialog = false,
+  isCurrentPlan = false,
 }) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -115,8 +117,9 @@ const PriceCard: React.FC<PriceCardProps> = ({
             <Button
               className="text-white px-6 py-3"
               onClick={handleButtonClick}
+              disabled={isCurrentPlan}
             >
-              {buttonText}
+              {isCurrentPlan ? "Your current plan" : buttonText}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -132,8 +135,12 @@ const PriceCard: React.FC<PriceCardProps> = ({
           </AlertDialogContent>
         </AlertDialog>
       ) : (
-        <Button className="text-white px-6 py-3" onClick={handleButtonClick}>
-          {buttonText}
+        <Button
+          className="text-white px-6 py-3"
+          onClick={handleButtonClick}
+          disabled={isCurrentPlan}
+        >
+          {isCurrentPlan ? "Your current plan" : buttonText}
         </Button>
       )}
     </div>

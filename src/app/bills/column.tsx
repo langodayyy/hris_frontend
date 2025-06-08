@@ -41,7 +41,9 @@ export type checkclockSetting = {
   period: string;
   deadline: string;
   pay_at: string;
+  fine: number;
   status: string;
+  plan_name: string;
 };
 
 export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
@@ -102,6 +104,15 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
     },
   },
   {
+    accessorKey: "plan_name",
+    header: ({ column }) => {
+      return <div className="text-center">Plan Name</div>;
+    },
+    cell: ({ row }) => {
+      return <div className="text-center">{row.getValue("plan_name")}</div>;
+    },
+  },
+  {
     accessorKey: "total_employee",
     header: ({ column }) => {
       return <div className="text-center">Total Employee</div>;
@@ -110,15 +121,6 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
       return (
         <div className="text-center">{row.getValue("total_employee")}</div>
       );
-    },
-  },
-  {
-    accessorKey: "amount",
-    header: ({ column }) => <div className="text-center">Amount</div>,
-    cell: ({ row }) => {
-      const amount = row.getValue("amount");
-      const formatted = amount ? Number(amount).toLocaleString("en-US") : "";
-      return <div className="text-center">IDR {formatted}</div>;
     },
   },
   {
@@ -149,10 +151,10 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
       return <div className="text-center">Date Paid</div>;
     },
     cell: ({ row }) => {
-      const deadline = row.getValue("deadline");
+      const pay_at = row.getValue("pay_at");
       let formatted = "";
-      if (typeof deadline === "string" && /^\d{4}-\d{2}-\d{2}/.test(deadline)) {
-        const [year, month, day] = deadline.split("-");
+      if (typeof pay_at === "string" && /^\d{4}-\d{2}-\d{2}/.test(pay_at)) {
+        const [year, month, day] = pay_at.split("-");
         const date = new Date(Number(year), Number(month) - 1, Number(day));
         formatted = date.toLocaleDateString("en-US", {
           day: "numeric",
@@ -160,9 +162,27 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
           year: "numeric",
         });
       } else {
-        formatted = typeof deadline === "string" ? deadline : "";
+        formatted = typeof pay_at === "string" ? pay_at : "-";
       }
       return <div className="text-center">{formatted}</div>;
+    },
+  },
+  {
+    accessorKey: "amount",
+    header: ({ column }) => <div className="text-center">Amount</div>,
+    cell: ({ row }) => {
+      const amount = row.getValue("amount");
+      const formatted = amount ? Number(amount).toLocaleString("en-US") : "";
+      return <div className="text-center">IDR {formatted}</div>;
+    },
+  },
+  {
+    accessorKey: "fine",
+    header: ({ column }) => <div className="text-center">Fine</div>,
+    cell: ({ row }) => {
+      const fine = row.getValue("fine");
+      const formatted = fine ? Number(fine).toLocaleString("en-US") : "";
+      return <div className="text-center">IDR {formatted}</div>;
     },
   },
   {
@@ -307,14 +327,12 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
                 })()}
               />
               <BillDetailRow
-                label="Total Employee"
-                value={row.getValue("total_employee")}
+                label="Plan Name"
+                value={row.getValue("plan_name")}
               />
               <BillDetailRow
-                label="Amount"
-                value={`IDR ${Number(row.getValue("amount")).toLocaleString(
-                  "en-US"
-                )}`}
+                label="Total Employee"
+                value={row.getValue("total_employee")}
               />
               <BillDetailRow
                 label="Pay Before"
@@ -356,9 +374,35 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
                   />
                 }
               />
+              <div className="w-full border border-neutral-300 my-2"></div>
+              <BillDetailRow
+                label="Amount"
+                value={`IDR ${Number(row.getValue("amount")).toLocaleString(
+                  "en-US"
+                )}`}
+              />
+              <BillDetailRow
+                label="Fine (20%)"
+                value={`IDR ${Number(row.getValue("fine")).toLocaleString(
+                  "en-US"
+                )}`}
+              />
+              <div className="w-full border border-neutral-300 my-2"></div>
+              <BillDetailRow
+                label="Total"
+                labelClassName="font-semibold text-neutral-900"
+                value={(() => {
+                  const amount = Number(row.getValue("amount") || 0);
+                  const fine = Number(row.getValue("fine") || 0);
+                  const total = amount + fine;
+                  return `IDR ${total.toLocaleString("en-US")}`;
+                 
+                })()}
+              />
             </div>
             <SheetFooter className="mt-4">
-              {row.getValue("status") === "pending" && (
+              {(row.getValue("status") === "pending" ||
+                row.getValue("status") === "overdue") && (
                 <Button
                   type="submit"
                   onClick={() => {

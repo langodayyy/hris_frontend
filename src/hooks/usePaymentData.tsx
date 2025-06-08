@@ -14,6 +14,8 @@ export type paymentRule = {
   deadline: Date;
   status: string;
   pay_at: Date;
+  fine: number;
+  plan_name: string; // Optional, if you want to include plan name
 };
 
 const fetcher = (url: string) =>
@@ -41,6 +43,8 @@ export function usePaymentData() {
         deadline: item.deadline,
         status: item.status,
         pay_at: item.pay_at,
+        fine: item.fine || 0, 
+        plan_name: item.plan_name, 
       }))
     : [];
 
