@@ -1,13 +1,7 @@
 "use client";
-import Sidebar from "@/components/sidebar";
+
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import CheckIcon from "./checkicon";
-import SwitchMenu from "./switch-menu";
-import Package from "./package";
-import Seat from "./seat";
 import { useState } from "react";
-import RevealOnScroll from "@/components/ui/reveal-on-scroll";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PricingCard from "../../components/ui/pricing";
 import {
@@ -23,7 +17,10 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function Subscription() {
-  const [activeMenu, setActiveMenu] = useState("package");
+  const [activeTab, setActiveTab] = useState("kurang");
+  // currentPlan hanya menyimpan nama plan yang aktif
+  const [currentPlan] = useState({ name: "Ultra" });
+
   return (
     <>
       <AlertDialog>
@@ -77,8 +74,11 @@ export default function Subscription() {
 
         <div className="flex justify-center">
           {/* tabs option */}
-
-          <Tabs defaultValue="kurang" className="w-[400px] h-fit ">
+          <Tabs
+            defaultValue={activeTab}
+            className="w-[400px] h-fit "
+            onValueChange={setActiveTab}
+          >
             <TabsList className="h-15">
               <TabsTrigger
                 className="text-lg h-full w-full cursor-pointer "
@@ -117,11 +117,12 @@ export default function Subscription() {
                     ]}
                     buttonText="Change Plan"
                     alertDialog={true}
+                    isCurrentPlan={currentPlan.name === "Standart"}
                   />
                 </div>
                 <div className="flex justify-center items-center h-fit">
                   <PricingCard
-                    title="Professional"
+                    title="Premium"
                     imageUrl="/images/price02.png"
                     currency="IDR"
                     price="15.000"
@@ -139,11 +140,12 @@ export default function Subscription() {
                     ]}
                     buttonText="Change Plan"
                     alertDialog={true}
+                    isCurrentPlan={currentPlan.name === "Premium"}
                   />
                 </div>
                 <div className="flex justify-center items-center h-fit">
                   <PricingCard
-                    title="Enterprise"
+                    title="Ultra"
                     imageUrl="/images/price03.png"
                     currency="IDR"
                     price="20.000"
@@ -159,6 +161,7 @@ export default function Subscription() {
                     ]}
                     buttonText="Change Plan"
                     alertDialog={true}
+                    isCurrentPlan={currentPlan.name === "Ultra"}
                   />
                 </div>
               </div>
@@ -185,11 +188,12 @@ export default function Subscription() {
                     ]}
                     buttonText="Change Plan"
                     alertDialog={true}
+                    isCurrentPlan={currentPlan.name === "Standart"}
                   />
                 </div>
                 <div className="flex justify-center items-center h-fit">
                   <PricingCard
-                    title="Professional"
+                    title="Premium"
                     imageUrl="/images/price02.png"
                     currency="IDR"
                     price="14.000"
@@ -207,11 +211,12 @@ export default function Subscription() {
                     ]}
                     buttonText="Change Plan"
                     alertDialog={true}
+                    isCurrentPlan={currentPlan.name === "Premium"}
                   />
                 </div>
                 <div className="flex justify-center items-center h-fit">
                   <PricingCard
-                    title="Enterprise"
+                    title="Ultra"
                     imageUrl="/images/price03.png"
                     currency="IDR"
                     price="18.000"
@@ -227,6 +232,7 @@ export default function Subscription() {
                     ]}
                     buttonText="Change Plan"
                     alertDialog={true}
+                    isCurrentPlan={currentPlan.name === "Ultra"}
                   />
                 </div>
               </div>
