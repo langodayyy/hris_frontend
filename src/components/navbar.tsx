@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import SearchBar from "./ui/search";
 import {
@@ -11,20 +12,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
+import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { toast } from "sonner";
 
 interface NavbarProps {
   title: string; 
   avatarImage?: string;
   userName: string;
+  role: string;
   plan: string;
   period: string;
-  deadline: string;
+  deadline?: string | null;
   
 }
 
-export default function Navbar({ title, avatarImage, userName, plan, period, deadline }: NavbarProps) {
+export default function Navbar({ title, avatarImage, userName, role, plan, period, deadline }: NavbarProps) {
   
   // Fungsi untuk mengambil inisial dari nama pengguna
   const getInitials = (name: string) => {
@@ -48,8 +51,62 @@ export default function Navbar({ title, avatarImage, userName, plan, period, dea
   ];
   
   const notificationCount = notifications.length;
+  const router = useRouter();
+  const handleLogout = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${Cookies.get("token")}`,
+                    // Jangan tambahkan Content-Type manual di sini!
+                },
+        });
 
+        const responseData = await response.json();
 
+        if (!response.ok) {
+            throw responseData; 
+        }
+        
+        router.replace("/sign-in");
+    } catch (err) {
+        let message = "Unknown error occurred";
+        let messagesToShow: string[] = [];
+
+        if (
+        err &&
+        typeof err === "object" &&
+        "message" in err &&
+        typeof (err as any).message === "string"
+        ) {
+        const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+        if (backendError.message.toLowerCase().includes("failed to fetch")) {
+            message = "Unknown error occurred";
+        } else {
+            message = backendError.message;
+        }
+
+        messagesToShow = backendError.errors
+            ? Object.values(backendError.errors).flat()
+            : [message];
+        } else {
+        messagesToShow = [message]
+        }
+
+        toast.error(
+            <>
+                <p className="text-red-700 font-bold">Error</p>
+                {messagesToShow.map((msg, idx) => (
+                <div key={idx} className="text-red-700">• {msg}</div>
+                ))}
+            </>,
+            { duration: 30000 }
+        );
+    } finally {
+
+    }
+  };
   return (
     <nav className="sticky z-10 top-0 flex-row items-center h-auto bg-white px-6 py-[16px] justify-between shadow-[0px_2px_4px_#B0B0B0] grid grid-cols-3">
       <div className="flex w-full justify-start h-[29px]">
@@ -261,7 +318,7 @@ export default function Navbar({ title, avatarImage, userName, plan, period, dea
                     ? `${userName.slice(0, 20)}...`
                     : userName}
                   </span>
-                  <span className="text-sm text-start ext-neutral-500">Roles User</span>
+                  <span className="text-sm text-start ext-neutral-500">{role}</span>
                 </div>
               </div>
             </DropdownMenuTrigger>
@@ -279,7 +336,7 @@ export default function Navbar({ title, avatarImage, userName, plan, period, dea
                       <span className="text-base font-medium text-neutral-900 text-center">
                         Hello, {userName}
                       </span>
-                      <span className="text-sm text-neutral-500">Roles User</span>
+                      <span className="text-sm text-neutral-500">{role}</span>
                   </div>
                   <div className="flex flex-col justify-start items-start w-full gap-1">
                     <div className="flex flex-row">
@@ -290,20 +347,24 @@ export default function Navbar({ title, avatarImage, userName, plan, period, dea
                       <span className="font-medium text-neutral-900">Active Until:&nbsp;</span>
                       <span className="text-neutral-500"> {period}</span>
                     </div>
-                    <div className="flex flex-row w-auto">
-                      <span className="font-extrabold text-danger-600">Pay Bill Before:&nbsp;</span>
-                      <span className="text-danger-600 font-extralight"> {deadline}</span>
-                    </div>
+                   {deadline && deadline !== "null" && (
+                      <div className="flex flex-row w-auto">
+                        <span className="font-extrabold text-danger-600">Pay Bill Before:&nbsp;</span>
+                        <span className="text-danger-600 font-extralight">{deadline}</span>
+                      </div>
+                    )}
+
+                  
                     <Button className="mt-2">Pay Bill</Button>
                   </div>
                 </div>  
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => (window.location.href = "/profile")}
+                <DropdownMenuItem onClick={() => (window.location.href = "/settings/profile")}
               className="cursor-pointer">Profile</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => (window.location.href = "/plan")}
+                <DropdownMenuItem onClick={() => (window.location.href = "/settings/plan")}
               className="cursor-pointer">Change Plan</DropdownMenuItem>
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
         </div>

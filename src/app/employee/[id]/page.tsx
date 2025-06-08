@@ -18,6 +18,7 @@ import { Spinner } from "@/components/ui/spinner";
 import Cookies from "js-cookie";
 import React from "react";
 import { Toaster, toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EmployeeDetails(){
     const [employeeData, setEmployeeData] = useState<EmployeeResponse | undefined>(undefined);
@@ -516,15 +517,9 @@ export default function EmployeeDetails(){
     return (
         <Sidebar title="Employee Details">
             <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
-            <div className="flex flex-col gap-[30px]">
-                {/* <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
-                    <div className="w-full mx-[20px] mb-[-10px]">
-                            <h2 className="justify-center w-full text-lg font-medium whitespace-nowrap mx-[10px]">Employee Details</h2>
-                    </div> */}
+            <div className="flex flex-col gap-[15px]">
                     {isLoading ? ( 
-                        <Card className="min-h-screen flex items-center justify-center rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
-                            <Spinner size="large" />
-                        </Card>
+                        <Skeleton className="min-h-[241px]"></Skeleton>
 
                     ) : (
                     <div>
@@ -773,41 +768,7 @@ export default function EmployeeDetails(){
                                                                     <Spinner size="small" />
                                                                 )}
                                                                 </Button>
-                                                                {/* <Dialog
-                                                                open={success || error}
-                                                                onOpenChange={(open) => {
-                                                                    if (!open) {
-                                                                    setSuccess(false);
-                                                                    setError(false);
-                                                                    handleOkClickResetPassword();
-
-                                                                    }
-                                                                }}
-                                                                >
-                                                                <DialogContent className="bg-white max-w-sm mx-auto">
-                                                                    <DialogHeader>
-                                                                    <DialogTitle>{success ? "Success!" : "Error"}</DialogTitle>
-                                                                    </DialogHeader>
-                                                                    <div className="mt-2">
-                                                                    {success && <p className="text-green-700">Successfully!</p>}
-                                                                    {error && <p className="text-red-600">There was an error.</p>}
-                                                                    </div>
-                                                                    <DialogFooter className="mt-4 flex gap-2 justify-end">
-                                                                    {success && (
-                                                                        <div className="flex gap-2 justify-end w-full">
-                                                                        <DialogClose asChild>
-                                                                            <Button onClick={handleOkClickResetPassword} variant="default" className="max-w-[180px] whitespace-nowrap">Ok</Button>
-                                                                        </DialogClose>
-                                                                        </div>
-                                                                    )}
-                                                                    {error && (
-                                                                        <DialogClose asChild>
-                                                                            <Button onClick={handleOkClickResetPassword} variant="default" className="max-w-[180px] whitespace-nowrap">OK</Button>
-                                                                        </DialogClose>
-                                                                    )}
-                                                                    </DialogFooter>
-                                                                </DialogContent>
-                                                                </Dialog> */}
+                                                               
                                                         </div>
                                                     </div>
                                        
@@ -874,9 +835,17 @@ export default function EmployeeDetails(){
                         </Card>
                     </div>   )}  
                 {/* </Card> */}
-                {employeeData?.employee && (
-                <EmployeeDocuments isActive={employeeData?.employee.employee_status !== "Active"}></EmployeeDocuments>
-                )}
+                  {isLoading ? ( 
+                        <Skeleton className="min-h-[141px]"></Skeleton>
+
+                    ) : (
+                        <>
+                            {employeeData?.employee && (
+                            <EmployeeDocuments isActive={employeeData?.employee.employee_status !== "Active"}></EmployeeDocuments>
+                            )}
+                        </>
+                    )}
+              
              </div>
         </Sidebar>
     );

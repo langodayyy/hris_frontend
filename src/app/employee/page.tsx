@@ -8,6 +8,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import Cookies from "js-cookie";
 import { Toaster, toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Employee() {
   const [employees, setEmployees] = useState<Employees[]>([])
@@ -93,8 +94,11 @@ export default function Employee() {
       <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
       <div className="w-full">
         <div className="flex flex-wrap justify-center gap-[30px] min-h-[141px] w-full mx-auto">
-          <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
-
+          {isLoading ? (
+            <Skeleton className="flex-1 min-w-[250px] max-w-[500px] "></Skeleton>
+          ):(
+            <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
+            
             <div className="flex-col mt-[-5px] mx-[10px]">
               <div className="flex w-full h-[44px] items-center gap-[10px] mx-[20px]">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -105,12 +109,14 @@ export default function Employee() {
                 </svg>
                 <p className="justify-center w-full text-base font-medium whitespace-nowrap">Periode</p>
               </div>
-              {isLoading ? (
-                <Spinner className="w-full mx-[20px] my-[10px]" size="medium" />
-              ) : (<p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{periode}</p>)}
-              
+                <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{periode}</p>
             </div>
           </Card>
+          )}
+          
+           {isLoading ? (
+                <Skeleton className="flex-1 min-w-[250px] max-w-[500px] "></Skeleton>
+          ):(
           <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
           <div className="flex-col mt-[-5px] mx-[10px]">
               <div className="flex w-full h-[44px] items-center gap-[10px] mx-[20px]">
@@ -119,11 +125,13 @@ export default function Employee() {
                 </svg>
                 <p className="justify-center w-full text-base font-medium whitespace-nowrap">Total Employee</p>
               </div>
-              {isLoading ? (
-                <Spinner className="w-full mx-[20px] my-[10px]" size="medium" />
-              ) : (<p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{summary?.["Total Employee"]}</p>)}
+              <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{summary?.["Total Employee"]}</p>
             </div>
           </Card>
+          )}
+           {isLoading ? (
+                  <Skeleton className="flex-1 min-w-[250px] max-w-[500px] "></Skeleton>
+          ):(
           <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
           <div className="flex-col mt-[-5px] mx-[10px]">
               <div className="flex w-full h-[44px] items-center gap-[10px] mx-[20px]">
@@ -134,11 +142,14 @@ export default function Employee() {
                 </svg>
                 <p className="justify-center w-full text-base font-medium whitespace-nowrap">Total New Hire</p>
               </div>
-              {isLoading ? (
-                <Spinner className="w-full mx-[20px] my-[10px]" size="medium" />
-              ) : (<p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{summary?.["Total New Hire"]}</p>)}
+              
+              <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{summary?.["Total New Hire"]}</p>
             </div>
           </Card>
+          )}
+           {isLoading ? (
+                 <Skeleton className="flex-1 min-w-[250px] max-w-[500px] "></Skeleton>
+          ):(
           <Card className="flex-1 min-w-[250px] max-w-[500px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
           <div className="flex-col mt-[-5px] mx-[10px]">
               <div className="flex w-full h-[44px] items-center gap-[10px] mx-[20px]">
@@ -149,13 +160,15 @@ export default function Employee() {
 
                 <p className="justify-center w-full text-base font-medium whitespace-nowrap">Active Employee</p>
               </div>
-              {isLoading ? (
-                <Spinner className="w-full mx-[20px] my-[10px]" size="medium" />
-              ) : (<p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{summary?.["Active Employee"]}</p>)}
+              <p className="justify-center w-full text-4xl font-bold mx-[20px] my-[10px]">{summary?.["Active Employee"]}</p>
             </div>
           </Card>
+          )}
         </div>
         <div className="mt-[30px] w-full overflow-x-auto">
+            {isLoading ? (
+            <Skeleton className="min-h-[141px]"></Skeleton>
+          ):(
           <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
             <CardContent className="overflow-x-auto">
                 
@@ -163,6 +176,7 @@ export default function Employee() {
               
             </CardContent>
           </Card>
+          )}
         </div>
       </div>
       
