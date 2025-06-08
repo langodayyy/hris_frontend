@@ -38,8 +38,20 @@ export default function Navbar({ title, avatarImage, userName, role, plan, perio
   };
 
   //sugestion searchbar
-  const suggestion = ['Dashboard', 'Profile', 'Settings', 'Logout'];
-  const result = ['Article 1', 'Product A', 'Blog Post', 'Item XYZ'];
+const result = [
+  { label: 'Dashboard', path: '/dashboard' },
+  { label: 'Employee', path: '/employee' },
+  { label: 'Add Employee', path: '/employee/add' },
+  { label: 'Checkclock', path: '/checkclock/management' },
+  { label: 'Add Checkclock', path: '/checkclock/management/add' },
+  { label: 'Checkclock Setting', path: '/checkclock/setting' },
+  { label: 'Overtime', path: '/overtime/management' },
+  { label: 'Add Overtime', path: '/overtime/management/add' },
+  { label: 'Overtime Setting', path: '/overtime/setting' },
+  { label: 'Bills', path: '/bills' },
+  { label: 'Profile', path: '/settings/profile' },
+  { label: 'Plan', path: '/settings/plan' },
+];
 
   // array notification sample
   const notifications = [
@@ -115,7 +127,7 @@ export default function Navbar({ title, avatarImage, userName, role, plan, perio
         </a>
       </div>
       <div className="flex flex-row items-center justify-center w-full h-[36px] gap-[12px] relative">
-        <SearchBar suggestion={suggestion} results={result} />
+        <SearchBar results={result} />
       </div>
 
     {/* notification */}
