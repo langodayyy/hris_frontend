@@ -236,68 +236,6 @@ const ContactInformation = ({ employeeData, onUpdate }: Props) => {
                           <Spinner size="small" />
                         )}
                       </Button>
-                      {/* <Dialog
-                        open={success || error}
-                        onOpenChange={(open) => {
-                          if (!open) {
-                            setSuccess(false);
-                            setError(false);
-                            handleOkClick();
-                          }
-                        }}
-                      >
-                        <DialogContent className="bg-white max-w-sm mx-auto">
-                          <DialogHeader>
-                            <DialogTitle>
-                              {success ? "Success!" : "Error"}
-                            </DialogTitle>
-                          </DialogHeader>
-                          <div className="mt-2">
-                            {success && (
-                              <p className="text-green-700">Successfully!</p>
-                            )}
-                            {error && (
-                              <>
-                                <p className="text-red-700">There was an error submitting the form:</p>
-                                <ul className="list-disc list-inside">
-                                  {errorMessages?.map((msg, idx) => (
-                                    <li className="text-red-700" key={idx}>{msg}</li>
-                                  ))}
-                                </ul>
-                              </>
-                              // <p className="text-red-600">
-                              //   There was an error submitting the form.
-                              // </p>
-                            )}
-                          </div>
-                          <DialogFooter className="mt-4 flex gap-2 justify-end">
-                            {success && (
-                              <div className="flex gap-2 justify-end w-full">
-                                <DialogClose asChild>
-                                  <Button
-                                    onClick={handleOkClick}
-                                    variant="default"
-                                    className="max-w-[180px] whitespace-nowrap"
-                                  >
-                                    Ok
-                                  </Button>
-                                </DialogClose>
-                              </div>
-                            )}
-                            {error && (
-                              <DialogClose asChild>
-                                <Button
-                                  onClick={handleOkClick}
-                                  variant="default"
-                                  className="max-w-[180px] whitespace-nowrap"
-                                >
-                                  OK
-                                </Button>
-                              </DialogClose>
-                            )}
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog> */}
                     </div>
                   </div>
                 </form>

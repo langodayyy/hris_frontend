@@ -79,7 +79,7 @@ const result = [
         if (!response.ok) {
             throw responseData; 
         }
-        
+        Cookies.remove("token");
         router.replace("/sign-in");
     } catch (err) {
         let message = "Unknown error occurred";
@@ -359,7 +359,7 @@ const result = [
                       <span className="font-medium text-neutral-900">Active Until:&nbsp;</span>
                       <span className="text-neutral-500"> {period}</span>
                     </div>
-                   {deadline && deadline !== "null" && (
+                   {deadline && deadline !== "null" && deadline !== "undefined" && (
                       <div className="flex flex-row w-auto">
                         <span className="font-extrabold text-danger-600">Pay Bill Before:&nbsp;</span>
                         <span className="text-danger-600 font-extralight">{deadline}</span>

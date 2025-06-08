@@ -4,10 +4,18 @@ import SigninForm from "@/components/custom/signinForm";
 import { useFormContext } from "@/context/FormContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import GoogleAuthInButton from "@/components/custom/googleAuthIn";
+import { useEffect } from "react";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
+  const router = useRouter();
   const { errors } = useFormContext();
-
+  useEffect(() => {
+    if(Cookies.get("token")){
+      router.push("dashboard");
+    }
+  }, []);
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
     <div className="flex h-screen w-screen bg-white p-[23px]">

@@ -137,7 +137,6 @@ function NavItem({
   );
 }
 export default function Sidebar({ children, title }: LayoutProps) {
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
 
@@ -147,73 +146,18 @@ export default function Sidebar({ children, title }: LayoutProps) {
   const [role, setRole] = useState("");
   const [period, setPeriod] = useState("");
   const [deadline, setDeadline] = useState<string | null>(null);
-  const fetchData = async () => {
 
-    try {
-        // setIsLoading(true);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/navbar`, {
-            method: "GET",
-        headers: {
-            "Authorization": `Bearer ${Cookies.get("token")}`,
-            }
-        });
-
-        
-        
-        const data = await res.json();
-        if (res.status === 403 || res.status === 401) {
-          Cookies.remove("token"); // hapus token agar tidak disimpan
-          router.replace("/sign-in");
-          return;
-        }
-        if (!res.ok) {
-            throw data; 
-        }
-        setFullName(data.full_name);
-        setRole(data.user_role);
-        setPlanName(data.plan_name);
-        setPeriod(data.bill_period);
-        setDeadline(data.data_deadline);
-       
-    } catch (err: any) {
-        let message = "Unknown error occurred";
-        let messagesToShow: string[] = [];
-
-        if (
-        err &&
-        typeof err === "object" &&
-        "message" in err &&
-        typeof (err as any).message === "string"
-        ) {
-        const backendError = err as { message: string; errors?: Record<string, string[]> };
-
-        if (backendError.message.toLowerCase().includes("failed to fetch")) {
-            message = "Unknown error occurred";
-        } else {
-            message = backendError.message;
-        }
-
-        messagesToShow = backendError.errors
-            ? Object.values(backendError.errors).flat()
-            : [message];
-        } else {
-        messagesToShow = [message]
-        }
-          
-        toast.error(
-        <>
-            <p className="text-red-700 font-bold">Error</p>
-            {messagesToShow.map((msg, idx) => (
-            <div key={idx} className="text-red-700">• {msg}</div>
-            ))}
-        </>,
-        { duration: 30000 }
-        );
-    } finally {
-    }
-  };
   useEffect(() => {
-    fetchData();
+    const name = Cookies.get("full_name");
+    if (name) setFullName(name);
+    const plan = Cookies.get("plan_name");
+    if (plan) setPlanName(plan);
+    const role = Cookies.get("user_role");
+    if (role) setRole(role);
+    const period = Cookies.get("bill_period");
+    if (period) setPeriod(period);
+    const deadline = Cookies.get("bill_deadline");
+    if (deadline) setDeadline(deadline);
   }, []);
 
   return (
