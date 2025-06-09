@@ -32,7 +32,7 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
   {
     accessorKey: "minClockIn",
     header: ({ column }) => {
-      return <div className="text-center">Clock In</div>;
+      return <div className="text-center">Min Clock In</div>;
     },
     cell: ({ row }) => {
       return <div className="text-center">{row.getValue("minClockIn")}</div>;
@@ -50,7 +50,7 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
   {
     accessorKey: "maxClockIn",
     header: ({ column }) => {
-      return <div className="text-center">Clock In</div>;
+      return <div className="text-center">Max Clock In</div>;
     },
     cell: ({ row }) => {
       return <div className="text-center">{row.getValue("maxClockIn")}</div>;
@@ -68,39 +68,12 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
   {
     accessorKey: "maxClockOut",
     header: ({ column }) => {
-      return <div className="text-center">Clock Out</div>;
+      return <div className="text-center">Max Clock Out</div>;
     },
     cell: ({ row }) => {
       return <div className="text-center">{row.getValue("maxClockOut")}</div>;
     },
   },
-  // {
-  //   accessorKey: "latidude",
-  //   header: ({ column }) => {
-  //     return <div className="text-center">Latitude</div>;
-  //   },
-  //   cell: ({ row }) => {
-  //     return <div className="text-center">{row.getValue("latidude")}</div>;
-  //   },
-  // },
-  // {
-  //   accessorKey: "longitude",
-  //   header: ({ column }) => {
-  //     return <div className="text-center">Longitude</div>;
-  //   },
-  //   cell: ({ row }) => {
-  //     return <div className="text-center">{row.getValue("longitude")}</div>;
-  //   },
-  // },
-  // {
-  //   accessorKey: "radius",
-  //   header: ({ column }) => {
-  //     return <div className="text-center">Radius (m)</div>;
-  //   },
-  //   cell: ({ row }) => {
-  //     return <div className="text-center">{row.getValue("radius")}</div>;
-  //   },
-  // },
   {
     accessorKey: "action",
     header: ({ column }) => {
@@ -135,7 +108,7 @@ export const wfaColumns: ColumnDef<CheckclockSettingForm>[] = [
   {
     accessorKey: "minClockIn",
     header: ({ column }) => {
-      return <div className="text-center">Clock In</div>;
+      return <div className="text-center">Min Clock In</div>;
     },
     cell: ({ row }) => {
       return <div className="text-center">{row.getValue("minClockIn")}</div>;
@@ -144,7 +117,7 @@ export const wfaColumns: ColumnDef<CheckclockSettingForm>[] = [
   {
     accessorKey: "clockIn",
     header: ({ column }) => {
-      return <div className="text-center">Clock Out</div>;
+      return <div className="text-center">Clock In</div>;
     },
     cell: ({ row }) => {
       return <div className="text-center">{row.getValue("clockIn")}</div>;
@@ -153,7 +126,7 @@ export const wfaColumns: ColumnDef<CheckclockSettingForm>[] = [
   {
     accessorKey: "maxClockIn",
     header: ({ column }) => {
-      return <div className="text-center">Clock Out</div>;
+      return <div className="text-center">Max Clock In</div>;
     },
     cell: ({ row }) => {
       return <div className="text-center">{row.getValue("maxClockIn")}</div>;

@@ -44,7 +44,7 @@ export default function CheckclockSettingPage() {
 
   return (
     <Sidebar title={"Checkclock"}>
-      <Toaster position="bottom-right" expand={true}></Toaster>
+      <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
       <DataTable
         columns={selectedWorkType === "WFO" ? wfoColumns : wfaColumns}
         data={filteredData}

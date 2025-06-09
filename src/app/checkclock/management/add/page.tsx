@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar"; // Pastikan Anda memiliki komponen Calendar
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 import {
   Command,
@@ -36,52 +37,41 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Route } from "react-router-dom";
+import { Spinner } from "@/components/ui/spinner";
+import { useEdit } from "@/context/EditFormContext";
+import { Toaster, toast } from "sonner";
 
-const employeesSample = [
-  {
-    id_employee: "EMP0001",
-    Name: "Mumtaz",
-    position: "Manager",
-    workType: "",
-    clockIn: "",
-    clockOut: "",
-  },
-  {
-    id_employee: "EMP0002",
-    Name: "Kemal",
-    position: "Manager",
-    workType: "",
-    clockIn: "",
-    clockOut: "",
-  },
-  {
-    id_employee: "EMP0003",
-    Name: "Lucky",
-    position: "Manager",
-    workType: "",
-    clockIn: "08:00",
-    clockOut: "",
-  },
-  {
-    id_employee: "EMP0004",
-    Name: "Silfi",
-    position: "Manager",
-    workType: "",
-    clockIn: "08:00",
-    clockOut: "",
-  },
-];
+type Employee = {
+  dataEmployeeId: string;
+  idEmployee: string;
+  name: string;
+  ccDate: string;
+  position: string;
+  worktype: string | null;
+  clockIn: string | null;
+  clockOut: string | null;
+};
 
 const attendanceType = [
-  { label: "Clock In", value: "clockIn" },
-  { label: "Clock Out", value: "clockOut" },
-  { label: "Anual Leave", value: "anualLeave" },
-  { label: "Sick Leave", value: "sickLeave" },
+  { label: "Clock In", value: "clockIn", input: "Present", subInput: "in" },
+  { label: "Clock Out", value: "clockOut", input: "Present", subInput: "out" },
+  {
+    label: "Annual Leave",
+    value: "annualLeave",
+    input: "Annual Leave",
+    subInput: "",
+  },
+  {
+    label: "Sick Leave",
+    value: "sickLeave",
+    input: "Sick Leave",
+    subInput: "",
+  },
 ];
 
 const workType = [
-  { label: "WFO", value: "wfo" },
-  { label: "WFA", value: "wfa" },
+  { label: "WFO", value: "WFO" },
+  { label: "WFA", value: "WFA" },
 ];
 
 export default function AddCheckclockPage() {
@@ -89,17 +79,94 @@ export default function AddCheckclockPage() {
   const [OpenAttendanceType, setOpenAttendanceType] = React.useState(false);
   const [valueEmployee, setValueEmployee] = React.useState("");
   const [valueAttendanceType, setValueAttendanceType] = React.useState("");
+  const [handleAttendanceType, setHandleAttendanceType] = React.useState("");
+  const [valueClockType, setValueClockType] = React.useState("");
   const inputRef = React.useRef<HTMLButtonElement>(null);
-  const selectedEmployee = employeesSample.find(
-    (employee) => employee.Name === valueEmployee
+  const [employees, setEmployees] = React.useState<Employee[]>([]);
+  const [loading, setLoading] = React.useState(false);
+  const { errors, setErrors, success, setSuccess } = useEdit();
+
+  const toCamelCase = (employee: any): Employee => ({
+    dataEmployeeId: employee.data_id,
+    idEmployee: employee.id_employee,
+    name: employee.name,
+    ccDate: employee.check_clock_date,
+    position: employee.position,
+    worktype: employee.worktype,
+    clockIn: employee.clock_in,
+    clockOut: employee.clock_out,
+  });
+
+  React.useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const userCookie = Cookies.get("token");
+        if (userCookie) {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/cc-employee-data`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userCookie}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            // If the response is not OK, parse the error response
+            const errorData = await response.json();
+            return { success: false, errors: errorData.errors };
+          }
+
+          // Parse and return the success response
+          const responseData = await response.json();
+          const camelCaseData = responseData.map(toCamelCase);
+          setEmployees(camelCaseData);
+        } else {
+          return {
+            success: false,
+            errors: { general: ["User token not found"] },
+          };
+        }
+      } catch (error: any) {
+        // Handle network or other unexpected errors
+        return {
+          success: false,
+          errors: {
+            general: [error.message || "An unexpected error occurred"],
+          },
+        };
+      }
+    };
+
+    fetchEmployees();
+  }, []);
+
+  const selectedEmployee = employees.find(
+    (employee) => employee.dataEmployeeId === valueEmployee
   );
+
+  console.log(selectedEmployee);
+  console.log(employees);
+  console.log(valueEmployee);
+
+  const [selectedWorkType, setSelectedWorkType] = React.useState("");
+  React.useEffect(() => {
+    if (selectedEmployee?.worktype) {
+      setSelectedWorkType(selectedEmployee.worktype);
+    } else {
+      setSelectedWorkType(""); // Optional: reset if employee has no worktype
+    }
+  }, [selectedEmployee]);
+
   const validateAttendanceType =
-    valueAttendanceType === "Anual Leave" ||
-    valueAttendanceType === "Sick Leave";
+    handleAttendanceType === "Annual Leave" ||
+    handleAttendanceType === "Sick Leave";
   const filteredAttendanceType = attendanceType.filter((type) => {
     // Hilangkan opsi "Clock In" jika employee memiliki data clockIn
-    if (type.value === "clockIn" && selectedEmployee?.clockIn) {
-      return false;
+    if (selectedEmployee?.clockIn) {
+      return type.value === "clockOut";
     }
     if (type.value === "clockOut" && !selectedEmployee?.clockIn) {
       return false;
@@ -108,37 +175,151 @@ export default function AddCheckclockPage() {
   });
 
   const [date, setDate] = React.useState<DateRange | undefined>(undefined);
-  const anual =
-    valueAttendanceType === "Anual Leave" ||
-    valueAttendanceType === "Sick Leave";
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const annual =
+    handleAttendanceType === "Annual Leave" ||
+    handleAttendanceType === "Sick Leave";
+
+  const employeeOptions = employees.map((employee) => ({
+    label: `${employee.idEmployee} - ${employee.name}`,
+    value: employee.dataEmployeeId,
+  }));
+
+  const handleEmployeeChange = (label: string) => {
+    const selected = employeeOptions.find((option) => option.label === label);
+    if (selected) {
+      setValueEmployee(selected.value);
+    }
   };
+
+  console.log(handleAttendanceType);
+  console.log(valueAttendanceType);
+  console.log("start",date?.from);
+  console.log("Formatted start_date:", date?.from ? format(date.from, "yyyy-MM-dd") : "");
+  console.log("end",date?.to);
+
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const handleFileDrop = (files: File[]) => {
+    if (files.length > 0 && fileInputRef.current) {
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(files[0]);
+      fileInputRef.current.files = dataTransfer.files;
+    }
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+
+    try {
+      const form = document.getElementById("checkClockForm") as HTMLFormElement;
+      const formData = new FormData(form);
+
+      console.log("Submitting data:", Object.fromEntries(formData.entries()));
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/check-clocks`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+          body: formData,
+        }
+      );
+
+      const responseData = await response.json();
+      console.log("Response:", responseData);
+
+      if (!response.ok) {
+        setErrors(responseData.errors);
+        console.log("state err", errors);
+      } else {
+        setSuccess({ message: responseData.message || "Successfully submitted"});
+        console.log("state succ", success);
+      }
+
+    } catch (err: any) {
+      console.log("Submit error:", err);
+      setErrors(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+  if (errors && Object.keys(errors).length > 0) {
+    Object.entries(errors).forEach(([field, messages]) => {
+      if (Array.isArray(messages)) {
+        messages.forEach((message) => toast.error(`${message}`));
+      } else {
+        toast.error(`${messages}`);
+      }
+    });
+    setErrors({});
+  }
+}, [errors]);
+
+  React.useEffect(() => {
+    if (success && Object.keys(success).length > 0) {
+      toast.success(`${success.message}`);
+      // setSuccess({});
+
+      // Delay redirect to allow user to see the toast
+      const timeout = setTimeout(() => {
+        router.push("/checkclock/management"); // replace with your desired route
+      }, 1000); // 2 seconds delay
+
+      // Clean up timeout on unmount
+      return () => clearTimeout(timeout);
+    }
+  }, [success]);
 
   return (
     <Sidebar title="Checkclock">
+      <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
       <Card>
         <CardContent className="flex flex-col gap-[15px]">
           <div className="px-[10px]">
             <h1 className="text-lg font-medium ">Add Checkclock</h1>
           </div>
-          <form action="" onSubmit={handleSubmit}>
+          <form
+            id="checkClockForm"
+            onSubmit={(e) => {
+              e.preventDefault(); // mencegah reload halaman
+              handleSubmit();
+            }}
+          >
+            <input
+              type="hidden"
+              name="start_date"
+              value={date?.from ? format(date.from, "yyyy-MM-dd") : ""}
+            />
+            <input
+              type="hidden"
+              name="end_date"
+              value={date?.to ? format(date.to, "yyyy-MM-dd") : ""}
+            />
+            <input
+              type="hidden"
+              name="ck_setting_name"
+              value={selectedWorkType}
+            />
             <Card className="w-full p-5 gap-[30px]">
               <div className="w-full flex flex-col gap-4">
                 {/* employee name */}
                 <div className="flex flex-col gap-2">
                   <Label>Employee Name</Label>
                   <SelectPopover
-                    options={employeesSample.map((employee) => ({
-                      label: employee.Name,
-                      value: employee.Name,
-                    }))}
-                    value={valueEmployee}
-                    onChange={(value: string) => setValueEmployee(value)}
+                    options={employeeOptions}
+                    value={
+                      employeeOptions.find(
+                        (option) => option.value === valueEmployee
+                      )?.label || ""
+                    }
+                    onChange={handleEmployeeChange}
                     placeholder="Select employee"
                   />
                   <Input
-                    name="employeeName"
+                    name="employee_id"
                     type="hidden"
                     value={valueEmployee}
                   />
@@ -159,16 +340,17 @@ export default function AddCheckclockPage() {
                             aria-expanded={OpenAttendanceType}
                             className={cn(
                               "justify-between border-neutral-300 w-full hover:bg-primary-900 h-[45px]",
-                              !valueAttendanceType
+                              !handleAttendanceType
                                 ? "text-neutral-300"
                                 : "text-neutral-900"
                             )}
                             ref={inputRef}
                           >
-                            {valueAttendanceType
+                            {handleAttendanceType
                               ? attendanceType.find(
                                   (attendanceType) =>
-                                    attendanceType.label === valueAttendanceType
+                                    attendanceType.label ===
+                                    handleAttendanceType
                                 )?.label
                               : "Select attendance type"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -196,20 +378,23 @@ export default function AddCheckclockPage() {
                                       <CommandItem
                                         key={attendanceType.label}
                                         value={attendanceType.label}
-                                        onSelect={(currentValue) => {
-                                          setValueAttendanceType(
-                                            currentValue === valueAttendanceType
-                                              ? ""
-                                              : currentValue
+                                        onSelect={() => {
+                                          setHandleAttendanceType(
+                                            attendanceType.label
                                           );
-                                          console.log(currentValue);
+                                          setValueAttendanceType(
+                                            attendanceType.input
+                                          );
+                                          setValueClockType(
+                                            attendanceType.subInput
+                                          );
                                           setOpenAttendanceType(false);
                                         }}
                                       >
                                         <Check
                                           className={cn(
                                             "mr-2 h-4 w-4",
-                                            valueAttendanceType ===
+                                            handleAttendanceType ===
                                               attendanceType.label
                                               ? "opacity-100"
                                               : "opacity-0"
@@ -227,9 +412,14 @@ export default function AddCheckclockPage() {
                       </div>
                     </Popover>
                     <Input
-                      name="attendanceType"
+                      name="status"
                       type="hidden"
                       value={valueAttendanceType}
+                    />
+                    <Input
+                      name="check_clock_type"
+                      type="hidden"
+                      value={valueClockType}
                     />
                   </div>
                 </div>
@@ -238,6 +428,15 @@ export default function AddCheckclockPage() {
                   <Label>Date</Label>
                   {validateAttendanceType ? (
                     <Popover>
+                      <input
+                      name="check_clock_date"
+                      type="hidden"
+                      defaultValue={`${new Date().getFullYear()}-${String(
+                        new Date().getMonth() + 1
+                      ).padStart(2, "0")}-${String(
+                        new Date().getDate()
+                      ).padStart(2, "0")}`}
+                    ></input>
                       <PopoverTrigger asChild>
                         <Button
                           id="date"
@@ -347,7 +546,8 @@ export default function AddCheckclockPage() {
                     </Popover>
                   ) : (
                     <Input
-                      name="date"
+                      readOnly
+                      name="check_clock_date"
                       type="date"
                       defaultValue={`${new Date().getFullYear()}-${String(
                         new Date().getMonth() + 1
@@ -360,7 +560,10 @@ export default function AddCheckclockPage() {
                 {/* WorkType */}
                 <div className="flex flex-col gap-2">
                   <Label>Work Type</Label>
-                  <Select>
+                  <Select
+                    value={selectedWorkType}
+                    onValueChange={(value) => setSelectedWorkType(value)}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select work type" />
                     </SelectTrigger>
@@ -374,7 +577,7 @@ export default function AddCheckclockPage() {
                   </Select>
                 </div>
 
-                {!anual ? (
+                {!annual ? (
                   <div
                     className={cn(
                       "grid gap-[10px]",
@@ -385,7 +588,7 @@ export default function AddCheckclockPage() {
                     <div className="flex-col gap-2 flex">
                       <TimeInput
                         label="Clock In"
-                        name="clockIn"
+                        name="check_clock_time"
                         defaultValue={selectedEmployee?.clockIn || ""} // Gunakan nilai clockIn jika ada
                         readOnly={!!selectedEmployee?.clockIn} // Read-only jika clockIn ada
                       />
@@ -395,7 +598,7 @@ export default function AddCheckclockPage() {
                       <div className="flex-col gap-2 flex">
                         <TimeInput
                           label="Clock Out"
-                          name="clockOut"
+                          name="check_clock_time"
                           defaultValue={selectedEmployee?.clockOut || ""} // Kosong jika tidak ada clockOut
                           disabled={!selectedEmployee?.clockIn} // Disabled jika tidak ada clockIn
                         />
@@ -406,7 +609,7 @@ export default function AddCheckclockPage() {
                   <div className="flex flex-col gap-2">
                     <Label>Upload Supporting Evidence</Label>
                     <FileUploader
-                      onDrop={(files) => console.log("Image Files:", files)}
+                      onDrop={handleFileDrop}
                       accept={{
                         "image/png": [],
                         "image/jpeg": [],
@@ -414,22 +617,31 @@ export default function AddCheckclockPage() {
                       }}
                       type="Only support .png, .jpg, .jpeg"
                     />
+                    <input
+                      type="file"
+                      name="evidence"
+                      // accept=".csv"
+                      ref={fileInputRef}
+                      hidden
+                    />
                   </div>
                 )}
                 {/* Time */}
               </div>
+              <div className="flex w-full gap-[15px] justify-end">
+                <div className="w-[93px]">
+                  <Button type="button" variant={"outline"} onClick={() => router.back()}>
+                    Cancel
+                  </Button>
+                </div>
+                <div className="w-[93px]">
+                  <Button type="submit" disabled={loading}>
+                    {loading ? <Spinner size={"small"}></Spinner> : "Save"}
+                  </Button>
+                </div>
+              </div>
             </Card>
           </form>
-          <div className="flex w-full gap-[15px] justify-end">
-            <div className="w-[93px]">
-              <Button variant={"outline"} onClick={() => router.back()}>
-                Cancel
-              </Button>
-            </div>
-            <div className="w-[93px]">
-              <Button type="submit">Save</Button>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </Sidebar>
