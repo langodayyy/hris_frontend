@@ -1,5 +1,6 @@
 "use client";
 
+import Cookies from "js-cookie";
 import Sidebar from "@/components/sidebar";
 import {
   AlertDialog,
@@ -31,11 +32,22 @@ import { Label } from "@/components/ui/label";
 import PasswordInput from "@/components/ui/passwordInput";
 import FormPhoneInput from "@/components/ui/phoneInput";
 import { useState, useCallback, useEffect } from "react";
+import { toast, Toaster } from "sonner";
+import { useForm } from "@felte/react";
+import { validator } from "@felte/validator-zod";
+import { z } from "zod";
+import { reporter } from "@felte/reporter-react";
+
+const userSchema = z.object({
+    user_photo: z.any().optional(),
+    full_name: z.string().min(1, { message: 'First name is required' }),
+    phone: z.string().min(10, { message: 'Phone number is invalid' }),
+    email: z.string().email({ message: 'Invalid email address' }),
+})
 
 // Define interfaces for better type safety and readability
 interface ProfileData {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   phoneNumber: string;
   email: string;
 }
@@ -43,8 +55,12 @@ interface ProfileData {
 interface Department {
   id: number;
   name: string;
-  positions: string[];
+  positions: {
+    id: number;
+    name: string;
+  }[];
 }
+
 
 export default function Profile() {
   // --- State Management ---
@@ -61,11 +77,11 @@ export default function Profile() {
     useState<File | null>(null);
 
   // Profile and Company data states
+  const [phone, setPhone] = useState<string | undefined>(undefined);
   const [profileData, setProfileData] = useState<ProfileData>({
-    firstName: "John",
-    lastName: "Doe",
-    phoneNumber: "+6281234567890",
-    email: "john.doe@example.com",
+    fullName: '',
+    phoneNumber: '',
+    email: '',
   });
   const [companyName, setCompanyName] = useState("Acme Corporation");
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -77,19 +93,19 @@ export default function Profile() {
   const [showInUseAlertDialog, setShowInUseAlertDialog] = useState(false);
   const [inUseMessage, setInUseMessage] = useState("");
 
-  useEffect(() => {
-    // --- SIMULASI DATA YANG SEDANG DIGUNAKAN ---
-    // Misalnya, anggap departemen dengan ID 1 tidak bisa dihapus
-    setDepartmentsInUse([2]);
+  // useEffect(() => {
+  //   // --- SIMULASI DATA YANG SEDANG DIGUNAKAN ---
+  //   // Misalnya, anggap departemen dengan ID 1 tidak bisa dihapus
+  //   setDepartmentsInUse([2]);
 
-    // Anggap posisi "Software Engineer" di departemen ID 2 tidak bisa dihapus
-    setPositionsInUse([
-      // { deptId: 1, positionName: "Software Engineer" },
-      { deptId: 2, positionName: "Manager" },
-      { deptId: 2, positionName: "Frontend Engineer" },
-      // Anda bisa menambahkan simulasi lain di sini
-    ]);
-  }, []); // [] agar hanya berjalan sekali saat komponen di-mount
+  //   // Anggap posisi "Software Engineer" di departemen ID 2 tidak bisa dihapus
+  //   setPositionsInUse([
+  //     // { deptId: 1, positionName: "Software Engineer" },
+  //     { deptId: 2, positionName: "Manager" },
+  //     { deptId: 2, positionName: "Frontend Engineer" },
+  //     // Anda bisa menambahkan simulasi lain di sini
+  //   ]);
+  // }, []); // [] agar hanya berjalan sekali saat komponen di-mount
 
   // Original data for cancelling edits
   const [originalProfileData, setOriginalProfileData] =
@@ -145,7 +161,7 @@ export default function Profile() {
     useState(false);
   const [positionToDeleteInfo, setPositionToDeleteInfo] = useState<{
     deptId: number;
-    positionIndex: number;
+    positionId: number;
     positionName: string;
   } | null>(null);
 
@@ -161,7 +177,7 @@ export default function Profile() {
   } | null>(null);
   const [positionToEditInfo, setPositionToEditInfo] = useState<{
     deptId: number;
-    positionIndex: number;
+    positionId: number;
     oldName: string;
     newName: string;
   } | null>(null);
@@ -253,9 +269,10 @@ export default function Profile() {
   const handleAddDepartmentClick = useCallback(() => {
     setShowAddDepartmentForm(true);
   }, []);
-
+  
   const handleAddDepartmentSubmit = useCallback(() => {
     if (newDepartmentName.trim() !== "") {
+      
       const newId =
         departments.length > 0
           ? Math.max(...departments.map((d) => d.id)) + 1
@@ -383,7 +400,11 @@ export default function Profile() {
         setDepartments((prev) =>
           prev.map((dept) =>
             dept.id === deptId
-              ? { ...dept, positions: [...dept.positions, positionName] }
+              ? { ...dept, positions: [...dept.positions, {
+                    id: Date.now(), // temp ID sebelum dapat dari backend
+                    name: positionName,
+                  },
+                ] }
               : dept
           )
         );
@@ -395,20 +416,27 @@ export default function Profile() {
   );
 
   const handleEditPosition = useCallback(
-    (deptId: number, positionIndex: number) => {
+    (deptId: number, positionId: number) => {
       const department = departments.find((dept) => dept.id === deptId);
-      if (department && department.positions[positionIndex]) {
+      const position = department?.positions.find((pos) => pos.id === positionId);
+
+      if (department && position) {
         setEditPositionName((prev) => ({
           ...prev,
           [deptId]: {
             ...prev[deptId],
-            [positionIndex]: department.positions[positionIndex],
+            [positionId]: position.name,
           },
         }));
+
         setShowEditPositionForm((prev) => ({
           ...prev,
-          [deptId]: { ...prev[deptId], [positionIndex]: true },
+          [deptId]: {
+            ...prev[deptId],
+            [positionId]: true,
+          },
         }));
+
         // Close other forms when opening position edit form
         setShowAddPositionForm((prev) => ({ ...prev, [deptId]: false }));
         setShowEditDepartmentForm((prev) => ({ ...prev, [deptId]: false }));
@@ -418,77 +446,78 @@ export default function Profile() {
   );
 
   const handleSaveEditPosition = useCallback(
-    (deptId: number, positionIndex: number) => {
-      const newPosition = editPositionName[deptId]?.[positionIndex]?.trim();
+    (deptId: number, positionId: number) => {
+      const newPositionNameTrimmed = editPositionName[deptId]?.[positionId]?.trim();
       const department = departments.find((dept) => dept.id === deptId);
-      const oldPosition = department ? department.positions[positionIndex] : "";
+      const oldPosition = department?.positions.find((pos) => pos.id === positionId);
 
-      // Tambahkan kondisi ini: Jika nama posisi baru sama dengan nama posisi lama, langsung batalkan edit
-      if (newPosition === oldPosition) {
+      if (!department || !oldPosition || !newPositionNameTrimmed) return;
+
+      // Jika tidak ada perubahan nama, batalkan edit
+      if (newPositionNameTrimmed === oldPosition.name) {
         setShowEditPositionForm((prev) => ({
           ...prev,
-          [deptId]: { ...prev[deptId], [positionIndex]: false },
+          [deptId]: { ...prev[deptId], [positionId]: false },
         }));
         setEditPositionName((prev) => ({
           ...prev,
-          [deptId]: { ...prev[deptId], [positionIndex]: "" },
+          [deptId]: { ...prev[deptId], [positionId]: "" },
         }));
-        return; // Keluar dari fungsi
+        return;
       }
 
-      if (newPosition && newPosition !== "") {
-        // ... (logika yang sudah ada)
+      // Cek apakah posisi sedang digunakan
+      const isPositionCurrentlyInUse = positionsInUse.some(
+        (info) => info.deptId === deptId && info.positionName === oldPosition.name
+      );
 
-        // Check if the specific position is in use
-        const isPositionCurrentlyInUse = positionsInUse.some(
-          (info) => info.deptId === deptId && info.positionName === oldPosition
+      if (isPositionCurrentlyInUse) {
+        setPositionToEditInfo({
+          deptId,
+          positionId,
+          oldName: oldPosition.name,
+          newName: newPositionNameTrimmed,
+        });
+        setShowEditPositionInUseDialog(true);
+      } else {
+        // Update langsung
+        setDepartments((prev) =>
+          prev.map((dept) =>
+            dept.id === deptId
+              ? {
+                  ...dept,
+                  positions: dept.positions.map((pos) =>
+                    pos.id === positionId ? { ...pos, name: newPositionNameTrimmed } : pos
+                  ),
+                }
+              : dept
+          )
         );
 
-        if (isPositionCurrentlyInUse) {
-          setPositionToEditInfo({
-            deptId,
-            positionIndex,
-            oldName: oldPosition,
-            newName: newPosition,
-          });
-          setShowEditPositionInUseDialog(true); // Show the new confirmation dialog
-        } else {
-          // If not in use, proceed with saving directly
-          setDepartments((prev) =>
-            prev.map((dept) =>
-              dept.id === deptId
-                ? {
-                    ...dept,
-                    positions: dept.positions.map((pos, idx) =>
-                      idx === positionIndex ? newPosition : pos
-                    ),
-                  }
-                : dept
-            )
-          );
-          setShowEditPositionForm((prev) => ({
-            ...prev,
-            [deptId]: { ...prev[deptId], [positionIndex]: false },
-          }));
-          setEditPositionName((prev) => ({
-            ...prev,
-            [deptId]: { ...prev[deptId], [positionIndex]: "" },
-          }));
-        }
+        setShowEditPositionForm((prev) => ({
+          ...prev,
+          [deptId]: { ...prev[deptId], [positionId]: false },
+        }));
+        setEditPositionName((prev) => ({
+          ...prev,
+          [deptId]: { ...prev[deptId], [positionId]: "" },
+        }));
       }
     },
     [editPositionName, departments, positionsInUse]
   );
 
+
+
   const handleCancelEditPosition = useCallback(
-    (deptId: number, positionIndex: number) => {
+    (deptId: number, positionId: number) => {
       setShowEditPositionForm((prev) => ({
         ...prev,
-        [deptId]: { ...prev[deptId], [positionIndex]: false },
+        [deptId]: { ...prev[deptId], [positionId]: false },
       }));
       setEditPositionName((prev) => ({
         ...prev,
-        [deptId]: { ...prev[deptId], [positionIndex]: "" },
+        [deptId]: { ...prev[deptId], [positionId]: "" },
       }));
     },
     []
@@ -496,14 +525,14 @@ export default function Profile() {
 
   const confirmSaveEditPosition = useCallback(() => {
     if (positionToEditInfo) {
-      const { deptId, positionIndex, newName } = positionToEditInfo;
+      const { deptId, positionId, newName } = positionToEditInfo;
       setDepartments((prev) =>
         prev.map((dept) =>
           dept.id === deptId
             ? {
                 ...dept,
                 positions: dept.positions.map((pos, idx) =>
-                  idx === positionIndex ? newName : pos
+                  idx === positionId ? { ...pos, name: newName } : pos
                 ),
               }
             : dept
@@ -515,11 +544,11 @@ export default function Profile() {
 
       setShowEditPositionForm((prev) => ({
         ...prev,
-        [deptId]: { ...prev[deptId], [positionIndex]: false },
+        [deptId]: { ...prev[deptId], [positionId]: false },
       }));
       setEditPositionName((prev) => ({
         ...prev,
-        [deptId]: { ...prev[deptId], [positionIndex]: "" },
+        [deptId]: { ...prev[deptId], [positionId]: "" },
       }));
     }
     setPositionToEditInfo(null);
@@ -527,8 +556,8 @@ export default function Profile() {
   }, [positionToEditInfo]);
 
   const openDeletePositionDialog = useCallback(
-    (deptId: number, positionIndex: number, positionName: string) => {
-      setPositionToDeleteInfo({ deptId, positionIndex, positionName });
+    (deptId: number, positionId: number, positionName: string) => {
+      setPositionToDeleteInfo({ deptId, positionId, positionName });
       setShowDeletePositionConfirmDialog(true);
       setOpenDepartmentDropdownId(null);
     },
@@ -537,14 +566,14 @@ export default function Profile() {
 
   const confirmDeletePosition = useCallback(() => {
     if (positionToDeleteInfo) {
-      const { deptId, positionIndex } = positionToDeleteInfo;
+      const { deptId, positionId } = positionToDeleteInfo;
       setDepartments((prev) =>
         prev.map((dept) =>
           dept.id === deptId
             ? {
                 ...dept,
                 positions: dept.positions.filter(
-                  (_, idx) => idx !== positionIndex
+                  (position) => position.id !== positionId
                 ),
               }
             : dept
@@ -567,8 +596,526 @@ export default function Profile() {
     setShowChangePasswordDialog(false);
   }, []);
 
+
+   useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const resProfile = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile`, {
+            headers: {
+              "Authorization": `Bearer ${Cookies.get("token")}`,
+              "Content-Type": "application/json"
+            }
+          })
+
+          const dataProfile = await resProfile.json();
+          if (!resProfile.ok) {
+            throw dataProfile;
+          }
+          setProfileData({
+            fullName: dataProfile.full_name,
+            phoneNumber: dataProfile.phone,
+            email: dataProfile.email
+          });
+          setAvatarPreview(dataProfile.photo_url);
+
+          const resDepPos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getCompanyDepPos`, {
+            headers: {
+              "Authorization": `Bearer ${Cookies.get("token")}`,
+              "Content-Type": "application/json"
+            }
+          })
+  
+          const dataDepPos = await resDepPos.json();
+          if (!resDepPos.ok) {
+            throw dataDepPos;
+          }
+
+          // Transform the flat array into Department[]
+          const departmentMap = new Map<number, Department>();
+
+          dataDepPos.forEach((item: any) => {
+          const deptId = item.id_department;
+          const deptName = item.Department;
+          const position = {
+            id: item.id_position,
+            name: item.Position,
+          };
+
+          if (!departmentMap.has(deptId)) {
+            departmentMap.set(deptId, {
+              id: deptId,
+              name: deptName,
+              positions: [position],
+            });
+          } else {
+            // Prevent duplicate positions
+            const dept = departmentMap.get(deptId)!;
+            const exists = dept.positions.some(pos => pos.id === position.id);
+            if (!exists) {
+              dept.positions.push(position);
+            }
+          }
+        });
+
+        const transformedDepartments = Array.from(departmentMap.values());
+        setDepartments(transformedDepartments);
+                
+        
+
+        } catch (err) {}
+      }
+      fetchData()
+    }, []
+  )
+  const { form, errors, setFields } = useForm({
+    extend: [validator({ schema: userSchema }), reporter()],
+    onSubmit: async (values) => {
+        // setLoading(true);
+        // setError(false);
+        // setSuccess(false);
+
+        try {
+        const formData = new FormData();
+
+        for (const [key, value] of Object.entries(values)) {
+            if (value instanceof File) {
+                formData.append(key, value);
+            } else if (value !== undefined && value !== null) {
+                formData.append(key, String(value));
+            }
+        }
+        if (selectedAvatarFile) {
+            formData.append("user_photo", selectedAvatarFile);
+        }
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user?_method=PATCH`, {
+            method: "POST",
+            headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+            },
+            body: formData,
+        });
+
+
+        const responseData = await response.json();
+        if (!response.ok) {
+            throw responseData; 
+        }
+        toast.success('Profile updated successfully')
+        // setSuccess(true);
+        } catch (err) {
+        // setError(true);
+        let message = "Unknown error occurred";
+        let messagesToShow: string[] = [];
+
+        if (
+        err &&
+        typeof err === "object" &&
+        "message" in err &&
+        typeof (err as any).message === "string"
+        ) {
+        const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+        if (backendError.message.toLowerCase().includes("failed to fetch")) {
+            message = "Unknown error occurred";
+        } else {
+            message = backendError.message;
+        }
+
+        messagesToShow = backendError.errors
+            ? Object.values(backendError.errors).flat()
+            : [message];
+        } else {
+        messagesToShow = [message]
+        }
+
+        toast.error(
+            <>
+                <p className="text-red-700 font-bold">Error</p>
+                {messagesToShow.map((msg, idx) => (
+                <div key={idx} className="text-red-700">• {msg}</div>
+                ))}
+            </>,
+            { duration: 30000 }
+        );
+        } finally {
+        // setLoading(false);
+        }
+    },
+  });
+  
+  const AddDepartment = async () => {
+    console.log('Departemnet', newDepartmentName);
+    try {
+      const resDepPos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/department`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${Cookies.get("token")}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          department_name: newDepartmentName
+        })
+      })
+
+      const dataDepPos = await resDepPos.json();
+      if (!resDepPos.ok) {
+        throw dataDepPos;
+      }
+    
+      toast.success('Department created successfully')
+      handleAddDepartmentSubmit();
+      
+    } catch (err) {
+      let message = "Unknown error occurred";
+      let messagesToShow: string[] = [];
+
+      if (
+      err &&
+      typeof err === "object" &&
+      "message" in err &&
+      typeof (err as any).message === "string"
+      ) {
+      const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+      if (backendError.message.toLowerCase().includes("failed to fetch")) {
+          message = "Unknown error occurred";
+      } else {
+          message = backendError.message;
+      }
+
+      messagesToShow = backendError.errors
+          ? Object.values(backendError.errors).flat()
+          : [message];
+      } else {
+      messagesToShow = [message]
+      }
+
+      toast.error(
+          <>
+              <p className="text-red-700 font-bold">Error</p>
+              {messagesToShow.map((msg, idx) => (
+              <div key={idx} className="text-red-700">• {msg}</div>
+              ))}
+          </>,
+          { duration: 30000 }
+      );
+    }
+  }
+  const EditDepartment = async (deptid: number) => {
+    console.log('Departemnet_id', deptid);
+    console.log('Departemnet', editDepartmentName[deptid]);
+    try {
+      const resDepPos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/department?_method=PATCH`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${Cookies.get("token")}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          id: deptid,
+          department_name: editDepartmentName[deptid]
+        })
+      })
+
+      const dataDepPos = await resDepPos.json();
+      if (!resDepPos.ok) {
+        throw dataDepPos;
+      }
+    
+      toast.success('Department edited successfully')
+      handleSaveEditDepartment(deptid)
+      
+    } catch (err) {
+      let message = "Unknown error occurred";
+      let messagesToShow: string[] = [];
+
+      if (
+      err &&
+      typeof err === "object" &&
+      "message" in err &&
+      typeof (err as any).message === "string"
+      ) {
+      const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+      if (backendError.message.toLowerCase().includes("failed to fetch")) {
+          message = "Unknown error occurred";
+      } else {
+          message = backendError.message;
+      }
+
+      messagesToShow = backendError.errors
+          ? Object.values(backendError.errors).flat()
+          : [message];
+      } else {
+      messagesToShow = [message]
+      }
+
+      toast.error(
+          <>
+              <p className="text-red-700 font-bold">Error</p>
+              {messagesToShow.map((msg, idx) => (
+              <div key={idx} className="text-red-700">• {msg}</div>
+              ))}
+          </>,
+          { duration: 30000 }
+      );
+    }
+  }
+  const DeleteDepartment = async () => {
+    console.log('Departemnet_id', departmentToDelete.id);
+    console.log('Departemnet', departmentToDelete.name);
+    try {
+      const resDepPos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/department?_method=DELETE`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${Cookies.get("token")}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          department_id: departmentToDelete.id,
+        })
+      })
+
+      const dataDepPos = await resDepPos.json();
+      if (!resDepPos.ok) {
+        throw dataDepPos;
+      }
+    
+      toast.success('Department deleted successfully')
+      confirmDeleteDepartment()
+      
+    } catch (err) {
+      let message = "Unknown error occurred";
+      let messagesToShow: string[] = [];
+
+      if (
+      err &&
+      typeof err === "object" &&
+      "message" in err &&
+      typeof (err as any).message === "string"
+      ) {
+      const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+      if (backendError.message.toLowerCase().includes("failed to fetch")) {
+          message = "Unknown error occurred";
+      } else {
+          message = backendError.message;
+      }
+
+      messagesToShow = backendError.errors
+          ? Object.values(backendError.errors).flat()
+          : [message];
+      } else {
+      messagesToShow = [message]
+      }
+
+      toast.error(
+          <>
+              <p className="text-red-700 font-bold">Error</p>
+              {messagesToShow.map((msg, idx) => (
+              <div key={idx} className="text-red-700">• {msg}</div>
+              ))}
+          </>,
+          { duration: 30000 }
+      );
+    }
+  }
+
+  const AddPosition = async (deptid: number) => {
+    console.log('Department', deptid);
+    console.log('Position', newPositionName);
+    try {
+      const resDepPos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/position`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${Cookies.get("token")}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          department_id: deptid,
+          position_name: newPositionName[deptid]
+        })
+      })
+
+      const dataDepPos = await resDepPos.json();
+      if (!resDepPos.ok) {
+        throw dataDepPos;
+      }
+    
+      toast.success('Position created successfully')
+      handleAddPositionSubmit(deptid);
+      
+    } catch (err) {
+      let message = "Unknown error occurred";
+      let messagesToShow: string[] = [];
+
+      if (
+      err &&
+      typeof err === "object" &&
+      "message" in err &&
+      typeof (err as any).message === "string"
+      ) {
+      const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+      if (backendError.message.toLowerCase().includes("failed to fetch")) {
+          message = "Unknown error occurred";
+      } else {
+          message = backendError.message;
+      }
+
+      messagesToShow = backendError.errors
+          ? Object.values(backendError.errors).flat()
+          : [message];
+      } else {
+      messagesToShow = [message]
+      }
+
+      toast.error(
+          <>
+              <p className="text-red-700 font-bold">Error</p>
+              {messagesToShow.map((msg, idx) => (
+              <div key={idx} className="text-red-700">• {msg}</div>
+              ))}
+          </>,
+          { duration: 30000 }
+      );
+    }
+  }
+
+  const EditPosition = async (deptid: number, posid: number) => {
+    console.log('Department', deptid);
+    console.log('id posisi', posid);
+    console.log('Position', editPositionName);
+    try {
+      const resDepPos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/position?_method=PATCH`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${Cookies.get("token")}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          department_id: deptid,
+          position_id: posid,
+          position_name: editPositionName[deptid][posid]
+        })
+      })
+
+      const dataDepPos = await resDepPos.json();
+      if (!resDepPos.ok) {
+        throw dataDepPos;
+      }
+    
+      toast.success('Position edited successfully')
+      // setShowEditPositionForm()
+      // setShowEditPositionForm((prev) => ({
+      //   ...prev,
+      //   [deptid]: { ...prev[deptid], [posid]: false },
+      // }));
+
+      handleSaveEditPosition(deptid, posid);
+      
+    } catch (err) {
+      let message = "Unknown error occurred";
+      let messagesToShow: string[] = [];
+
+      if (
+      err &&
+      typeof err === "object" &&
+      "message" in err &&
+      typeof (err as any).message === "string"
+      ) {
+      const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+      if (backendError.message.toLowerCase().includes("failed to fetch")) {
+          message = "Unknown error occurred";
+      } else {
+          message = backendError.message;
+      }
+
+      messagesToShow = backendError.errors
+          ? Object.values(backendError.errors).flat()
+          : [message];
+      } else {
+      messagesToShow = [message]
+      }
+
+      toast.error(
+          <>
+              <p className="text-red-700 font-bold">Error</p>
+              {messagesToShow.map((msg, idx) => (
+              <div key={idx} className="text-red-700">• {msg}</div>
+              ))}
+          </>,
+          { duration: 30000 }
+      );
+    }
+  }
+
+  
+  const DeletePosition = async () => {
+    console.log('Position_id', positionToDeleteInfo?.positionId);
+    console.log('Position', positionToDeleteInfo?.positionName);
+    try {
+      const resDepPos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/position?_method=DELETE`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${Cookies.get("token")}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          position_id: positionToDeleteInfo?.positionId,
+        })
+      })
+
+      const dataDepPos = await resDepPos.json();
+      if (!resDepPos.ok) {
+        throw dataDepPos;
+      }
+    
+      toast.success('Position deleted successfully')
+      confirmDeletePosition()
+      
+    } catch (err) {
+      let message = "Unknown error occurred";
+      let messagesToShow: string[] = [];
+
+      if (
+      err &&
+      typeof err === "object" &&
+      "message" in err &&
+      typeof (err as any).message === "string"
+      ) {
+      const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+      if (backendError.message.toLowerCase().includes("failed to fetch")) {
+          message = "Unknown error occurred";
+      } else {
+          message = backendError.message;
+      }
+
+      messagesToShow = backendError.errors
+          ? Object.values(backendError.errors).flat()
+          : [message];
+      } else {
+      messagesToShow = [message]
+      }
+
+      toast.error(
+          <>
+              <p className="text-red-700 font-bold">Error</p>
+              {messagesToShow.map((msg, idx) => (
+              <div key={idx} className="text-red-700">• {msg}</div>
+              ))}
+          </>,
+          { duration: 30000 }
+      );
+    }
+  }
+
   return (
     <Sidebar title="">
+      <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
       <div className="">
         <Card className="w-full h-fit px-5 py-7 gap-[15px]">
           <div className="flex flex-row justify-between">
@@ -682,6 +1229,7 @@ export default function Profile() {
           </div>
 
           {/* Profile Information Card */}
+        <form ref={form} method="post">
           <Card className="p-5 mt-1">
             <div className="flex justify-between items-center">
               <span className="text-lg">Profile Information</span>
@@ -760,15 +1308,15 @@ export default function Profile() {
                   <div>
                     <input
                       type="file"
-                      name="employee_photo"
+                      name="user_photo"
                       accept="image/*"
-                      id="employee_photo"
+                      id="user_photo"
                       className="hidden"
                       onChange={handleAvatarChange}
                     />
                     <Button variant="default">
                       <label
-                        htmlFor="employee_photo"
+                        htmlFor="user_photo"
                         className="cursor-pointer"
                       >
                         Edit Avatar
@@ -778,54 +1326,35 @@ export default function Profile() {
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-[8px]">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="fullName">Full Name</Label>
                   <Input
                     type="text"
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Enter first name"
-                    value={profileData.firstName}
+                    id="fullName"
+                    name="fullName"
+                    placeholder="Enter full name"
+                    value={profileData.fullName || ''}
                     onChange={(e) =>
                       setProfileData({
                         ...profileData,
-                        firstName: e.target.value,
-                      })
-                    }
-                    disabled={!isProfileEditing}
-                  />
-                </div>
-                <div className="flex flex-col gap-[8px]">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    placeholder="Enter last name"
-                    value={profileData.lastName}
-                    onChange={(e) =>
-                      setProfileData({
-                        ...profileData,
-                        lastName: e.target.value,
+                        fullName: e.target.value,
                       })
                     }
                     disabled={!isProfileEditing}
                   />
                 </div>
               </div>
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-[8px]">
+              <div className="flex gap-4">
+                <div className="flex flex-1 flex-col gap-[8px]">
                   {isProfileEditing ? (
-                    <FormPhoneInput
-                      placeholder="Enter employee phone number"
-                      // value={profileData.phoneNumber}
-                      // onChange={(value) =>
-                      //   setProfileData({ ...profileData, phoneNumber: value })
-                      // }
-                      // value belum diambil
-                    />
+                   <>
+                    <FormPhoneInput placeholder="Enter employee phone number" value={phone} onValueChange={(value) => {
+                    setPhone(value);
+                    setFields("phone", value); // sinkronisasi ke Felte
+                    }} />
+                    <input type="hidden" name="phone" value={phone ?? ""} />
+                    {errors().phone && <p className="text-red-500">{errors().phone[0]}</p>}</>
                   ) : (
                     <>
                       <Label htmlFor="phoneNumber">Phone Number</Label>
@@ -834,20 +1363,20 @@ export default function Profile() {
                         id="phoneNumber"
                         name="phoneNumber"
                         placeholder="N/A"
-                        value={profileData.phoneNumber}
+                        value={profileData.phoneNumber || ''}
                         disabled
                       />
                     </>
                   )}
                 </div>
-                <div className="flex flex-col gap-[8px]">
+                <div className="flex flex-1 flex-col gap-[8px]">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     type="email"
                     id="email"
                     name="email"
                     placeholder="Enter email"
-                    value={profileData.email}
+                    value={profileData.email || ''}
                     onChange={(e) =>
                       setProfileData({
                         ...profileData,
@@ -858,7 +1387,6 @@ export default function Profile() {
                   />
                 </div>
               </div>
-            </div>
             {isProfileEditing && (
               <div className="flex flex-row gap-3.5 justify-end mt-4">
                 <Button
@@ -871,13 +1399,15 @@ export default function Profile() {
                 <Button
                   variant={"default"}
                   className="w-fit"
-                  onClick={handleSaveProfileEdit}
+                  // onClick={handleSaveProfileEdit}
+                  type="submit"
                 >
                   Save
                 </Button>
               </div>
             )}
           </Card>
+          </form>
 
           {/* Company Information Card */}
           <Card className="p-5 mt-5">
@@ -956,7 +1486,7 @@ export default function Profile() {
                     <Button
                       variant="default"
                       className="h-fit w-fit"
-                      onClick={handleAddDepartmentSubmit}
+                      onClick={AddDepartment}
                     >
                       Add +
                     </Button>
@@ -1022,7 +1552,7 @@ export default function Profile() {
                                 variant={"default"}
                                 className="w-fit"
                                 onClick={() =>
-                                  handleSaveEditDepartment(dept.id)
+                                  EditDepartment(dept.id)
                                 }
                               >
                                 Save
@@ -1103,43 +1633,47 @@ export default function Profile() {
                                     e.preventDefault();
                                     setOpenDepartmentDropdownId(null); // Selalu tutup dropdown saat memilih
 
-                                    // Periksa apakah departemen itu sendiri sedang digunakan
-                                    const isDepartmentDirectlyInUse =
-                                      departmentsInUse.includes(dept.id);
+                                    // // Periksa apakah departemen itu sendiri sedang digunakan
+                                    // const isDepartmentDirectlyInUse =
+                                    //   departmentsInUse.includes(dept.id);
 
-                                    // Periksa apakah ada posisi di dalam departemen ini yang sedang digunakan
-                                    const areAnyPositionsInUse =
-                                      positionsInUse.some(
-                                        (pos) => pos.deptId === dept.id
-                                      );
+                                    // // Periksa apakah ada posisi di dalam departemen ini yang sedang digunakan
+                                    // const areAnyPositionsInUse =
+                                    //   positionsInUse.some(
+                                    //     (pos) => pos.deptId === dept.id
+                                    //   );
 
-                                    if (
-                                      isDepartmentDirectlyInUse ||
-                                      areAnyPositionsInUse
-                                    ) {
-                                      if (isDepartmentDirectlyInUse) {
-                                        setInUseMessage(
-                                          // `Departemen "${dept.name}" tidak dapat dihapus karena sedang digunakan oleh karyawan.`
-                                          `Department "${dept.name}" cannot be deleted because it is being used by an employee.`
-                                        );
-                                      } else if (areAnyPositionsInUse) {
-                                        // Anda dapat membuat pesan ini lebih spesifik dengan mencantumkan posisi jika diperlukan
-                                        setInUseMessage(
-                                          // `Departemen "${dept.name}" tidak dapat dihapus karena beberapa posisinya sedang digunakan oleh karyawan.`
-                                          `The department "${dept.name}" cannot be deleted because some of its positions are already occupied by employees.`
-                                        );
-                                      }
-                                      setShowInUseAlertDialog(true); // Tampilkan dialog peringatan
-                                    } else {
-                                      // Jika departemen maupun posisinya tidak sedang digunakan, lanjutkan dengan penghapusan
-                                      openDeleteDepartmentDialog(
+                                    // if (
+                                    //   isDepartmentDirectlyInUse ||
+                                    //   areAnyPositionsInUse
+                                    // ) {
+                                    //   if (isDepartmentDirectlyInUse) {
+                                    //     setInUseMessage(
+                                    //       // `Departemen "${dept.name}" tidak dapat dihapus karena sedang digunakan oleh karyawan.`
+                                    //       `Department "${dept.name}" cannot be deleted because it is being used by an employee.`
+                                    //     );
+                                    //   } else if (areAnyPositionsInUse) {
+                                    //     // Anda dapat membuat pesan ini lebih spesifik dengan mencantumkan posisi jika diperlukan
+                                    //     setInUseMessage(
+                                    //       // `Departemen "${dept.name}" tidak dapat dihapus karena beberapa posisinya sedang digunakan oleh karyawan.`
+                                    //       `The department "${dept.name}" cannot be deleted because some of its positions are already occupied by employees.`
+                                    //     );
+                                    //   }
+                                    //   setShowInUseAlertDialog(true); // Tampilkan dialog peringatan
+                                    // } else {
+                                    //   // Jika departemen maupun posisinya tidak sedang digunakan, lanjutkan dengan penghapusan
+                                    //   openDeleteDepartmentDialog(
+                                    //     dept.id,
+                                    //     dept.name
+                                    //   );
+                                    // }
+                                    openDeleteDepartmentDialog(
                                         dept.id,
                                         dept.name
                                       );
-                                    }
                                   }}
                                 >
-                                  Delete Department
+                                  Delete Department tus
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -1164,7 +1698,7 @@ export default function Profile() {
                           <Button
                             variant="default"
                             className="h-fit w-fit"
-                            onClick={() => handleAddPositionSubmit(dept.id)}
+                            onClick={() => AddPosition(dept.id)}
                           >
                             Add +
                           </Button>
@@ -1178,25 +1712,25 @@ export default function Profile() {
                           </p>
                         ) : (
                           <ul className="list-disc space-y-2">
-                            {dept.positions.map((position, index) => (
-                              <li key={index}>
+                            {dept.positions.map((position) => (
+                              <li key={position.id}>
                                 {isCompanyEditing &&
-                                showEditPositionForm[dept.id]?.[index] ? (
+                                showEditPositionForm[dept.id]?.[position.id] ? (
                                   <div className="flex flex-col gap-2">
                                     <Input
                                       type="text"
-                                      id={`edit_position_${dept.id}_${index}`}
-                                      name={`edit_position_${dept.id}_${index}`}
+                                      id={`edit_position_${dept.id}_${position.id}`}
+                                      name={`edit_position_${dept.id}_${position.id}`}
                                       placeholder="Edit position name"
                                       value={
-                                        editPositionName[dept.id]?.[index] || ""
+                                        editPositionName[dept.id]?.[position.id] || ""
                                       }
                                       onChange={(e) =>
                                         setEditPositionName((prev) => ({
                                           ...prev,
                                           [dept.id]: {
                                             ...prev[dept.id],
-                                            [index]: e.target.value,
+                                            [position.id]: e.target.value,
                                           },
                                         }))
                                       }
@@ -1208,7 +1742,7 @@ export default function Profile() {
                                         onClick={() =>
                                           handleCancelEditPosition(
                                             dept.id,
-                                            index
+                                            position.id
                                           )
                                         }
                                       >
@@ -1218,7 +1752,7 @@ export default function Profile() {
                                         className="w-fit h-fit"
                                         variant={"default"}
                                         onClick={() =>
-                                          handleSaveEditPosition(dept.id, index)
+                                          EditPosition(dept.id, position.id)
                                         }
                                       >
                                         Save
@@ -1227,13 +1761,13 @@ export default function Profile() {
                                   </div>
                                 ) : (
                                   <div className="flex justify-between items-center">
-                                    <span>{position}</span>
+                                    <span>{position.name}</span>
                                     {isCompanyEditing && (
                                       <div className="flex flex-row gap-0.5">
                                         <Button
                                           variant="ghost"
                                           onClick={() =>
-                                            handleEditPosition(dept.id, index)
+                                            handleEditPosition(dept.id, position.id)
                                           }
                                           className="w-fit h-fit p-1.5"
                                           icon={
@@ -1264,7 +1798,7 @@ export default function Profile() {
                                               positionsInUse.some(
                                                 (info) =>
                                                   info.deptId === dept.id &&
-                                                  info.positionName === position
+                                                  info.positionName === position.name
                                               );
 
                                             if (isPositionCurrentlyInUse) {
@@ -1276,8 +1810,8 @@ export default function Profile() {
                                             } else {
                                               openDeletePositionDialog(
                                                 dept.id,
-                                                index,
-                                                position
+                                                position.id,
+                                                position.name
                                               ); // Lanjutkan ke dialog konfirmasi penghapusan biasa
                                             }
                                           }}
@@ -1364,7 +1898,7 @@ export default function Profile() {
             <AlertDialogCancel className="w-fit">Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="w-auto bg-danger-700 text-white border border-danger-700 hover:bg-danger-800 hover:text-white"
-              onClick={confirmDeleteDepartment}
+              onClick={DeleteDepartment}
             >
               Delete
             </AlertDialogAction>
@@ -1397,7 +1931,7 @@ export default function Profile() {
             <AlertDialogCancel className="w-fit">Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="w-auto bg-danger-700 text-white border border-danger-700 hover:bg-danger-800 hover:text-white"
-              onClick={confirmDeletePosition}
+              onClick={DeletePosition}
             >
               Delete
             </AlertDialogAction>
@@ -1510,7 +2044,7 @@ export default function Profile() {
                 if (positionToEditInfo) {
                   handleCancelEditPosition(
                     positionToEditInfo.deptId,
-                    positionToEditInfo.positionIndex
+                    positionToEditInfo.positionId
                   );
                 }
               }}

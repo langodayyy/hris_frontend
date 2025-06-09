@@ -367,12 +367,12 @@ const result = [
                     )}
 
                   
-                    <Button className="mt-2">Pay Bill</Button>
+                    <Button onClick={() => (window.location.href = "/bills")} className="mt-2">Pay Bill</Button>
                   </div>
                 </div>  
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => (window.location.href = "/settings/profile")}
+                <DropdownMenuItem onClick={() => (window.location.href = "/profile")}
               className="cursor-pointer">Profile</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => (window.location.href = "/settings/plan")}
               className="cursor-pointer">Change Plan</DropdownMenuItem>
