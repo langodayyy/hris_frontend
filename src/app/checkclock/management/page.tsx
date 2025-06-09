@@ -6,6 +6,7 @@ import { CheckclockOverview, columns } from "./columns";
 import { DataTable } from "./data-table";
 import Cookies from "js-cookie";
 import { CheckclockResponse } from "@/types/checkclock";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CheckclockOverviewPage() {
   const [date, setDate] = useState<Date | undefined>();
@@ -58,6 +59,8 @@ export default function CheckclockOverviewPage() {
               return {
                 id: item.employee_id,
                 data_id: item.data_id,
+                submitter: item.submitter_name,
+                employeeNumber: item.employee_number,
                 employeeName: item.employee_name,
                 position: item.position,
                 date: item.date,
@@ -66,10 +69,15 @@ export default function CheckclockOverviewPage() {
                 workType: item.work_type,
                 status: item.status,
                 approvalStatus: shouldClearStatus ? "" : item.approval_status,
-                latitude: item.latitude || "-",
-                longitude: item.longitude || "-",
+                latitude: item.latitude || null,
+                longitude: item.longitude || null,
                 startDate: item.absent_start_date || "-",
                 endDate: item.absent_end_date || "-",
+                rejectReason: item.reject_reason,
+                presentEvidence: item.present_evidence,
+                presentEvidenceUrl: item.present_evidence_url,
+                absentEvidence: item.absent_evidence,
+                absentEvidenceUrl: item.absent_evidence_url,
               };
             }
           );
@@ -107,7 +115,7 @@ export default function CheckclockOverviewPage() {
   if (loading) {
     return (
       <Sidebar title="Checkclock">
-        <div>Loading...</div>
+        <Skeleton className="w-full h-[400px]"></Skeleton>
       </Sidebar>
     );
   }
@@ -122,7 +130,7 @@ export default function CheckclockOverviewPage() {
 
   return (
     <Sidebar title="Checkclock">
-      <div className="min-h-screen bg-white rounded-[15px] p-5 flex flex-col gap-[10px]">
+      <div className="bg-white rounded-[15px] p-5 flex flex-col gap-[10px]">
         <div className="container mx-auto">
           <DataTable
             columns={columns}
