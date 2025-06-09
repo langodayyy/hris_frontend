@@ -33,6 +33,7 @@ import { EmployeeResponse } from "@/types/employee";
 import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import Cookies from "js-cookie";
+import { toast } from "sonner";
 
 type Props = {
   employeeData?: EmployeeResponse;
@@ -188,13 +189,48 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
 
             const responseData = await response.json();
             console.log("Response:", responseData);
-
-            if (!response.ok) throw new Error("Gagal submit");
-
+            if (!response.ok) {
+                throw responseData; 
+            }
+            toast.success('Data updated successfully')
+        
             setSuccess(true);
+            handleOkClick()
         } catch (err) {
-            console.error("Submit error:", err);
             setError(true);
+            let message = "Unknown error occurred";
+            let messagesToShow: string[] = [];
+
+            if (
+            err &&
+            typeof err === "object" &&
+            "message" in err &&
+            typeof (err as any).message === "string"
+            ) {
+            const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+            if (backendError.message.toLowerCase().includes("failed to fetch")) {
+                message = "Unknown error occurred";
+            } else {
+                message = backendError.message;
+            }
+
+            messagesToShow = backendError.errors
+                ? Object.values(backendError.errors).flat()
+                : [message];
+            } else {
+            messagesToShow = [message]
+            }
+
+            toast.error(
+            <>
+                <p className="text-red-700 font-bold">Error</p>
+                {messagesToShow.map((msg, idx) => (
+                <div key={idx} className="text-red-700">• {msg}</div>
+                ))}
+            </>,
+            { duration: 30000 }
+            );
         } finally {
             setLoading(false);
         }
@@ -455,7 +491,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                                                 <Spinner size="small" />
                                             )}
                                             </Button>
-                                            <Dialog
+                                            {/* <Dialog
                                             open={success || error}
                                             onOpenChange={(open) => {
                                                 if (!open) {
@@ -488,7 +524,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
                                                 )}
                                                 </DialogFooter>
                                             </DialogContent>
-                                            </Dialog>
+                                            </Dialog> */}
                                         </div>
                                     </div>
                                 </form>

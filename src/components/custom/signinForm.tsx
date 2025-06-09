@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import PasswordInput from "../ui/passwordInput";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useFormContext } from "@/context/FormContext";
@@ -49,6 +49,7 @@ export default function SigninForm() {
           Cookies.remove("token");
         }
         Cookies.set("token", response.data.token, { expires:7, secure:true });
+        Cookies.set("is_profile_complete", response.data.is_profile_complete, { expires:7, secure:true });
 
         if (response.data.is_profile_complete) {
           router.push("dashboard");

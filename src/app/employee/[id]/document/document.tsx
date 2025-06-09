@@ -5,6 +5,9 @@ import { DataTable } from "./data-table"
 import { Card, CardContent } from "@/components/ui/card";
 import Cookies from "js-cookie";
 import { useParams } from "next/navigation";
+import { Spinner } from "@/components/ui/spinner";
+import { toast, Toaster } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const EmployeeDocuments = ({ isActive }: { isActive: boolean }) => {
     const [documents, setDocuments] = useState<Documents[]>([])
@@ -23,12 +26,48 @@ const EmployeeDocuments = ({ isActive }: { isActive: boolean }) => {
           method: "GET",
         })
 
-        if (!res.ok) throw new Error("Failed to fetch employees")
+        if (!res.ok) {
+          const responseData = await res.json();
+          throw responseData; 
+        }
 
         const data = await res.json()
         setDocuments(data.documents)
-      } catch (error) {
-        console.error("Error fetching data:", error)
+      } catch (err) {
+    
+        let message = "Unknown error occurred";
+        let messagesToShow: string[] = [];
+
+        if (
+        err &&
+        typeof err === "object" &&
+        "message" in err &&
+        typeof (err as any).message === "string"
+        ) {
+        const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+        if (backendError.message.toLowerCase().includes("failed to fetch")) {
+            message = "Unknown error occurred";
+        } else {
+            message = backendError.message;
+        }
+
+        messagesToShow = backendError.errors
+            ? Object.values(backendError.errors).flat()
+            : [message];
+        } else {
+        messagesToShow = [message]
+        }
+
+        toast.error(
+            <>
+                <p className="text-red-700 font-bold">Error</p>
+                {messagesToShow.map((msg, idx) => (
+                <div key={idx} className="text-red-700">• {msg}</div>
+                ))}
+            </>,
+            { duration: 30000 }
+        );
       } finally {
         setIsLoading(false);
       }
@@ -36,41 +75,7 @@ const EmployeeDocuments = ({ isActive }: { isActive: boolean }) => {
 
     fetchData()
   }, [])
-  // const handleDownload = async (documentId: string) => {
-  //   try {
-  //     const token = Cookies.get("token");
-
-  //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/download/${documentId}`, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch download URL");
-  //     }
-
-  //     const data = await response.json();
-  //     const fileUrl = data.document_url;
-
-  //     // Ambil ekstensi dari URL
-  //     const urlPath = new URL(fileUrl).pathname;
-  //     const extMatch = urlPath.match(/\.[0-9a-z]+$/i);
-  //     const extension = extMatch ? extMatch[0] : "";
-
-  //     const fileName = `document-${documentId}${extension}`;
-
-  //     // Simulasikan klik langsung ke file dengan nama file khusus
-  //     const link = document.createElement("a");
-  //     link.href = fileUrl;
-  //     link.download = fileName; // Nama file lokal yang akan disimpan user
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-  //   } catch (err) {
-  //     console.error("Download failed", err);
-  //   }
-  // };
+  
   const handleDownload = async (documentId: string) => {
   try {
     const token = Cookies.get("token");
@@ -82,7 +87,8 @@ const EmployeeDocuments = ({ isActive }: { isActive: boolean }) => {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch download URL");
+      const responseData = await response.json();
+      throw responseData; 
     }
 
     const data = await response.json();
@@ -91,7 +97,39 @@ const EmployeeDocuments = ({ isActive }: { isActive: boolean }) => {
     // Buka file di tab baru
     window.open(fileUrl, "_blank", "noopener,noreferrer");
   } catch (err) {
-    console.error("Download failed", err);
+    let message = "Unknown error occurred";
+    let messagesToShow: string[] = [];
+
+    if (
+    err &&
+    typeof err === "object" &&
+    "message" in err &&
+    typeof (err as any).message === "string"
+    ) {
+    const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+    if (backendError.message.toLowerCase().includes("failed to fetch")) {
+        message = "Unknown error occurred";
+    } else {
+        message = backendError.message;
+    }
+
+    messagesToShow = backendError.errors
+        ? Object.values(backendError.errors).flat()
+        : [message];
+    } else {
+    messagesToShow = [message]
+    }
+
+    toast.error(
+        <>
+            <p className="text-red-700 font-bold">Error</p>
+            {messagesToShow.map((msg, idx) => (
+            <div key={idx} className="text-red-700">• {msg}</div>
+            ))}
+        </>,
+        { duration: 30000 }
+    );
   }
 };
 
@@ -101,13 +139,19 @@ const EmployeeDocuments = ({ isActive }: { isActive: boolean }) => {
 
 
     return (
-        
-        <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
-            <CardContent>
+        <>
+          <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
+         {isLoading ? ( 
+            <Skeleton className="min-h-[141px]"></Skeleton>
+            ) : (
+            <Card className="flex-1 rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
+              <CardContent>
                 <DataTable columns={columns(handleDownload)} data={documents} isLoading={isLoading} isActive={isActive}/>
-            </CardContent>
-        </Card>
-
+              </CardContent>
+             </Card>
+          )}
+        
+        </>
     );
 }
 

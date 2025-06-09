@@ -1,9 +1,13 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Navbar from "./navbar";
 import Image from "next/image";
+import Cookies from "js-cookie";
+import { string } from "zod";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type NavItemProps = {
   url: string;
@@ -12,6 +16,7 @@ type NavItemProps = {
   text?: string;
   isOpen?: boolean;
   submenu?: { label: string; href: string }[];
+  className?: string;
 };
 
 type LayoutProps = {
@@ -26,6 +31,7 @@ function NavItem({
   text,
   isOpen,
   submenu,
+  className = "",
 }: NavItemProps) {
   const pathname = usePathname(); // Ensure this hook is always called at the top level
 
@@ -56,8 +62,8 @@ function NavItem({
                   : "bg-white text-neutral-900 hover:bg-primary-950 hover:text-white"
               }`}
             >
-              <div className="flex items-center gap-2">
-                <span className="text-base font-medium">{svgIcon}</span>
+              <div className="flex items-center gap-4">
+                <span className="text-base font-medium p-0 m-0">{svgIcon}</span>
                 {isOpen && text && (
                   <span className="text-base font-medium">{text}</span>
                 )}
@@ -97,8 +103,8 @@ function NavItem({
                   : "bg-white text-neutral-900 hover:bg-primary-950 hover:text-white"
               }`}
             >
-              <div className="flex items-center gap-2">
-                <span className="text-base font-medium">{svgIcon}</span>
+              <div className={`flex items-center gap-4 ${className}`}>
+                <span className="text-base font-medium p-0 m-0">{svgIcon}</span>
                 {isOpen && text && (
                   <span className="text-base font-medium">{text}</span>
                 )}
@@ -133,6 +139,26 @@ function NavItem({
 export default function Sidebar({ children, title }: LayoutProps) {
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
+
+
+  const [fullName, setFullName] = useState("");
+  const [planName, setPlanName] = useState("");
+  const [role, setRole] = useState("");
+  const [period, setPeriod] = useState("");
+  const [deadline, setDeadline] = useState<string | null>(null);
+
+  useEffect(() => {
+    const name = Cookies.get("full_name");
+    if (name) setFullName(name);
+    const plan = Cookies.get("plan_name");
+    if (plan) setPlanName(plan);
+    const role = Cookies.get("user_role");
+    if (role) setRole(role);
+    const period = Cookies.get("bill_period");
+    if (period) setPeriod(period);
+    const deadline = Cookies.get("bill_deadline");
+    if (deadline) setDeadline(deadline);
+  }, []);
 
   return (
     <div className="flex">
@@ -372,7 +398,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
               url="/overtime/management"
               isOpen={isOpen}
               isSelected={pathname.startsWith("/overtime")}
-              text="Overtime"
+              text=" Overtime"
               submenu={[
                 { label: "Management", href: "/overtime/management" },
                 { label: "Setting", href: "/overtime/setting" },
@@ -403,6 +429,80 @@ export default function Sidebar({ children, title }: LayoutProps) {
                 </svg>
               }
             />
+            <NavItem
+              url="/bills"
+              isSelected={pathname.startsWith("/bills")}
+              text="Bills"
+              isOpen={isOpen}
+              svgIcon={
+                <svg
+                  width="16"
+                  height="20"
+                  viewBox="0 0 16 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M10 1V5C10 5.26522 10.1054 5.51957 10.2929 5.70711C10.4804 5.89464 10.7348 6 11 6H15"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M13 19H3C2.46957 19 1.96086 18.7893 1.58579 18.4142C1.21071 18.0391 1 17.5304 1 17V3C1 2.46957 1.21071 1.96086 1.58579 1.58579C1.96086 1.21071 2.46957 1 3 1H10L15 6V17C15 17.5304 14.7893 18.0391 14.4142 18.4142C14.0391 18.7893 13.5304 19 13 19Z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M10 9H7.5C7.10218 9 6.72064 9.15804 6.43934 9.43934C6.15804 9.72064 6 10.1022 6 10.5C6 10.8978 6.15804 11.2794 6.43934 11.5607C6.72064 11.842 7.10218 12 7.5 12H8.5C8.89782 12 9.27936 12.158 9.56066 12.4393C9.84196 12.7206 10 13.1022 10 13.5C10 13.8978 9.84196 14.2794 9.56066 14.5607C9.27936 14.842 8.89782 15 8.5 15H6"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M8 15V16M8 8V9"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              }
+            />
+            <NavItem
+              url="/profile"
+              isOpen={isOpen}
+              isSelected={pathname.startsWith("/Profile")}
+              text="Profile"
+              svgIcon={
+                <svg
+                  width="18"
+                  height="20"
+                  viewBox="0 0 18 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M17 19V17C17 15.9391 16.5786 14.9217 15.8284 14.1716C15.0783 13.4214 14.0609 13 13 13H5C3.93913 13 2.92172 13.4214 2.17157 14.1716C1.42143 14.9217 1 15.9391 1 17V19"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M9 9C11.2091 9 13 7.20914 13 5C13 2.79086 11.2091 1 9 1C6.79086 1 5 2.79086 5 5C5 7.20914 6.79086 9 9 9Z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              }
+            />
           </div>
         </nav>
       </div>
@@ -416,9 +516,11 @@ export default function Sidebar({ children, title }: LayoutProps) {
         <div className="flex flex-col">
           <Navbar
             title={title}
-            userName="Silfi Nazarina"
-            subsPlan="Free"
-            activePeriod="28 May, 2025"
+            userName= {fullName}
+            role= {role}
+            plan= {planName}
+            period= {period}
+            deadline= {deadline}
           />
           <main className="p-[30px] ">{children}</main>
         </div>

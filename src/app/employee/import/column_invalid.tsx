@@ -19,7 +19,7 @@ export type Employees = {
   status: "Active" | "Retire" | "Fired" | "Resign"
 }
 
-export const columns: ColumnDef<Employees>[] = [
+export const columns_invalid: ColumnDef<Employees>[] = [
   {
     accessorKey: "id",
     header: () => <div className="text-left">ID</div>,
@@ -118,5 +118,14 @@ export const columns: ColumnDef<Employees>[] = [
     filterFn: (row, columnId, filterValue) => {
       return filterValue.includes(row.getValue(columnId));
     },
+  },
+  {
+    accessorKey: "errors",
+    header: "Reasons for Rejection",
+    cell: ({ row }) => (
+      <div className="text-red-600 whitespace-pre-wrap">
+        {row.getValue("errors")}
+      </div>
+    ),
   },
 ]

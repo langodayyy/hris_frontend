@@ -5,7 +5,7 @@ import "./globals.css";
 
 import { FormProvider } from "@/context/FormContext";
 import { EditProvider } from "@/context/EditFormContext";
-import React from "react";
+import React, { useEffect, useState } from "react";
 // import { GoogleOAuthProvider } from "@react-oauth/google";
 // import { AuthProvider } from "@/context/AuthContext";
 // import AuthGate from "@/components/custom/authGate";
@@ -33,6 +33,10 @@ import React from "react";
 // import OvertimeManagement from "./overtime/page";
 // import CheckclockOverviewPage from "./checkclock/checkclock-management/page";
 // import NotFound from "@/components/custom/NotFound";
+import Cookies from "js-cookie";
+import { string } from "zod";
+import { toast } from "sonner";
+import { usePathname, useRouter } from "next/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,6 +58,114 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const fetchData = async () => {
+
+    try {
+        // setIsLoading(true);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getUser`, {
+            method: "GET",
+        headers: {
+            "Authorization": `Bearer ${Cookies.get("token")}`,
+            }
+        });
+        const data = await res.json();
+        if (res.status === 403 || res.status === 401) {
+          Cookies.remove("token"); // hapus token agar tidak disimpan
+          router.replace("/sign-in");
+          return;
+        }
+        if (!res.ok) {
+            throw data; 
+        }
+
+        // Cookies.set('is_profile_complete', String(data.is_profile_complete));
+        // const isProfileComplete = Cookies.get('is_profile_complete');
+        // if (isProfileComplete && isProfileComplete !== 'true' && isProfileComplete !== 'null') {
+        //   router.replace('/sign-up/complete-registration');
+        //   Cookies.set('is_profile_complete', String(false))
+        //   return;
+        // }
+        const isProfileComplete = data.is_profile_complete === true;
+        if (!isProfileComplete) {
+          // Kalau belum lengkap profil dan bukan di halaman /sign-up/complete-registration, redirect
+          if (pathname !== '/sign-up/complete-registration') {
+            router.replace('/sign-up/complete-registration');
+            return;
+          }
+        } else {
+          // Kalau sudah lengkap profil dan masih di halaman auth atau complete-registration, redirect ke dashboard
+          if (
+            pathname === '/sign-in' ||
+            pathname === '/sign-up' ||
+            pathname === '/sign-up/complete-registration'
+          ) {
+            router.replace('/dashboard');
+            return;
+          }
+        }
+        Cookies.set('full_name', data.full_name)
+        Cookies.set('user_role', data.user_role)
+        Cookies.set('plan_name', data.plan_name)
+        Cookies.set('bill_period', data.bill_period)
+        Cookies.set('bill_deadline', String(data.bill_deadline))
+        // if (pathname === '/sign-in' || pathname === '/sign-up') {
+        //   router.replace('/dashboard');
+        //   return;
+        // }
+        // if (isProfileComplete || pathname === '/sign-up/complete-registration') {
+        //   router.replace('/dashboard');
+        //   return;
+        // }
+        
+   
+
+    } catch (err: any) {
+        let message = "Unknown error occurred";
+        let messagesToShow: string[] = [];
+
+        if (
+        err &&
+        typeof err === "object" &&
+        "message" in err &&
+        typeof (err as any).message === "string"
+        ) {
+        const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+        if (backendError.message.toLowerCase().includes("failed to fetch")) {
+            message = "Unknown error occurred";
+        } else {
+            message = backendError.message;
+        }
+
+        messagesToShow = backendError.errors
+            ? Object.values(backendError.errors).flat()
+            : [message];
+        } else {
+        messagesToShow = [message]
+        }
+          
+        toast.error(
+        <>
+            <p className="text-red-700 font-bold">Error</p>
+            {messagesToShow.map((msg, idx) => (
+            <div key={idx} className="text-red-700">• {msg}</div>
+            ))}
+        </>,
+        { duration: 30000 }
+        );
+    } finally {
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+
+
   return (
     <html lang="en">
       <body
