@@ -34,9 +34,7 @@ type OvertimeRecord = {
 };
 
 
-export const OvertimeColumn = (
-  onEdit: (id: string) => void
-): ColumnDef<OvertimeRecord>[] => [
+export const OvertimeColumn = (): ColumnDef<OvertimeRecord>[] => [
   {
     id: "no",
     enableSorting: true,
@@ -233,7 +231,7 @@ export const OvertimeColumn = (
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => onEdit(row.original.id)}
+              // onClick={}
               className="p-1 h-auto w-auto"
               icon={
                 <svg
