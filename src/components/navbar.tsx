@@ -18,17 +18,23 @@ import { toast } from "sonner";
 
 interface NavbarProps {
   title: string; 
-  avatarImage?: string;
-  userName: string;
-  role: string;
-  plan: string;
-  period: string;
-  deadline?: string | null;
+  // avatarImage?: string;
+  // userName: string;
+  // role: string;
+  // plan: string;
+  // period: string;
+  // deadline?: string | null;
   
 }
 
-export default function Navbar({ title, avatarImage, userName, role, plan, period, deadline }: NavbarProps) {
-  
+// export default function Navbar({ title, avatarImage, userName, role, plan, period, deadline }: NavbarProps) {
+export default function Navbar({ title }: NavbarProps) {
+  const [avatarImage, setAvatarImage] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
+  const [plan, setPlan] = useState<string | null>(null);
+  const [period, setPeriod] = useState<string | null>(null);
+  const [deadline, setDeadline] = useState<string | null>(null);
   // Fungsi untuk mengambil inisial dari nama pengguna
   const getInitials = (name: string) => {
     const nameParts = name.split(" ");
@@ -64,6 +70,42 @@ const result = [
   
   const notificationCount = notifications.length;
   const router = useRouter();
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = Cookies.get('token');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getUser`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw data;
+        }
+        setAvatarImage(data.photo_url);
+        setUserName(data.full_name);
+        setRole(data.user_role);
+        setPlan(data.plan_name);
+        setPeriod(data.bill_period);
+        setDeadline(String(data.bill_deadline))
+
+        // Cookies.set('user_photo', data.photo_url);
+        // Cookies.set('full_name', data.full_name);
+        // Cookies.set('user_role', data.user_role);
+        // Cookies.set('plan_name', data.plan_name);
+        // Cookies.set('bill_period', data.bill_period);
+        // Cookies.set('bill_deadline', String(data.bill_deadline));
+
+      } catch (err) {
+      
+      }
+    };
+    fetchUser();
+  }, [])
+  
   const handleLogout = async () => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
@@ -178,7 +220,7 @@ const result = [
                 {avatarImage ? (
                   <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                 ) : (
-                  <span className="text-white text-sm font-medium">{getInitials(userName)}</span>
+                  <span className="text-white text-sm font-medium">{userName}</span>
                 )}
               </div>
               </div>
@@ -201,14 +243,14 @@ const result = [
                 {avatarImage ? (
                   <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                 ) : (
-                  <span className="text-white text-sm font-medium">{getInitials(userName)}</span>
+                  <span className="text-white text-sm font-medium">{userName}</span>
                 )}
               </div>
               <div className="relative flex items-center justify-center w-13 h-10 bg-gray-400 rounded-full ring-2 ring-white">
                 {avatarImage ? (
                   <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                 ) : (
-                  <span className="text-white text-sm font-medium">{getInitials(userName)}</span>
+                  <span className="text-white text-sm font-medium">{userName}</span>
                 )}
               </div>
               </div>
@@ -231,7 +273,7 @@ const result = [
                 {avatarImage ? (
                   <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                 ) : (
-                  <span className="text-white text-sm font-medium">{getInitials(userName)}</span>
+                  <span className="text-white text-sm font-medium">{userName}</span>
                 )}
               </div>
               </div>
@@ -254,14 +296,14 @@ const result = [
                 {avatarImage ? (
                   <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                 ) : (
-                  <span className="text-white text-sm font-medium">{getInitials(userName)}</span>
+                  <span className="text-white text-sm font-medium">{userName}</span>
                 )}
               </div>
               <div className="relative flex items-center justify-center w-13 h-10 bg-gray-400 rounded-full ring-2 ring-white">
                 {avatarImage ? (
                   <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                 ) : (
-                  <span className="text-white text-sm font-medium">{getInitials(userName)}</span>
+                  <span className="text-white text-sm font-medium">{userName}</span>
                 )}
               </div>
               </div>
@@ -321,12 +363,12 @@ const result = [
                   {avatarImage ? (
                     <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                   ) : (
-                    <span className="text-white text-sm font-medium">{getInitials(userName)}</span>
+                    <span className="text-white text-sm font-medium">{userName}</span>
                   )}
                 </div>
                 <div className="flex flex-col h-auto w-auto">
                   <span className="text-base font-medium text-neutral-950">
-                    {userName.length > 20
+                    {userName !== null && userName.length > 20
                     ? `${userName.slice(0, 20)}...`
                     : userName}
                   </span>
@@ -341,7 +383,7 @@ const result = [
                     {avatarImage ? (
                       <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                     ) : (
-                      <span className="text-white text-sm font-medium">{getInitials(userName)}</span>
+                      <span className="text-white text-sm font-medium">{userName}</span>
                     )}
                   </div>
                   <div className="flex flex-col items-center">
@@ -367,12 +409,12 @@ const result = [
                     )}
 
                   
-                    <Button className="mt-2">Pay Bill</Button>
+                    <Button onClick={() => (window.location.href = "/bills")} className="mt-2">Pay Bill</Button>
                   </div>
                 </div>  
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => (window.location.href = "/settings/profile")}
+                <DropdownMenuItem onClick={() => (window.location.href = "/profile")}
               className="cursor-pointer">Profile</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => (window.location.href = "/settings/plan")}
               className="cursor-pointer">Change Plan</DropdownMenuItem>
