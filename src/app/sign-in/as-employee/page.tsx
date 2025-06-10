@@ -5,8 +5,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import SigninEmployeeForm from "@/components/custom/signinEmployeeForm";
+import { useFormContext } from "@/context/FormContext";
 
 export default function SignInAsEmployee() {
+
+  const {errors} = useFormContext();
 
   return (
     <div className="flex h-screen w-screen bg-white p-[23px]">
@@ -22,38 +25,19 @@ export default function SignInAsEmployee() {
             <h4 className="text-[34px] font-medium text-neutral-900">Sign In as Employee</h4>
           </div>
           <p className="text-base text-neutral-500">Welcome back to HRIS cmlabs! Manage everything with ease.</p>
-          {/* <div className="flex flex-col w-full gap-2">
-            <label htmlFor="id_company" className="font-medium text-neutral-900">ID Company</label>
-            <Input type="number" id="id_company" name="id_company" placeholder="Enter your company id" required/>
-          </div>
-          <div className="flex flex-col w-full gap-2">
-            <label htmlFor="id_employee" className="font-medium text-neutral-900">ID Employee</label>
-            <Input type="number" id="id_employee" name="id_employee" placeholder="Enter your employee id" required/>
-          </div>
-          <div className="flex flex-col w-full gap-2">
-            <PasswordInput id="password" name="password" />
-          </div>
-          <div className="grid grid-cols-2 w-full mt-0 pt-0 leading-none">
-            <div className="flex items-center space-x-2 leading-none">
-              <Checkbox id="remember" className="py-0 "/>
-              <label htmlFor="remember" className="text-base text-neutral-900 leading-none m-0 p-0">
-                Remember me
-              </label>
-            </div>
-            <Dialog>
-                <DialogTrigger asChild>
-                    <Button variant={"link"} className="text-base justify-end py-0">Forgot Password?</Button>
-                </DialogTrigger>
-                <DialogContent className="p-10 bg-white text-lg">
-                    <DialogHeader>
-                    <DialogTitle>Forgot Password</DialogTitle>
-                    <DialogDescription className="pt-2 text-base">
-                        Please contact admin to reset your password
-                    </DialogDescription>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog>
-          </div> */}
+          
+          {Object.entries(errors).map(([field, messages]) => (
+              <div key={field} className="text-danger-700">
+                {Array.isArray(messages) ? (
+                  messages.map((message, idx) => (
+                    <div key={idx}>{message}</div>
+                  ))
+                ) : (
+                  <div>{messages}</div>
+                )}
+              </div>
+            ))}
+
           <SigninEmployeeForm></SigninEmployeeForm>
           <div className="flex flex-col gap-[20px] w-full">
             {/* <Button type="submit">Sign In</Button> */}

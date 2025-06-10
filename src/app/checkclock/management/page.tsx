@@ -9,7 +9,7 @@ import { CheckclockResponse } from "@/types/checkclock";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CheckclockOverviewPage() {
-  const [date, setDate] = useState<Date | undefined>();
+  const [date, setDate] = useState<Date | undefined>(new Date());
   const [allData, setAllData] = useState<CheckclockOverview[]>([]);
   const [data, setData] = useState<CheckclockOverview[]>([]);
   const [loading, setLoading] = useState(true);
@@ -111,6 +111,10 @@ export default function CheckclockOverviewPage() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    handleCalendarChange(new Date());
+  }, [allData]);
 
   if (loading) {
     return (
