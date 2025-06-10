@@ -141,8 +141,8 @@ export default function Sidebar({ children, title }: LayoutProps) {
   const pathname = usePathname();
 
  useEffect(() => {
-    // const avatar = Cookies.get("user_avatar");
-    // if (avatar) setAvatar(avatar);
+    const avatar = Cookies.get("user_photo");
+    if (avatar) setAvatar(avatar);
     const name = Cookies.get("full_name");
     if (name) setFullName(name);
     const plan = Cookies.get("plan_name");
@@ -480,7 +480,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
             <NavItem
               url="/profile"
               isOpen={isOpen}
-              isSelected={pathname.startsWith("/Profile")}
+              isSelected={pathname.startsWith("/profile")}
               text="Profile"
               svgIcon={
                 <svg
@@ -521,11 +521,11 @@ export default function Sidebar({ children, title }: LayoutProps) {
           <Navbar
             title={title}
             // avatarImage={avatar}
-            userName= {fullName}
-            role= {role}
-            plan= {planName}
-            period= {period}
-            deadline= {deadline}
+            // userName= {fullName}
+            // role= {role}
+            // plan= {planName}
+            // period= {period}
+            // deadline= {deadline}
           />
           <main className="p-[30px] ">{children}</main>
         </div>

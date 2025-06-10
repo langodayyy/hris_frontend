@@ -187,6 +187,7 @@ const ContactInformation = ({ employeeData, onUpdate }: Props) => {
                             className="w-[80px]"
                             variant="outline"
                             size="lg"
+                            disabled={loading}
                           >
                             Cancel
                           </Button>

@@ -37,13 +37,8 @@ import { useForm } from "@felte/react";
 import { validator } from "@felte/validator-zod";
 import { z } from "zod";
 import { reporter } from "@felte/reporter-react";
-
-const userSchema = z.object({
-    user_photo: z.any().optional(),
-    full_name: z.string().min(1, { message: 'First name is required' }),
-    phone: z.string().min(10, { message: 'Phone number is invalid' }),
-    email: z.string().email({ message: 'Invalid email address' }),
-})
+import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Define interfaces for better type safety and readability
 interface ProfileData {
@@ -77,13 +72,16 @@ export default function Profile() {
     useState<File | null>(null);
 
   // Profile and Company data states
+  const[oldPassword, setOldPassword] = useState('')
+  const[newPassword, setNewPassword] = useState('')
+  const[confirmPassword, setConfirmPassword] = useState('')
   const [phone, setPhone] = useState<string | undefined>(undefined);
   const [profileData, setProfileData] = useState<ProfileData>({
     fullName: '',
     phoneNumber: '',
     email: '',
   });
-  const [companyName, setCompanyName] = useState("Acme Corporation");
+  const [companyName, setCompanyName] = useState('');
   const [departments, setDepartments] = useState<Department[]>([]);
   const [departmentsInUse, setDepartmentsInUse] = useState<number[]>([]);
   const [positionsInUse, setPositionsInUse] = useState<
@@ -270,13 +268,13 @@ export default function Profile() {
     setShowAddDepartmentForm(true);
   }, []);
   
-  const handleAddDepartmentSubmit = useCallback(() => {
+  const handleAddDepartmentSubmit = useCallback((deptId: number) => {
     if (newDepartmentName.trim() !== "") {
       
-      const newId =
-        departments.length > 0
-          ? Math.max(...departments.map((d) => d.id)) + 1
-          : 1;
+      const newId = deptId
+        // departments.length > 0
+        //   ? Math.max(...departments.map((d) => d.id)) + 1
+        //   : 1;
       const newDept = {
         id: newId,
         name: newDepartmentName.trim(),
@@ -394,14 +392,14 @@ export default function Profile() {
   }, []);
 
   const handleAddPositionSubmit = useCallback(
-    (deptId: number) => {
+    (deptId: number, positionId: number) => {
       const positionName = newPositionName[deptId]?.trim();
       if (positionName && positionName !== "") {
         setDepartments((prev) =>
           prev.map((dept) =>
             dept.id === deptId
               ? { ...dept, positions: [...dept.positions, {
-                    id: Date.now(), // temp ID sebelum dapat dari backend
+                    id: positionId, // temp ID sebelum dapat dari backend
                     name: positionName,
                   },
                 ] }
@@ -596,9 +594,11 @@ export default function Profile() {
     setShowChangePasswordDialog(false);
   }, []);
 
-
+   const [isLoading, setIsLoading] = useState(true);
+   const [loading, setLoading] = useState(true);
    useEffect(() => {
       const fetchData = async () => {
+        setLoading(true);
         try {
           const resProfile = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile`, {
             headers: {
@@ -611,6 +611,7 @@ export default function Profile() {
           if (!resProfile.ok) {
             throw dataProfile;
           }
+          setCompanyName(dataProfile.company_name)
           setProfileData({
             fullName: dataProfile.full_name,
             phoneNumber: dataProfile.phone,
@@ -661,39 +662,64 @@ export default function Profile() {
         setDepartments(transformedDepartments);
                 
         
+        setLoading(false);
+        } catch (err: any) {
+          let message = "Unknown error occurred";
+          let messagesToShow: string[] = [];
 
-        } catch (err) {}
+          if (
+          err &&
+          typeof err === "object" &&
+          "message" in err &&
+          typeof (err as any).message === "string"
+          ) {
+          const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+          if (backendError.message.toLowerCase().includes("failed to fetch")) {
+              message = "Unknown error occurred";
+          } else {
+              message = backendError.message;
+          }
+
+          messagesToShow = backendError.errors
+              ? Object.values(backendError.errors).flat()
+              : [message];
+          } else {
+          messagesToShow = [message]
+          }
+            
+          toast.error(
+          <>
+              <p className="text-red-700 font-bold">Error</p>
+              {messagesToShow.map((msg, idx) => (
+              <div key={idx} className="text-red-700">• {msg}</div>
+              ))}
+          </>,
+          { duration: 30000 }
+          );
+
+      } finally {
+        setIsLoading(false);
+        setLoading(false);
+      }
       }
       fetchData()
     }, []
   )
-  const { form, errors, setFields } = useForm({
-    extend: [validator({ schema: userSchema }), reporter()],
-    onSubmit: async (values) => {
-        // setLoading(true);
+    const changePassword = async () => {
+        setLoading(true);
         // setError(false);
         // setSuccess(false);
+        const form = document.getElementById("passwordForm") as HTMLFormElement;
+        const formData = new FormData(form);
 
         try {
-        const formData = new FormData();
-
-        for (const [key, value] of Object.entries(values)) {
-            if (value instanceof File) {
-                formData.append(key, value);
-            } else if (value !== undefined && value !== null) {
-                formData.append(key, String(value));
-            }
-        }
-        if (selectedAvatarFile) {
-            formData.append("user_photo", selectedAvatarFile);
-        }
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user?_method=PATCH`, {
-            method: "POST",
-            headers: {
-            Authorization: `Bearer ${Cookies.get("token")}`,
-            },
-            body: formData,
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/change-password?_method=PATCH`, {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${Cookies.get("token")}`,
+              },
+              body: formData,
         });
 
 
@@ -701,7 +727,8 @@ export default function Profile() {
         if (!response.ok) {
             throw responseData; 
         }
-        toast.success('Profile updated successfully')
+        toast.success('Company updated successfully')
+        handleSaveCompanyEdit()
         // setSuccess(true);
         } catch (err) {
         // setError(true);
@@ -739,12 +766,153 @@ export default function Profile() {
             { duration: 30000 }
         );
         } finally {
-        // setLoading(false);
+        setLoading(false);
         }
-    },
-  });
+  }
+  const editProfile = async () => {
+        setLoading(true);
+
+        try {
+        const formData = new FormData();
+
+        if (selectedAvatarFile) {
+            formData.append("user_photo", selectedAvatarFile);
+        }
+
+        formData.append("fullName", profileData.fullName);
+        formData.append("email", profileData.email);
+        formData.append("phone", phone ?? profileData.phoneNumber);
+        // formData.append("photo", )
+        console.log("FormData yang akan dikirim:");
+          for (let pair of formData.entries()) {
+              console.log(`${pair[0]}:`, pair[1]);
+          }
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile?_method=PATCH`, {
+            method: "POST",
+            headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+            },
+            body: formData,
+        });
+
+
+        const responseData = await response.json();
+        console.log(responseData);
+        if (!response.ok) {
+            throw responseData; 
+        }
+        toast.success('Profile updated successfully')
+        handleSaveProfileEdit()
+        window.location.reload();
+        // setSuccess(true);
+        // setLoading(false)
+        } catch (err) {
+        // setError(true);
+        let message = "Unknown error occurred";
+        let messagesToShow: string[] = [];
+
+        if (
+        err &&
+        typeof err === "object" &&
+        "message" in err &&
+        typeof (err as any).message === "string"
+        ) {
+        const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+        if (backendError.message.toLowerCase().includes("failed to fetch")) {
+            message = "Unknown error occurred";
+        } else {
+            message = backendError.message;
+        }
+
+        messagesToShow = backendError.errors
+            ? Object.values(backendError.errors).flat()
+            : [message];
+        } else {
+        messagesToShow = [message]
+        }
+
+        toast.error(
+            <>
+                <p className="text-red-700 font-bold">Error</p>
+                {messagesToShow.map((msg, idx) => (
+                <div key={idx} className="text-red-700">• {msg}</div>
+                ))}
+            </>,
+            { duration: 30000 }
+        );
+        } finally {
+        setLoading(false);
+        }
+  }
+  const editCompany = async () => {
+        setLoading(true);
+        // setError(false);
+        // setSuccess(false);
+
+        try {
+          console.log(companyName)
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/company?_method=PATCH`, {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${Cookies.get("token")}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                company_name: companyName
+          })
+        });
+
+
+        const responseData = await response.json();
+        if (!response.ok) {
+            throw responseData; 
+        }
+        toast.success('Company updated successfully')
+        handleSaveCompanyEdit()
+        // setSuccess(true);
+        } catch (err) {
+        // setError(true);
+        let message = "Unknown error occurred";
+        let messagesToShow: string[] = [];
+
+        if (
+        err &&
+        typeof err === "object" &&
+        "message" in err &&
+        typeof (err as any).message === "string"
+        ) {
+        const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+        if (backendError.message.toLowerCase().includes("failed to fetch")) {
+            message = "Unknown error occurred";
+        } else {
+            message = backendError.message;
+        }
+
+        messagesToShow = backendError.errors
+            ? Object.values(backendError.errors).flat()
+            : [message];
+        } else {
+        messagesToShow = [message]
+        }
+
+        toast.error(
+            <>
+                <p className="text-red-700 font-bold">Error</p>
+                {messagesToShow.map((msg, idx) => (
+                <div key={idx} className="text-red-700">• {msg}</div>
+                ))}
+            </>,
+            { duration: 30000 }
+        );
+        } finally {
+        setLoading(false);
+        }
+  }
   
   const AddDepartment = async () => {
+    setLoading(true)
     console.log('Departemnet', newDepartmentName);
     try {
       const resDepPos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/department`, {
@@ -764,7 +932,7 @@ export default function Profile() {
       }
     
       toast.success('Department created successfully')
-      handleAddDepartmentSubmit();
+      handleAddDepartmentSubmit(dataDepPos.department_id);
       
     } catch (err) {
       let message = "Unknown error occurred";
@@ -800,9 +968,12 @@ export default function Profile() {
           </>,
           { duration: 30000 }
       );
+    } finally {
+      setLoading(false)
     }
   }
   const EditDepartment = async (deptid: number) => {
+    setLoading(true)
     console.log('Departemnet_id', deptid);
     console.log('Departemnet', editDepartmentName[deptid]);
     try {
@@ -860,9 +1031,12 @@ export default function Profile() {
           </>,
           { duration: 30000 }
       );
+    } finally {
+      setLoading(false)
     }
   }
   const DeleteDepartment = async () => {
+    setLoading(true)
     console.log('Departemnet_id', departmentToDelete.id);
     console.log('Departemnet', departmentToDelete.name);
     try {
@@ -919,10 +1093,13 @@ export default function Profile() {
           </>,
           { duration: 30000 }
       );
+    } finally {
+      setLoading(false)
     }
   }
 
   const AddPosition = async (deptid: number) => {
+    setLoading(true)
     console.log('Department', deptid);
     console.log('Position', newPositionName);
     try {
@@ -944,7 +1121,7 @@ export default function Profile() {
       }
     
       toast.success('Position created successfully')
-      handleAddPositionSubmit(deptid);
+      handleAddPositionSubmit(deptid, dataDepPos.position_id);
       
     } catch (err) {
       let message = "Unknown error occurred";
@@ -980,10 +1157,13 @@ export default function Profile() {
           </>,
           { duration: 30000 }
       );
+    } finally {
+      setLoading(false)
     }
   }
 
   const EditPosition = async (deptid: number, posid: number) => {
+    setLoading(true)
     console.log('Department', deptid);
     console.log('id posisi', posid);
     console.log('Position', editPositionName);
@@ -1049,11 +1229,14 @@ export default function Profile() {
           </>,
           { duration: 30000 }
       );
+    } finally {
+      setLoading(false)
     }
   }
 
   
   const DeletePosition = async () => {
+    setLoading(true)
     console.log('Position_id', positionToDeleteInfo?.positionId);
     console.log('Position', positionToDeleteInfo?.positionName);
     try {
@@ -1110,13 +1293,19 @@ export default function Profile() {
           </>,
           { duration: 30000 }
       );
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <Sidebar title="">
+    <Sidebar title="Profile">
       <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
       <div className="">
+         {isLoading ? ( 
+              <Skeleton className="min-h-svh"></Skeleton>
+
+          ) : (
         <Card className="w-full h-fit px-5 py-7 gap-[15px]">
           <div className="flex flex-row justify-between">
             <span className="px-[10px] text-lg">Profile</span>
@@ -1182,12 +1371,15 @@ export default function Profile() {
               onOpenChange={setShowChangePasswordDialog}
             >
               <DialogContent
-                className="sm:max-w-[425px] bg-white"
+                className="sm:max-w-[425px] min-w-[500px] bg-white"
                 showCloseButton={false}
               >
                 <AlertDialogHeader>
                   <DialogTitle>Change Password</DialogTitle>
                 </AlertDialogHeader>
+              <form id="passwordForm">
+
+               
                 <div className="grid gap-4 mt-3">
                   <PasswordInput
                     label="Old Password"
@@ -1203,33 +1395,83 @@ export default function Profile() {
                   />
                   <PasswordInput
                     label="Confirmation New Password"
-                    name="confirm_password"
-                    id="confirm_password"
+                    name="new_password_confirmation"
+                    id="new_password_confirmation"
                     placeholder="Enter your new password"
                   />
                 </div>
                 <DialogFooter>
-                  <div className="flex flex-row gap-3.5 justify-end mt-4">
-                    <DialogClose asChild>
-                      <Button variant={"outline"} className="w-fit">
-                        Cancel
+                  <div className="flex w-full">
+                    {/* <Button variant={"link"} className="w-fit flex-1 justify-start items-center p-0"> */}
+                      <a className="flex cursor-pointer text-info-500 underline-offset-4 hover:underline items-center text-sm" href="sign-in/forgot-password">Forgot Password?</a>
+                    {/* </Button> */}
+                    {/* <div className="w-full"></div> */}
+                  
+                  
+                    <div className="flex flex-1 flex-row gap-3.5 justify-end mt-4">
+                      <DialogClose asChild>
+                        <Button variant={"outline"} className="w-fit" disabled={loading}>
+                          Cancel
+                        </Button>
+                      </DialogClose>
+                      <Button
+                        disabled={loading}
+                        variant={"default"}
+                        className="w-fit h-fit"
+                        // onClick={handleChangePasswordSubmit}
+                        onClick={changePassword}
+                      >
+                        {!loading ? (
+                            <>
+                              <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z"
+                                  stroke="white"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                <path
+                                  d="M17 21V13H7V21"
+                                  stroke="white"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                <path
+                                  d="M7 3V8H15"
+                                  stroke="white"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                              <span className="ml-1">Save</span>
+                            </>
+                          ) : (
+                            <Spinner size="small" />
+                          )}
                       </Button>
-                    </DialogClose>
-                    <Button
-                      variant={"default"}
-                      className="w-fit h-fit"
-                      onClick={handleChangePasswordSubmit}
-                    >
-                      Save
-                    </Button>
+                    </div>
                   </div>
+                  
+
+                  
                 </DialogFooter>
+                </form>
               </DialogContent>
             </Dialog>
           </div>
 
           {/* Profile Information Card */}
-        <form ref={form} method="post">
+        {/* <form ref={form} method="post"> */}
+       
           <Card className="p-5 mt-1">
             <div className="flex justify-between items-center">
               <span className="text-lg">Profile Information</span>
@@ -1349,12 +1591,12 @@ export default function Profile() {
                 <div className="flex flex-1 flex-col gap-[8px]">
                   {isProfileEditing ? (
                    <>
-                    <FormPhoneInput placeholder="Enter employee phone number" value={phone} onValueChange={(value) => {
+                    <FormPhoneInput placeholder="Enter employee phone number" value={profileData.phoneNumber} onValueChange={(value) => {
                     setPhone(value);
-                    setFields("phone", value); // sinkronisasi ke Felte
                     }} />
-                    <input type="hidden" name="phone" value={phone ?? ""} />
-                    {errors().phone && <p className="text-red-500">{errors().phone[0]}</p>}</>
+                    <input type="hidden" name="phone" value={profileData.phoneNumber ?? ""} />
+
+                    </>
                   ) : (
                     <>
                       <Label htmlFor="phoneNumber">Phone Number</Label>
@@ -1390,6 +1632,7 @@ export default function Profile() {
             {isProfileEditing && (
               <div className="flex flex-row gap-3.5 justify-end mt-4">
                 <Button
+                  disabled={loading}
                   variant={"outline"}
                   className="w-fit"
                   onClick={handleCancelProfileEdit}
@@ -1399,15 +1642,51 @@ export default function Profile() {
                 <Button
                   variant={"default"}
                   className="w-fit"
-                  // onClick={handleSaveProfileEdit}
-                  type="submit"
+                  onClick={editProfile}
+                  disabled={loading}
                 >
-                  Save
+                  
+                  {!loading ? (
+                    <>
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z"
+                          stroke="white"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M17 21V13H7V21"
+                          stroke="white"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M7 3V8H15"
+                          stroke="white"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span className="ml-1">Save</span>
+                    </>
+                  ) : (
+                    <Spinner size="small" />
+                  )}
                 </Button>
               </div>
             )}
           </Card>
-          </form>
+          {/* </form> */}
 
           {/* Company Information Card */}
           <Card className="p-5 mt-5">
@@ -1487,8 +1766,14 @@ export default function Profile() {
                       variant="default"
                       className="h-fit w-fit"
                       onClick={AddDepartment}
+                      disabled={loading}
                     >
-                      Add +
+                      {!loading ? (
+                        <span>Add +</span>
+
+                      ):(
+                        <Spinner size="small" />
+                      )}
                     </Button>
                   </div>
                 )}
@@ -1540,6 +1825,7 @@ export default function Profile() {
                             />
                             <div className="flex flex-row gap-3.5 justify-end">
                               <Button
+                                disabled={loading}
                                 variant={"outline"}
                                 className="w-fit"
                                 onClick={() =>
@@ -1549,13 +1835,49 @@ export default function Profile() {
                                 Cancel
                               </Button>
                               <Button
+                                disabled={loading}
                                 variant={"default"}
                                 className="w-fit"
                                 onClick={() =>
                                   EditDepartment(dept.id)
                                 }
                               >
-                                Save
+                                 {!loading ? (
+                                  <>
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z"
+                                        stroke="white"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                      <path
+                                        d="M17 21V13H7V21"
+                                        stroke="white"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                      <path
+                                        d="M7 3V8H15"
+                                        stroke="white"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                    </svg>
+                                    <span className="ml-1">Save</span>
+                                  </>
+                                ) : (
+                                  <Spinner size="small" />
+                                )}
                               </Button>
                             </div>
                           </div>
@@ -1673,7 +1995,7 @@ export default function Profile() {
                                       );
                                   }}
                                 >
-                                  Delete Department tus
+                                  Delete Department
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -1699,20 +2021,26 @@ export default function Profile() {
                             variant="default"
                             className="h-fit w-fit"
                             onClick={() => AddPosition(dept.id)}
+                            disabled={loading}
                           >
-                            Add +
+                            {!loading ? (
+                              <span>Add +</span>
+
+                            ):(
+                              <Spinner size="small" />
+                            )}
                           </Button>
                         </div>
                       )}
 
                       <div className="pl-5">
-                        {dept.positions.length === 0 ? (
+                        {dept.positions.filter((position) => position.name?.trim()).length === 0  ? (
                           <p className="text-gray-500 italic">
                             Positions are empty. Please add some!
                           </p>
                         ) : (
                           <ul className="list-disc space-y-2">
-                            {dept.positions.map((position) => (
+                            {dept.positions.filter((position) => position.name?.trim()).map((position) => (
                               <li key={position.id}>
                                 {isCompanyEditing &&
                                 showEditPositionForm[dept.id]?.[position.id] ? (
@@ -1737,6 +2065,7 @@ export default function Profile() {
                                     />
                                     <div className="flex flex-row gap-2 justify-end">
                                       <Button
+                                        disabled={loading}
                                         className="w-fit h-fit"
                                         variant={"outline"}
                                         onClick={() =>
@@ -1749,19 +2078,56 @@ export default function Profile() {
                                         Cancel
                                       </Button>
                                       <Button
+                                        disabled={loading}
                                         className="w-fit h-fit"
                                         variant={"default"}
                                         onClick={() =>
                                           EditPosition(dept.id, position.id)
                                         }
                                       >
-                                        Save
+                                        {!loading ? (
+                                          <>
+                                            <svg
+                                              width="24"
+                                              height="24"
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                              xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                              <path
+                                                d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z"
+                                                stroke="white"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                              />
+                                              <path
+                                                d="M17 21V13H7V21"
+                                                stroke="white"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                              />
+                                              <path
+                                                d="M7 3V8H15"
+                                                stroke="white"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                              />
+                                            </svg>
+                                            <span className="ml-1">Save</span>
+                                          </>
+                                        ) : (
+                                          <Spinner size="small" />
+                                        )}
                                       </Button>
                                     </div>
                                   </div>
                                 ) : (
                                   <div className="flex justify-between items-center">
                                     <span>{position.name}</span>
+
                                     {isCompanyEditing && (
                                       <div className="flex flex-row gap-0.5">
                                         <Button
@@ -1856,6 +2222,7 @@ export default function Profile() {
             {isCompanyEditing && (
               <div className="flex flex-row gap-3.5 justify-end mt-4">
                 <Button
+                  disabled={loading}
                   variant={"outline"}
                   className="w-fit"
                   onClick={handleCancelCompanyEdit}
@@ -1863,16 +2230,54 @@ export default function Profile() {
                   Cancel
                 </Button>
                 <Button
+                  disabled={loading}
                   variant={"default"}
                   className="w-fit"
-                  onClick={handleSaveCompanyEdit}
+                  // onClick={handleSaveCompanyEdit}
+                  onClick={editCompany}
                 >
-                  Save
+                   {!loading ? (
+                          <>
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z"
+                                stroke="white"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M17 21V13H7V21"
+                                stroke="white"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M7 3V8H15"
+                                stroke="white"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                            <span className="ml-1">Save</span>
+                          </>
+                        ) : (
+                          <Spinner size="small" />
+                        )}
                 </Button>
               </div>
             )}
           </Card>
         </Card>
+        )}
       </div>
 
       {/* Delete Department Confirmation Dialog */}
@@ -1895,12 +2300,18 @@ export default function Profile() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="w-fit">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="w-fit" disabled={loading}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="w-auto bg-danger-700 text-white border border-danger-700 hover:bg-danger-800 hover:text-white"
               onClick={DeleteDepartment}
+              disabled={loading}
             >
-              Delete
+               {!loading ? (
+                <span>Delete</span>
+
+                ):(
+                  <Spinner size="small" />
+                )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1928,12 +2339,18 @@ export default function Profile() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="w-fit">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="w-fit" disabled={loading}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="w-auto bg-danger-700 text-white border border-danger-700 hover:bg-danger-800 hover:text-white"
               onClick={DeletePosition}
+              disabled={loading}
             >
-              Delete
+               {!loading ? (
+                  <span>Delete</span>
+
+                ):(
+                  <Spinner size="small" />
+                )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1989,6 +2406,7 @@ export default function Profile() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
+              disabled={loading}
               className="w-fit"
               onClick={() => {
                 // Reset the edit form state if cancelled from this dialog
@@ -2038,6 +2456,7 @@ export default function Profile() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
+              disabled={loading}
               className="w-fit"
               onClick={() => {
                 // Reset the edit form state if cancelled from this dialog

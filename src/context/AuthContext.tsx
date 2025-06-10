@@ -78,15 +78,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.is_profile_complete && (
         pathname === '/sign-in' || pathname === '/sign-up' || pathname === '/sign-up/complete-registration'
       )) {
-        router.replace('/dashboard');
+        router.replace('/dashboard');    
         return;
       }
 
-      Cookies.set('full_name', data.full_name);
-      Cookies.set('user_role', data.user_role);
-      Cookies.set('plan_name', data.plan_name);
-      Cookies.set('bill_period', data.bill_period);
-      Cookies.set('bill_deadline', String(data.bill_deadline));
+      // Cookies.set('user_photo', data.photo_url);
+      // Cookies.set('full_name', data.full_name);
+      // Cookies.set('user_role', data.user_role);
+      // Cookies.set('plan_name', data.plan_name);
+      // Cookies.set('bill_period', data.bill_period);
+      // Cookies.set('bill_deadline', String(data.bill_deadline));
 
       setUser(data);
     } catch (err) {
