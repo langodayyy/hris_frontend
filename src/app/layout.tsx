@@ -13,6 +13,7 @@ import Cookies from "js-cookie";
 import { string } from "zod";
 import { toast } from "sonner";
 import { usePathname, useRouter } from "next/navigation";
+import { useRef } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -163,7 +164,7 @@ export default function RootLayout({
   const [joyrideKey, setJoyrideKey] = useState(0); // Key to force Joyride re-render
   const [showJoyride, setShowJoyride] = useState(false); // State to control Joyride visibility
   const pathname = usePathname();
-  const router = useRouter();
+  const mounted = useRef(false);
 
   const checkJoyride = (pageKey: string) => {
     const hasSeenJoyride = localStorage.getItem(`hasSeenJoyride_${pageKey}`);
@@ -178,13 +179,21 @@ export default function RootLayout({
   };
 
   useEffect(() => {
+    mounted.current = true; // Set mounted to true when component mounts
+
     const pageKey = pathname.replace("/", "");
-
     const selectedSteps = menuSteps[pageKey as keyof typeof menuSteps] || [];
-    setSteps(selectedSteps);
 
-    checkJoyride(pageKey);
-    setJoyrideKey((prevKey) => prevKey + 1);
+    // Only update state if component is still mounted
+    if (mounted.current) {
+      setSteps(selectedSteps);
+      checkJoyride(pageKey);
+      setJoyrideKey((prevKey) => prevKey + 1);
+    }
+
+    return () => {
+      mounted.current = false; // Set mounted to false when component unmounts
+    };
   }, [pathname]);
 
   return (
