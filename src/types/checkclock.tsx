@@ -20,4 +20,5 @@ export type CheckclockResponse = {
   present_evidence_url: string | null;
   absent_evidence: string | null;
   absent_evidence_url: string | null;
+  employee_photo_url: string | null;
 };

@@ -133,6 +133,7 @@ export default function CheckclockOverviewPage() {
                 presentEvidenceUrl: item.present_evidence_url,
                 absentEvidence: item.absent_evidence,
                 absentEvidenceUrl: item.absent_evidence_url,
+                employeePhoto: item.employee_photo_url,
               };
             }
           );

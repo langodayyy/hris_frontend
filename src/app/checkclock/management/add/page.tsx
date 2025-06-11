@@ -572,6 +572,7 @@ export default function AddCheckclockPage() {
                   <Select
                     value={selectedWorkType}
                     onValueChange={(value) => setSelectedWorkType(value)}
+                    disabled={!!selectedEmployee?.clockOut || !!selectedEmployee?.clockIn} 
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select work type" />
