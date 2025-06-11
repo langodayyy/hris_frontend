@@ -86,8 +86,8 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
   // const [selectedRow, setSelectedRow] = useState<TData | null>(null);
   // const [open, setOpen] = useState(false);
 
-  const { locationRule, loading, refetch } = useCKSettingData();
-  const paymentRule = usePaymentData();
+  const { paymentRule, loading, payData } = usePaymentData();
+  // const paymentRule = usePaymentData();
 
   const [filters, setFilters] = useState({
     position: [] as string[],
