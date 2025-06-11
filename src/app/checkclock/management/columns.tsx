@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { differenceInMinutes } from "date-fns";
-
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ApprovalStatusBadge } from "@/components/ui/approval";
 import { Input } from "@/components/ui/input";
@@ -37,6 +37,7 @@ import DownloadButton from "@/components/ui/downloadButton";
 import Cookies from "js-cookie";
 import MapboxMapView from "@/components/custom/mapbox/MapBoxView";
 import { Spinner } from "@/components/ui/spinner";
+import { useEdit } from "@/context/EditFormContext";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -160,30 +161,35 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
       return filterValue.includes(row.getValue(columnId));
     },
   },
-  // {
-  //   accessorKey: "date",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Date
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => {
-  //     const date = row.getValue("date") as
-  //       | string
-  //       | { startDate: string; endDate: string };
-  //     return (
-  //       <div className="text-center">
-  //         {typeof date === "string" ? date : `${date.startDate}`}
-  //       </div>
-  //     );
-  //   },
-  // },
+  {
+    accessorKey: "date",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Date
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const date = row.getValue("date") as
+        | string
+        | { startDate: string; endDate: string };
+      return (
+        <div className="text-center">
+          {typeof date === "string" ? date : `${date.startDate}`}
+        </div>
+      );
+    },
+    sortingFn: (rowA, rowB, columnId) => {
+      const dateA = new Date(rowA.getValue(columnId) as string).getTime();
+      const dateB = new Date(rowB.getValue(columnId) as string).getTime();
+      return dateA - dateB; // Ascending order
+    },
+  },
 
   {
     accessorKey: "clockIn",
@@ -587,7 +593,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
 
                                   if (response.success) {
                                   } else {
-                                    console.error("failed");
+                                    console.log(response);
                                   }
                                 } catch (error) {
                                   console.error(
@@ -662,7 +668,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
 
                                   if (response.success) {
                                   } else {
-                                    console.error("failed app");
+                                    console.log(response);
                                   }
                                 } catch (error) {
                                   console.error(
@@ -707,7 +713,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
 
                                       if (response.success) {
                                       } else {
-                                        console.error("failed");
+                                        console.log(response);
                                       }
                                     } catch (error) {
                                       console.error(
@@ -1127,7 +1133,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
 
                                   if (response.success) {
                                   } else {
-                                    console.error("failed");
+                                    console.log(response);
                                   }
                                 } catch (error) {
                                   console.error(
@@ -1208,7 +1214,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
 
                                   if (response.success) {
                                   } else {
-                                    console.error("failed app");
+                                    console.log(response);
                                   }
                                 } catch (error) {
                                   console.error(
@@ -1253,7 +1259,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
 
                                       if (response.success) {
                                       } else {
-                                        console.error("failed");
+                                        console.log(response);
                                       }
                                     } catch (error) {
                                       console.error(
@@ -1330,6 +1336,7 @@ export async function updateCheckClockApproval(
 ) {
   try {
     isLoading(true);
+    console.log(data_id, status);
     const userCookie = Cookies.get("token");
     if (!userCookie) {
       throw new Error("No authentication token found");
@@ -1353,11 +1360,13 @@ export async function updateCheckClockApproval(
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Failed to update approval status");
+      // toast.error(data.errors);
+      console.error(data.errors)
     }
 
     window.location.reload();
 
+    // toast.success(data.message);
     return { success: true, data };
   } catch (error: any) {
     return {

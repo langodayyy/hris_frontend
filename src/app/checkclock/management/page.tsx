@@ -7,13 +7,17 @@ import { DataTable } from "./data-table";
 import Cookies from "js-cookie";
 import { CheckclockResponse } from "@/types/checkclock";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useEdit } from "@/context/EditFormContext";
+import { Toaster, toast } from "sonner";
 
 export default function CheckclockOverviewPage() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>();
   const [allData, setAllData] = useState<CheckclockOverview[]>([]);
   const [data, setData] = useState<CheckclockOverview[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // const { errors, setErrors, success, setSuccess } = useEdit();
 
   const handleCalendarChange = (selectedDate: Date | undefined) => {
     setDate(selectedDate);
@@ -45,6 +49,7 @@ export default function CheckclockOverviewPage() {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
         const response = await getCheckClock();
 
         if (response.success && response.data) {
@@ -83,21 +88,22 @@ export default function CheckclockOverviewPage() {
           );
 
           setAllData(transformedData); // sets for calendar filter use
+          setData(transformedData);
 
           // Filter by today's date directly using transformedData
-          const today = new Date();
-          const todayStr = today.toISOString().slice(0, 10);
+          // const today = new Date();
+          // const todayStr = today.toISOString().slice(0, 10);
 
-          const filtered = transformedData.filter((item) => {
-            if (!item.date || typeof item.date !== "string") return false;
+          // const filtered = transformedData.filter((item) => {
+          //   if (!item.date || typeof item.date !== "string") return false;
 
-            const itemDateStr = new Date(item.date).toISOString().slice(0, 10);
-            return itemDateStr === todayStr;
-          });
+          //   const itemDateStr = new Date(item.date).toISOString().slice(0, 10);
+          //   return itemDateStr === todayStr;
+          // });
 
-          console.log("Filtered today data", filtered);
-          setDate(today); // update calendar
-          setData(filtered); // show today's data
+          // console.log("Filtered today data", filtered);
+          // setDate(today); // update calendar
+          // setData(filtered); // show today's data
         } else {
           setError(response.errors?.general?.[0] || "Failed to fetch data");
         }
@@ -112,28 +118,54 @@ export default function CheckclockOverviewPage() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    handleCalendarChange(new Date());
-  }, [allData]);
+  // useEffect(() => {
+  //   handleCalendarChange(new Date());
+  // }, [allData]);
+
+  // if (loading) {
+  //   return (
+  //     <Sidebar title="Checkclock">
+  //       <Skeleton className="w-full h-[400px]"></Skeleton>
+  //     </Sidebar>
+  //   );
+  // }
+
+  // React.useEffect(() => {
+  //   if (errors && Object.keys(errors).length > 0) {
+  //     Object.entries(errors).forEach(([field, messages]) => {
+  //       if (Array.isArray(messages)) {
+  //         messages.forEach((message) => toast.error(`${message}`));
+  //       } else {
+  //         toast.error(`${messages}`);
+  //       }
+  //     });
+  //     setErrors({});
+  //   }
+  // }, [errors]);
+
+  // React.useEffect(() => {
+  //   if (success && Object.keys(success).length > 0) {
+  //     toast.success(`${success.message}`);
+  //     setSuccess({});
+  //   }
+  // }, [success]);
 
   if (loading) {
     return (
       <Sidebar title="Checkclock">
-        <Skeleton className="w-full h-[400px]"></Skeleton>
-      </Sidebar>
-    );
-  }
-
-  if (error) {
-    return (
-      <Sidebar title="Checkclock">
-        <div>Error: {error}</div>
+        <Skeleton className="w-full h-screen"></Skeleton>
       </Sidebar>
     );
   }
 
   return (
     <Sidebar title="Checkclock">
+      <Toaster
+        position="bottom-right"
+        expand={true}
+        richColors
+        closeButton
+      ></Toaster>
       <div className="bg-white rounded-[15px] p-5 flex flex-col gap-[10px]">
         <div className="container mx-auto">
           <DataTable
