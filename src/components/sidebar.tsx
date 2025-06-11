@@ -8,6 +8,8 @@ import Cookies from "js-cookie";
 import { string } from "zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
+import ResetTourButton from "./ui/live-tour";
 
 type NavItemProps = {
   url: string;
@@ -136,13 +138,18 @@ function NavItem({
     </li>
   );
 }
+
 export default function Sidebar({ children, title }: LayoutProps) {
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
 
- useEffect(() => {
-    const avatar = Cookies.get("user_photo");
-    if (avatar) setAvatar(avatar);
+  const [fullName, setFullName] = useState("");
+  const [planName, setPlanName] = useState("");
+  const [role, setRole] = useState("");
+  const [period, setPeriod] = useState("");
+  const [deadline, setDeadline] = useState<string | null>(null);
+
+  useEffect(() => {
     const name = Cookies.get("full_name");
     if (name) setFullName(name);
     const plan = Cookies.get("plan_name");
@@ -154,24 +161,14 @@ export default function Sidebar({ children, title }: LayoutProps) {
     const deadline = Cookies.get("bill_deadline");
     if (deadline) setDeadline(deadline);
   }, []);
-  
-  const [avatar, setAvatar] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [planName, setPlanName] = useState("");
-  const [role, setRole] = useState("");
-  const [period, setPeriod] = useState("");
-  const [deadline, setDeadline] = useState<string | null>(null);
 
- 
-  
   return (
     <div className="flex">
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full bg-white text-neutral-900 py-4 border-r-2 border-neutral-200 
+        className={`sidebar-menu fixed top-0 left-0 h-full bg-white text-neutral-900 py-4 border-r-2 border-neutral-200 
         ${isOpen ? "w-64" : "w-[77px]"} 
-        transition-all duration-300 ease-in-out z-50`}
-        
+        transition-all duration-300 ease-in -out z-50`}
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -509,19 +506,23 @@ export default function Sidebar({ children, title }: LayoutProps) {
               }
             />
           </div>
+          {isOpen ? (
+            <ResetTourButton></ResetTourButton>
+          ):
+          ("")}
+         
         </nav>
       </div>
 
       {/* Main Content Container */}
       <div
-        className={`transition-all duration-300 ease-in-out ${
-          isOpen ? "ml-64" : "ml-[77px]"
-        } w-full`}
+        className={`transition-all duration-300 ease-in-out w-full ${
+          isOpen ? "pl-64" : "pl-[77px]"
+        }`}
       >
         <div className="flex flex-col">
           <Navbar
             title={title}
-            // avatarImage={avatar}
             // userName= {fullName}
             // role= {role}
             // plan= {planName}

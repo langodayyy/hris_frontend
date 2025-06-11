@@ -205,41 +205,40 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
   }
 
   const [error, setError] = useState<string | null>(null);
-  
-    const [steps, setSteps] = useState<Step[]>([]);
-    const [joyrideKey, setJoyrideKey] = useState(0);
-  
-    const billsSteps = {
-      bills: [
-        {
-          target: "#bills",
-          content:
-            "This is the Payment History table of your company. A new invoice will be generated on the 28th of each month based on the selected plan and the number of employees.",
-          disableBeacon: true,
-          placement: "bottom" as const,
-        },
-       
-      ],
-    };
-  
-    function checkJoyride(key: string) {
-      const hasRun = localStorage.getItem(`joyride_shown_${key}`);
-      if (!hasRun) {
-        localStorage.setItem(`joyride_shown_${key}`, "true");
-        return true;
-      }
-      return false;
+
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [joyrideKey, setJoyrideKey] = useState(0);
+
+  const billsSteps = {
+    bills: [
+      {
+        target: "#bills",
+        content:
+          "This is the Payment History table of your company. A new invoice will be generated on the 28th of each month based on the selected plan and the number of employees.",
+        disableBeacon: true,
+        placement: "bottom" as const,
+      },
+    ],
+  };
+
+  function checkJoyride(key: string) {
+    const hasRun = localStorage.getItem(`joyride_shown_${key}`);
+    if (!hasRun) {
+      localStorage.setItem(`joyride_shown_${key}`, "true");
+      return true;
     }
-  
-    useEffect(() => {
-      if (!loading) {
-        const checkclockEl = document.querySelector("#bills");
-        if (checkclockEl && checkJoyride("bills")) {
-          setSteps(billsSteps["bills"]);
-          setJoyrideKey((prev) => prev + 1);
-        }
+    return false;
+  }
+
+  useEffect(() => {
+    if (!loading) {
+      const checkclockEl = document.querySelector("#bills");
+      if (checkclockEl && checkJoyride("bills")) {
+        setSteps(billsSteps["bills"]);
+        setJoyrideKey((prev) => prev + 1);
       }
-    }, [loading]);
+    }
+  }, [loading]);
 
   // console.log("loading fetch", loading);
   if (loading) {
@@ -248,10 +247,11 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
 
   return (
     <>
-    <Joyride
+      <Joyride
         key={joyrideKey} // Force re-render when key changes
         steps={steps}
         continuous={true}
+        disableScrolling
         styles={{
           options: {
             arrowColor: "#fff",
@@ -281,183 +281,188 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
         showProgress={true}
         showSkipButton
       />
-    <Card className="flex items-center p-5 gap-4 w-full" id="bills">
-      <div className="flex justify-between w-full">
-        <span className="w-[187px] text-lg flex-none flex items-center">
-          Payment History
-        </span>
-        <div className="flex gap-2 w-auto items-center">
-          <div className="">
+      <Card className="flex items-center p-5 gap-4 w-full" id="bills">
+        <div className="flex justify-between w-full">
+          <span className="w-[187px] text-lg flex-none flex items-center">
+            Payment History
+          </span>
+          <div className="flex gap-2 w-auto items-center">
+            <div className="">
+              <Select
+                value={selectedYear}
+                onValueChange={(value: string) => setSelectedYear(value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select year" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[230px]">
+                  {/* Hapus opsi All/value kosong karena Select.Item tidak boleh value kosong */}
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+        <Table className="h-fit">
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {currentData.length > 0 ? (
+              currentData.map((row, idx) => {
+                const rowModel = table
+                  .getRowModel()
+                  .rows.find((r) => r.original === row);
+                if (!rowModel) return null;
+                return (
+                  <TableRow key={rowModel.id}>
+                    {rowModel.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="text-center">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        <div className="w-full flex justify-between mt-[10px]">
+          {/* Select Rows */}
+          <div className="flex items-center gap-[10px]">
+            <p className="text-base font-medium">Showing</p>
             <Select
-              value={selectedYear}
-              onValueChange={(value: string) => setSelectedYear(value)}
+              onValueChange={handleRowsChange}
+              defaultValue={rowsPerPage.toString()}
             >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select year" />
+              <SelectTrigger className="w-[72px]">
+                <SelectValue placeholder="" />
               </SelectTrigger>
-              <SelectContent className="max-h-[230px]">
-                {/* Hapus opsi All/value kosong karena Select.Item tidak boleh value kosong */}
-                {years.map((year) => (
-                  <SelectItem key={year} value={year}>
-                    {year}
-                  </SelectItem>
-                ))}
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
           </div>
-        </div>
-      </div>
-      <Table className="h-fit">
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {currentData.length > 0 ? (
-            currentData.map((row, idx) => {
-              const rowModel = table
-                .getRowModel()
-                .rows.find((r) => r.original === row);
-              if (!rowModel) return null;
-              return (
-                <TableRow key={rowModel.id}>
-                  {rowModel.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="text-center">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              );
-            })
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <div className="w-full flex justify-between mt-[10px]">
-        {/* Select Rows */}
-        <div className="flex items-center gap-[10px]">
-          <p className="text-base font-medium">Showing</p>
-          <Select
-            onValueChange={handleRowsChange}
-            defaultValue={rowsPerPage.toString()}
-          >
-            <SelectTrigger className="w-[72px]">
-              <SelectValue placeholder="" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
 
-        {/* Pagination */}
-        <div className="flex">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-                  className="mx-[4px] w-[24px] h-[26px] !py-[6px] !px-[6px] border text-primary-900 bg-[#F5F5F5] shadow-xs hover:bg-primary-950 hover:text-white dark:bg-input/30 dark:border-input dark:hover:bg-input/50"
-                />
-              </PaginationItem>
-              {startPage > 1 && (
-                <>
-                  <PaginationItem>
-                    <PaginationLink
-                      href="#"
-                      onClick={() => handlePageChange(1)}
-                    >
-                      1
-                    </PaginationLink>
-                  </PaginationItem>
-                  {startPage > 2 && (
+          {/* Pagination */}
+          <div className="flex">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={() =>
+                      handlePageChange(Math.max(currentPage - 1, 1))
+                    }
+                    className="mx-[4px] w-[24px] h-[26px] !py-[6px] !px-[6px] border text-primary-900 bg-[#F5F5F5] shadow-xs hover:bg-primary-950 hover:text-white dark:bg-input/30 dark:border-input dark:hover:bg-input/50"
+                  />
+                </PaginationItem>
+                {startPage > 1 && (
+                  <>
                     <PaginationItem>
-                      <PaginationEllipsis />
+                      <PaginationLink
+                        href="#"
+                        onClick={() => handlePageChange(1)}
+                      >
+                        1
+                      </PaginationLink>
                     </PaginationItem>
-                  )}
-                </>
-              )}
+                    {startPage > 2 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+                  </>
+                )}
 
-              {Array.from({ length: endPage - startPage + 1 }).map((_, i) => {
-                const page = startPage + i;
-                return (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      href="#"
-                      isActive={page === currentPage}
-                      onClick={() => handlePageChange(page)}
-                      className={`inline-flex items-center justify-center mx-[4px] w-[24px] h-[26px] !py-[6px] !px-[6px] border text-primary-900 bg-[#F5F5F5] shadow-xs 
+                {Array.from({ length: endPage - startPage + 1 }).map((_, i) => {
+                  const page = startPage + i;
+                  return (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        href="#"
+                        isActive={page === currentPage}
+                        onClick={() => handlePageChange(page)}
+                        className={`inline-flex items-center justify-center mx-[4px] w-[24px] h-[26px] !py-[6px] !px-[6px] border text-primary-900 bg-[#F5F5F5] shadow-xs 
                                             ${
                                               page === currentPage
                                                 ? "bg-primary-950 text-white"
                                                 : "hover:bg-primary-950 hover:text-white"
                                             }
                                             dark:bg-input/30 dark:border-input dark:hover:bg-input/50`}
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              })}
-
-              {endPage < totalPages && (
-                <>
-                  {endPage < totalPages - 1 && (
-                    <PaginationItem>
-                      <PaginationEllipsis />
+                      >
+                        {page}
+                      </PaginationLink>
                     </PaginationItem>
-                  )}
-                  <PaginationItem>
-                    <PaginationLink
-                      href="#"
-                      onClick={() => handlePageChange(totalPages)}
-                    >
-                      {totalPages}
-                    </PaginationLink>
-                  </PaginationItem>
-                </>
-              )}
+                  );
+                })}
 
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={() =>
-                    handlePageChange(Math.min(currentPage + 1, totalPages))
-                  }
-                  className="mx-[4px] w-[24px] h-[26px] !py-[6px] !px-[6px] border text-primary-900 bg-[#F5F5F5] shadow-xs hover:bg-primary-950 hover:text-white dark:bg-input/30 dark:border-input dark:hover:bg-input/50"
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+                {endPage < totalPages && (
+                  <>
+                    {endPage < totalPages - 1 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+                    <PaginationItem>
+                      <PaginationLink
+                        href="#"
+                        onClick={() => handlePageChange(totalPages)}
+                      >
+                        {totalPages}
+                      </PaginationLink>
+                    </PaginationItem>
+                  </>
+                )}
+
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={() =>
+                      handlePageChange(Math.min(currentPage + 1, totalPages))
+                    }
+                    className="mx-[4px] w-[24px] h-[26px] !py-[6px] !px-[6px] border text-primary-900 bg-[#F5F5F5] shadow-xs hover:bg-primary-950 hover:text-white dark:bg-input/30 dark:border-input dark:hover:bg-input/50"
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
     </>
   );
 }

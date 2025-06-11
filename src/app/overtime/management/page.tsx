@@ -19,11 +19,11 @@ export default function OvertimeManagement(){
   const totalPages = Math.ceil(overtimeDisplay.length / rowsPerPage);
   const router = useRouter();
 
-  const handleEdit = (id: string) => {
-    router.push(`management/edit/${id}`);
-  };
+  // const handleEdit = (id: string) => {
+  //   router.push(`management/edit/${id}`);
+  // };
 
-  const column = OvertimeColumn(handleEdit);
+  const column = OvertimeColumn();
 
   // Fungsi untuk menangani perubahan halaman
   const handlePageChange = (page: number) => {
@@ -50,7 +50,9 @@ export default function OvertimeManagement(){
     <Sidebar title="Overtime Management">
       <Card className="p-[20px] flex flex-col" id="overtime">
         <div className="flex flex-col gap-[10px]">
-          <div className="overflow-y-none">
+
+          <div className="overflow-x-auto">
+
             {/* Table */}
             <DataTable columns={column} data={data} />
           </div>

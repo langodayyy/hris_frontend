@@ -20,11 +20,11 @@ type OvertimeSettingsRecord = {
   name: string;
   type: string;
   category: string;
-  work_day: number | null;
-  calculation: number | null;
-  rate: number | null;
-  formula: string;
+  working_days: number | null;
+  status: string;
+  formula: string[];
 };
+import Cookies from "js-cookie";
 
 export const OvertimeSettingsColumn = (): ColumnDef<OvertimeSettingsRecord>[] => [
   {
@@ -69,44 +69,22 @@ export const OvertimeSettingsColumn = (): ColumnDef<OvertimeSettingsRecord>[] =>
     accessorKey: "category",
     header: "Category",
   },
-  {
-    accessorKey: "work_day",
-    header: "Working Day",
-    cell: ({ getValue }) => {
-      const value = getValue();
-      return value == null ? "-" : `${value} days`;
-    },
+{
+  accessorKey: "formulas",
+  header: "Formula",
+  cell: ({ getValue }) => {
+    const formulas = getValue(); // harus berupa array
+    return (
+      <div style={{ whiteSpace: "pre-line" }}>
+        {Array.isArray(formulas) && formulas.length > 0
+          ? formulas.join("\n")
+          : "-"}
+      </div>
+    );
   },
-  {
-    accessorKey: "calculation",
-    header: "Calculation",
-    cell: ({ getValue }) => {
-      const value = getValue();
-      return value == null ? "-" : `per ${Number(value)} hour`;
-    },
-  },
-  {
-    accessorKey: "rate",
-    header: "Overtime Rate",
-    cell: ({ getValue }) => {
-      const value = getValue();
-      return value == null
-        ? "-"
-        : `IDR ${Number(value ?? 0).toLocaleString("id-ID")}`;
-    },
-  },
-  {
-    accessorKey: "formula",
-    header: "Formula",
-    cell: ({ getValue }) => {
-      const value = getValue();
-      return (
-        <div style={{ whiteSpace: "pre-line" }}>
-          {value ? String(value) : "-"}
-        </div>
-      );
-    },
-  },
+},
+
+
   {
     accessorKey: "action",
     header: "Action",
@@ -114,7 +92,8 @@ export const OvertimeSettingsColumn = (): ColumnDef<OvertimeSettingsRecord>[] =>
       const status = row.getValue(
         "type"
       ) as OvertimeSettingsRecord["type"];
-
+      const data = row.original; // Akses seluruh data row
+      const id = data.id;    
       if (status === "Flat") {
       return (
         <div className="flex px-6 justify-center gap-1">
@@ -163,9 +142,37 @@ export const OvertimeSettingsColumn = (): ColumnDef<OvertimeSettingsRecord>[] =>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel className="w-auto">Cancel</AlertDialogCancel>
-                <AlertDialogAction className="w-auto bg-danger-700 text-white border border-danger-700 hover:bg-danger-800 hover:text-white">
+                {/* <AlertDialogAction className="w-auto bg-danger-700 text-white border border-danger-700 hover:bg-danger-800 hover:text-white">
+                  Delete
+                </AlertDialogAction> */}
+                <AlertDialogAction
+                  className="w-auto bg-danger-700 text-white border border-danger-700 hover:bg-danger-800 hover:text-white"
+                  // onClick={() => console.log("Delete ID:", id)}
+                  onClick={async () => {
+                      try {
+                        console.log("Deleting ID:", id); 
+                        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/overtime-settings/${id}`, {
+                          method: "DELETE",
+                          headers: {
+                             "Authorization": `Bearer ${Cookies.get("token")}`,
+                          }
+                        });
+
+                        if (!response.ok) {
+                          throw new Error("Failed to delete overtime setting");
+                        }
+
+                        console.log("Deleted successfully");
+                        // Optional: call a refetch or mutate to update the table
+                      } catch (error) {
+                        console.error("Delete error:", error);
+                      }
+                    }}
+
+                >
                   Delete
                 </AlertDialogAction>
+
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
