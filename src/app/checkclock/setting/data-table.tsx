@@ -239,7 +239,7 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
           }`}
         >
           {selectedWorkType === "WFO" && (
-            <div className="col-span-2 rounded-md max-w-[550px] min-w-[400px] h-fit">
+            <div className="col-span-2 rounded-md max-w-[550px] h-fit">
               <MapboxMap></MapboxMap>
             </div>
           )}

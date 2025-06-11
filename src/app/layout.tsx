@@ -330,19 +330,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          {/* <AuthProvider> */}
-          {/* <AuthGate> */}
-          <React.StrictMode>
-            
-          <FormProvider>
-            <EditProvider>
-              {children}
-            </EditProvider>
-            </FormProvider>
-        
-          </React.StrictMode>
-        </AuthProvider>
          {showJoyride && (
           <Joyride
             key={joyrideKey} // Force re-render when key changes
@@ -377,6 +364,7 @@ export default function RootLayout({
             }}
             showProgress={true}
             showSkipButton
+            disableScrolling
           />
         )}
         {/* <AuthProvider> */}
@@ -391,67 +379,6 @@ export default function RootLayout({
         </React.StrictMode>
         {/* </AuthGate> */}
         {/* </AuthProvider> */}
-
-        {/* <AuthProvider>
-          <FormProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route element={<PublicRoute />}>
-                  <Route path="/" element={<SignIn />}></Route>
-                  <Route path="/sign-in" element={<SignIn />}></Route>
-                  <Route
-                    path="/sign-in/as-employee"
-                    element={<SignInAsEmployee />}
-                  ></Route>
-                  <Route
-                    path="/sign-in/check-email"
-                    element={<CheckEmail />}
-                  ></Route>
-                  <Route
-                    path="/sign-in/forgot-password"
-                    element={<ForgotPassword />}
-                  ></Route>
-                  <Route
-                    path="/sign-in/link-expired"
-                    element={<LinkExpired />}
-                  ></Route>
-                  <Route
-                    path="/sign-in/set-new-password"
-                    element={<SetNewPassword />}
-                  ></Route>
-                  <Route
-                    path="/sign-in/success-set-password"
-                    element={<SuccessSetPassword />}
-                  ></Route>
-                  <Route path="/sign-up" element={<SignUp />}></Route>
-                  <Route
-                    path="/sign-up/complete-registration"
-                    element={<SignUpCompleteRegistration />}
-                  ></Route>
-                </Route>
-
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/employee" element={<Employee />} />
-                  <Route path="/overtime" element={<OvertimeManagement />} />
-                  <Route
-                    path="/checkclock/checkclock-management"
-                    element={<CheckclockOverviewPage />}
-                  />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                </Route>
-
-                <Route
-                  path="/"
-                  element={<Navigate to="/dashboard" replace />}
-                />
-
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </FormProvider>
-        </AuthProvider> */}
       </body>
     </html>
   );
