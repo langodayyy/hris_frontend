@@ -105,40 +105,73 @@ const menuSteps = {
       placement: "top" as const,
     },
   ],
-  "checkclock/setting": [
+  
+    profile:
+   [ 
     {
-      target: "#checkclock-setting",
-      content: "This is the Checkclock Management table. You can manage employee checkclock data here.",
+      target: "#profile-user",
+      content: "This is your profile page. You can update your personal information, change your password, and manage your company settings.",
       disableBeacon: true,
+      // placement: "top" as const,
     },
-    {
-      target: "#date-checkclock",
-      content: "You can filter checkclock data by date.",
-      disableBeacon: true,
-    },
-    {
-      target: "#filter-checkclock",
-      content: "You can filter checkclock data by position, or work type.",
-      disableBeacon: true,
-    },
-    {
-      target: "#add-checkclock",
-      content: "You can add new checkclock for employee who you choose here manually.",
-      disableBeacon: true,
-    },
+
   ],
-  overtime: [
+  
+  // "checkclock/setting": [
+  //   {
+  //     target: "#checkclock-setting",
+  //     content: "This is the Checkclock Management table. You can manage employee checkclock data here.",
+  //     disableBeacon: true,
+  //   },
+  //   {
+  //     target: "#date-checkclock",
+  //     content: "You can filter checkclock data by date.",
+  //     disableBeacon: true,
+  //   },
+  //   {
+  //     target: "#filter-checkclock",
+  //     content: "You can filter checkclock data by position, or work type.",
+  //     disableBeacon: true,
+  //   },
+  //   {
+  //     target: "#add-checkclock",
+  //     content: "You can add new checkclock for employee who you choose here manually.",
+  //     disableBeacon: true,
+  //   },
+  // ],
+  "overtime/management": [
     {
       target: "#overtime",
-      content: "Welcome!! Please spare a minute to learn about our page",
+      content: "This is the Overtime Management table. You can manage employee overtime data here. You can also approve or reject overtime requests submitted by employees.",
       disableBeacon: true,
     },
+    {
+      target: "#date-overtime",
+      content: "You can filter overtime data by date.",
+      disableBeacon: true,
+    },
+    {
+      target: "#filter-overtime",
+      content: "You can filter overtime data by overtime type, and status.",
+      disableBeacon: true,
+    },
+    {
+      target: "#add-overtime",
+      content: "You can add new overtime for employee who you choose here manually.",
+      disableBeacon: true,
+    },
+    
   ],
   // contoh selain path luar
-  "overtime/add": [
+  "overtime/setting": [
     {
-      target: "#overtime-add",
-      content: "Welcome!! Please spare a minute to learn about our page",
+      target: "#overtime-setting",
+      content: "This is the Overtime Setting table. You can manage overtime settings here.",
+      disableBeacon: true,
+    },
+    {
+      target: "#add-overtime-setting",
+      content: "This is the Overtime Setting table. You can manage overtime settings here.",
       disableBeacon: true,
     },
   ],

@@ -63,7 +63,7 @@ export default function OvertimeSettingsManagement() {
     <Sidebar title="Overtime Settings">
       <Card className="p-[20px] flex flex-col">
         <div className="flex flex-col gap-[10px]">
-          <div>
+          <div id="overtime-setting">
             {/* Table */}
             <DataTable columns={column} data={data} />
           </div>

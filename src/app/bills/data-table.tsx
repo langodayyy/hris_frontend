@@ -49,6 +49,7 @@ import EditWfaForm from "@/components/custom/ck-setting-form/EditWfaFrom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePaymentData } from "@/hooks/usePaymentData";
 import { useEffect } from "react";
+import Joyride, { Step } from "react-joyride";
 import {
   Pagination,
   PaginationContent,
@@ -203,13 +204,84 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
     years.push(y.toString());
   }
 
+  const [error, setError] = useState<string | null>(null);
+  
+    const [steps, setSteps] = useState<Step[]>([]);
+    const [joyrideKey, setJoyrideKey] = useState(0);
+  
+    const billsSteps = {
+      bills: [
+        {
+          target: "#bills",
+          content:
+            "This is the Payment History table of your company. A new invoice will be generated on the 28th of each month based on the selected plan and the number of employees.",
+          disableBeacon: true,
+          placement: "bottom" as const,
+        },
+       
+      ],
+    };
+  
+    function checkJoyride(key: string) {
+      const hasRun = localStorage.getItem(`joyride_shown_${key}`);
+      if (!hasRun) {
+        localStorage.setItem(`joyride_shown_${key}`, "true");
+        return true;
+      }
+      return false;
+    }
+  
+    useEffect(() => {
+      if (!loading) {
+        const checkclockEl = document.querySelector("#bills");
+        if (checkclockEl && checkJoyride("bills")) {
+          setSteps(billsSteps["bills"]);
+          setJoyrideKey((prev) => prev + 1);
+        }
+      }
+    }, [loading]);
+
   // console.log("loading fetch", loading);
   if (loading) {
     return <Skeleton className="w-full h-[550px]"></Skeleton>;
   }
 
   return (
-    <Card className="flex items-center p-5 gap-4 w-full">
+    <>
+    <Joyride
+        key={joyrideKey} // Force re-render when key changes
+        steps={steps}
+        continuous={true}
+        styles={{
+          options: {
+            arrowColor: "#fff",
+            backgroundColor: "#fff",
+            primaryColor: "#1E3A5F",
+            zIndex: 10000,
+          },
+          tooltip: {
+            borderRadius: "12px",
+            padding: "16px",
+            fontSize: "16px",
+            boxShadow: "0 4px 5px rgba(0,0,0,0.2)",
+            height: "fit-content",
+          },
+
+          buttonBack: {
+            marginRight: 5,
+            color: "#1E3A5F",
+            border: "1px solid #1E3A5F",
+            backgroundColor: "#fff",
+            borderRadius: "5px",
+          },
+          buttonClose: {
+            display: "none",
+          },
+        }}
+        showProgress={true}
+        showSkipButton
+      />
+    <Card className="flex items-center p-5 gap-4 w-full" id="bills">
       <div className="flex justify-between w-full">
         <span className="w-[187px] text-lg flex-none flex items-center">
           Payment History
@@ -386,5 +458,6 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
         </div>
       </div>
     </Card>
+    </>
   );
 }

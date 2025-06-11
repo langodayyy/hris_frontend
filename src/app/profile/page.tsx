@@ -570,7 +570,7 @@ export default function Profile() {
   return (
     <Sidebar title="">
       <div className="">
-        <Card className="w-full h-fit px-5 py-7 gap-[15px]">
+        <Card className="w-full h-fit px-5 py-7 gap-[15px]" id="profile-user">
           <div className="flex flex-row justify-between">
             <span className="px-[10px] text-lg">Profile</span>
 

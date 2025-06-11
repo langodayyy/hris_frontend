@@ -477,7 +477,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
             <NavItem
               url="/profile"
               isOpen={isOpen}
-              isSelected={pathname.startsWith("/Profile")}
+              isSelected={pathname.startsWith("/profile")}
               text="Profile"
               svgIcon={
                 <svg
