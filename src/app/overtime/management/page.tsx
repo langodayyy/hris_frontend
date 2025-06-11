@@ -10,18 +10,17 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { overtimeDummy } from "@/components/dummy/overtimeData";
-
+import { toast } from "sonner";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
 
 export default function OvertimeManagement(){
-  const overtimeDisplay = useMemo(() => overtimeDummy, []);
+  // const overtimeDisplay = useMemo(() => overtimeDummy, []);
+  const [overtimeData, setOvertimeData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10); 
-  const totalPages = Math.ceil(overtimeDisplay.length / rowsPerPage);
+  const totalPages = Math.ceil(overtimeData.length / rowsPerPage);
   const router = useRouter();
-
-  // const handleEdit = (id: string) => {
-  //   router.push(`management/edit/${id}`);
-  // };
 
   const column = OvertimeColumn();
 
@@ -39,13 +38,75 @@ export default function OvertimeManagement(){
   // Hitung data yang akan ditampilkan pada halaman ini
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const data = overtimeDisplay.slice(startIndex, endIndex);
+  const data = overtimeData.slice(startIndex, endIndex);
 
   // Perhitungan start dan end page untuk pagination
   const maxVisiblePages = 5; 
   const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
   const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
   
+
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchOvertime = async () => {
+      setLoading(true);
+      try {
+        const token = Cookies.get('token');
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/overtime`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw data;
+        }
+        // setOvertimeSettingData(data);
+        console.log(data)
+        setOvertimeData(data)
+      } catch (err) {
+        let message = "Unknown error occurred";
+        let messagesToShow: string[] = [];
+
+        if (
+          err &&
+          typeof err === "object" &&
+          "message" in err &&
+          typeof (err as any).message === "string"
+        ) {
+          const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+          if (backendError.message.toLowerCase().includes("failed to fetch")) {
+            message = "Unknown error occurred";
+          } else {
+            message = backendError.message;
+          }
+
+          messagesToShow = backendError.errors
+            ? Object.values(backendError.errors).flat()
+            : [message];
+        } else {
+          messagesToShow = [message];
+        }
+
+        toast.error(
+          <>
+            <p className="text-red-700 font-bold">Error</p>
+            {messagesToShow.map((msg, idx) => (
+              <div key={idx} className="text-red-700">• {msg}</div>
+            ))}
+          </>,
+          { duration: 30000 }
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+   fetchOvertime()
+  }, [])
+
   return (
     <Sidebar title="Overtime Management">
       <Card className="p-[20px] flex flex-col" id="overtime">
