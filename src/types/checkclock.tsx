@@ -1,5 +1,7 @@
 export type CheckclockResponse = {
   data_id: string;
+  submitter_name: string;
+  employee_number: string;
   employee_id: number;
   employee_name: string;
   position: string;
@@ -13,4 +15,9 @@ export type CheckclockResponse = {
   longitude?: number;
   absent_start_date: string | null;
   absent_end_date: string | null;
+  reject_reason: string | null;
+  present_evidence: string | null;
+  present_evidence_url: string | null;
+  absent_evidence: string | null;
+  absent_evidence_url: string | null;
 };

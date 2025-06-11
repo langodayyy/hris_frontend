@@ -20,7 +20,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { overtimeSettingSample } from "@/components/dummy/overtimeData";
 import { OvertimeSettingsColumn } from "./column";
 import { DataTable } from "./data-table";
@@ -30,13 +30,13 @@ export default function OvertimeSettingsManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const totalPages = Math.ceil(overtimeDisplay.length / rowsPerPage);
-  const router = useRouter();
+  // const router = useRouter();
 
-  const handleEdit = (id: string) => {
-    router.push(`/overtime/setting/edit/${id}`);
-  };
+  // const handleEdit = (id: string) => {
+  //   router.push(`/overtime/setting/edit/${id}`);
+  // };
 
-  const column = OvertimeSettingsColumn(handleEdit);
+  const column = OvertimeSettingsColumn();
 
   // Fungsi untuk menangani perubahan halaman
   const handlePageChange = (page: number) => {

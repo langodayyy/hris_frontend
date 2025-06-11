@@ -46,7 +46,7 @@ export default function CheckclockSettingPage() {
 
   return (
     <Sidebar title={"Checkclock"}>
-      <Toaster position="bottom-right" expand={true}></Toaster>
+      <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
       <div className="w-full" >
 
       <DataTable 

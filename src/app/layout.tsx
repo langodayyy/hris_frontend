@@ -6,6 +6,7 @@ import "./globals.css";
 import { FormProvider } from "@/context/FormContext";
 import { EditProvider } from "@/context/EditFormContext";
 import React, { useEffect, useState } from "react";
+import { AuthProvider } from '@/context/AuthContext';
 import Joyride from "react-joyride";
 
 
@@ -329,6 +330,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <AuthProvider>
+          {/* <AuthProvider> */}
+          {/* <AuthGate> */}
+          <React.StrictMode>
+            
+          <FormProvider>
+            <EditProvider>
+              {children}
+            </EditProvider>
+            </FormProvider>
+        
+          </React.StrictMode>
+        </AuthProvider>
          {showJoyride && (
           <Joyride
             key={joyrideKey} // Force re-render when key changes

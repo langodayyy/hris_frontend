@@ -140,14 +140,9 @@ export default function Sidebar({ children, title }: LayoutProps) {
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
 
-
-  const [fullName, setFullName] = useState("");
-  const [planName, setPlanName] = useState("");
-  const [role, setRole] = useState("");
-  const [period, setPeriod] = useState("");
-  const [deadline, setDeadline] = useState<string | null>(null);
-
-  useEffect(() => {
+ useEffect(() => {
+    const avatar = Cookies.get("user_photo");
+    if (avatar) setAvatar(avatar);
     const name = Cookies.get("full_name");
     if (name) setFullName(name);
     const plan = Cookies.get("plan_name");
@@ -159,7 +154,16 @@ export default function Sidebar({ children, title }: LayoutProps) {
     const deadline = Cookies.get("bill_deadline");
     if (deadline) setDeadline(deadline);
   }, []);
+  
+  const [avatar, setAvatar] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [planName, setPlanName] = useState("");
+  const [role, setRole] = useState("");
+  const [period, setPeriod] = useState("");
+  const [deadline, setDeadline] = useState<string | null>(null);
 
+ 
+  
   return (
     <div className="flex">
       {/* Sidebar */}
@@ -517,11 +521,12 @@ export default function Sidebar({ children, title }: LayoutProps) {
         <div className="flex flex-col">
           <Navbar
             title={title}
-            userName= {fullName}
-            role= {role}
-            plan= {planName}
-            period= {period}
-            deadline= {deadline}
+            // avatarImage={avatar}
+            // userName= {fullName}
+            // role= {role}
+            // plan= {planName}
+            // period= {period}
+            // deadline= {deadline}
           />
           <main className="p-[30px] ">{children}</main>
         </div>

@@ -24,6 +24,8 @@ const EditCKsSchema = z
     clockIn: z.string().nullable().optional(),
     minClockIn: z.string().nullable().optional(),
     maxClockIn: z.string().nullable().optional(),
+    clockOut: z.string().nullable().optional(),
+    maxClockOut: z.string().nullable().optional(),
   })
   .superRefine((data, ctx) => {
     const fields = {
@@ -63,6 +65,8 @@ export default function EditWfaForm({ onUpdate }: Props) {
       clockIn: selectedRow?.clockIn ?? "",
       minClockIn: selectedRow?.minClockIn ?? "",
       maxClockIn: selectedRow?.maxClockIn ?? "",
+      clockOut: "",
+      maxClockOut: "",
     },
     extend: [validator({ schema: EditCKsSchema }), reporter()],
     onSubmit: async (values) => {
@@ -107,6 +111,16 @@ export default function EditWfaForm({ onUpdate }: Props) {
                 type="hidden"
                 value={selectedRow?.worktype_id ?? ""}
               />
+              <input
+                name="clockOut"
+                type="hidden"
+                value={selectedRow?.clockOut}
+              />
+              <input
+                name="maxClockOut"
+                type="hidden"
+                value={selectedRow?.maxClockOut}
+              />
             </div>
             <div>
               <TimeInput
@@ -147,6 +161,8 @@ export default function EditWfaForm({ onUpdate }: Props) {
                 clockIn: "",
                 minClockIn: "",
                 maxClockIn: "",
+                clockOut: "",
+                maxClockOut: "",
               })
             }
           >
