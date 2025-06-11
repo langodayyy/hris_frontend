@@ -236,26 +236,8 @@ export default function RootLayout({
         <React.StrictMode>
           <FormProvider>
             <EditProvider>
+              
               {children}
-              <Joyride
-                key={joyrideKey}
-                steps={steps}
-                continuous
-                showSkipButton
-                scrollToFirstStep
-                styles={{
-                  options: {
-                    zIndex: 10000,
-                  },
-                }}
-                callback={(data) => {
-                  const { status, type } = data;
-                  if (status === "finished" || status === "skipped") {
-                    setShowJoyride(false);
-                  }
-                }}
-                run={showJoyride}
-              />
             </EditProvider>
           </FormProvider>
         </React.StrictMode>
