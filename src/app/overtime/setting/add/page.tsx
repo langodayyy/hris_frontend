@@ -16,29 +16,41 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { toast, Toaster } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function AddOvertimeSetting() {
   
   const router = useRouter();
+  const [overtimeName, setOvertimeName] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [calculation, setCalculation] = useState<number | null>(null); 
   const [rate, setRate] = useState<number | null>(null); 
-
-   const handleSubmit = async () => {
+  const [loading, setLoading] = useState(false);
+  
+  const handleSubmit = async () => {
     setLoading(true);
     // setError(false);
     // setSuccess(false);
 
+    console.log(overtimeName)
+    console.log(selectedCategory)
+    console.log(calculation)
+    console.log(rate)
     try {
-      console.log(tempOvertimeType)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/overtime-settings/status?_method=PATCH`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/overtime-settings`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${Cookies.get("token")}`,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            overtime_setting_id: tempOvertimeType
+            name: overtimeName,
+            category: selectedCategory,
+            interval_hours: calculation,
+            rate: rate
+
       })
     });
 
@@ -47,9 +59,9 @@ export default function AddOvertimeSetting() {
     if (!response.ok) {
         throw responseData; 
     }
-    toast.success('Company updated successfully')
-    setActiveOvertimeType(tempOvertimeType);
+    toast.success('Overtime created successfully')
     // setSuccess(true);
+    router.push("/overtime/setting")
     } catch (err) {
     // setError(true);
     let message = "Unknown error occurred";
@@ -92,6 +104,7 @@ export default function AddOvertimeSetting() {
   
   return (
     <Sidebar title="Overtime Setting">
+      <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
       <Card className="flex flex-col gap-[15px] px-[20px] py-[26px]">
         <div className="px-[10px]">
           <p className="font-medium text-lg text-neutral-900">
@@ -111,6 +124,8 @@ export default function AddOvertimeSetting() {
                 name="ovt_name"
                 placeholder="Enter overtime name"
                 required
+                value={overtimeName}
+                onChange={(e) => setOvertimeName(e.target.value)}
               />
             </div>
 
@@ -203,16 +218,37 @@ export default function AddOvertimeSetting() {
             variant="outline"
             className="w-[98px]"
             onClick={() => router.push("/overtime/setting")}
+            disabled={loading}
           >
-            Cancel
+            {!loading ? (
+              <>
+              <span>Cancel</span>
+              </>
+            ) : (
+              <Spinner size="small" />
+          )}
           </Button>
-          <Button
+          {/* <Button
             type="submit"
             variant="default"
             className="w-[98px]"
             onClick={handleSubmit}
           >
             Save
+          </Button> */}
+          <Button className="w-[80px] h-[40px]" variant="default"  onClick={handleSubmit} disabled={loading}>
+          {!loading ? (
+              <>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M17 21V13H7V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M7 3V8H15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="ml-1">Save</span>
+              </>
+          ) : (
+              <Spinner size="small" />
+          )}
           </Button>
         </div>
       </Card>
