@@ -113,6 +113,7 @@ const ProfileInformation = ({ employeeData, onUpdate }: Props) => {
   };
   return (
     <Card className=" gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
+     
       <div className="flex mx-[20px] justify-between">
         <p className="justify-center text-lg font-medium whitespace-nowrap">
           Profile Information

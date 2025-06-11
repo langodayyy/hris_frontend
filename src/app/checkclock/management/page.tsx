@@ -86,6 +86,15 @@ export default function CheckclockOverviewPage() {
     return false;
   }
 
+  // useEffect(() => {
+  //   if (!loading) {
+  //     const checkclockEl = document.querySelector("#checkclock");
+  //     if (checkclockEl && checkJoyride("checkclock/management")) {
+  //       setSteps(checklockSteps["checkclock/management"]);
+  //       setJoyrideKey((prev) => prev + 1);
+  //     }
+  //   }
+  // }, [loading]);
   useEffect(() => {
     if (!loading) {
       const checkclockEl = document.querySelector("#checkclock");
@@ -209,27 +218,12 @@ export default function CheckclockOverviewPage() {
   }
 
   return (
-    <Sidebar title="Checkclock">
-      <Toaster
-        position="bottom-right"
-        expand={true}
-        richColors
-        closeButton
-      ></Toaster>
-      <div className="bg-white rounded-[15px] p-5 flex flex-col gap-[10px]">
-        <div className="container mx-auto">
-          <DataTable
-            columns={columns}
-            data={data}
-            date={date}
-            onDateChange={handleCalendarChange}
-          />
-        </div>
-      </div>
+    <>
       <Joyride
         key={joyrideKey} // Force re-render when key changes
         steps={steps}
         continuous={true}
+        disableScrolling
         styles={{
           options: {
             arrowColor: "#fff",
@@ -259,7 +253,25 @@ export default function CheckclockOverviewPage() {
         showProgress={true}
         showSkipButton
       />
-    </Sidebar>
+      <Sidebar title="Checkclock">
+        <Toaster
+          position="bottom-right"
+          expand={true}
+          richColors
+          closeButton
+        ></Toaster>
+        <div className="bg-white rounded-[15px] p-5 flex flex-col gap-[10px]">
+          <div className="container mx-auto" id="checkclock">
+            <DataTable
+              columns={columns}
+              data={data}
+              date={date}
+              onDateChange={handleCalendarChange}
+            />
+          </div>
+        </div>
+      </Sidebar>
+    </>
   );
 }
 
