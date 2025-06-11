@@ -27,12 +27,12 @@ const fetcher = (url: string) =>
   }).then((res) => res.json());
 
 export function usePaymentData() {
-  const { data, error } = useSWR(
+  const { data, error, isLoading } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/payment-history`,
     fetcher
   );
   console.log("API raw data:", data, "error:", error);
-
+ const payData = data?.payData ?? null;
   const paymentRule = Array.isArray(data?.data)
     ? data.data.map((item: any) => ({
         payment_id: item.payment_id,
@@ -49,6 +49,8 @@ export function usePaymentData() {
     : [];
 
   return {
+    payData,
+    loading: isLoading,
     paymentRule,
   };
 }
