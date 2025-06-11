@@ -7,7 +7,7 @@ interface StatCardProps {
   icon: React.ReactNode;
   title: string;
   //   value: number | string;
-  lastUpdated: string;
+  lastUpdated?: string;
   dashboardData: any; // Replace with the actual type of dashboardData
 }
 
@@ -27,11 +27,11 @@ export default function StatCard({ icon, title, lastUpdated, dashboardData }: St
         </div>
         <div className="font-bold text-4xl">{value}</div>
       </CardContent>
-      <CardFooter className="py-[10px] px-[20px] border-t-2 border-t-[#d9d9d9]">
+      {/* <CardFooter className="py-[10px] px-[20px] border-t-2 border-t-[#d9d9d9]">
         <div className="font-semibold text-sm text-[#acacac]">
           Update: {lastUpdated}
         </div>
-      </CardFooter>
+      </CardFooter> */}
     </Card>
   );
 }
