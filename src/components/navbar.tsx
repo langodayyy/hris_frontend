@@ -29,6 +29,7 @@ interface NavbarProps {
 
 // export default function Navbar({ title, avatarImage, userName, role, plan, period, deadline }: NavbarProps) {
 export default function Navbar({ title }: NavbarProps) {
+  const [imageValid, setImageValid] = useState(true);
   const [avatarImage, setAvatarImage] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
@@ -360,10 +361,18 @@ const result = [
             <DropdownMenuTrigger>
               <div className="flex flex-row gap-3 w-full h-full rounded-full cursor-pointer transition duration-15 hover:bg-gray-100">
                 <div className="relative flex items-center justify-center w-10 h-10 bg-gray-400 rounded-full">
-                  {avatarImage ? (
-                    <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+                  {avatarImage && imageValid ? (
+                    <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" onError={() => setImageValid(false)}/>
                   ) : (
-                    <span className="text-white text-sm font-medium">{userName}</span>
+                     <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="78" height="78" rx="39" fill="#F3F4F6" />
+                        <mask id="mask0_462_2363" maskUnits="userSpaceOnUse" x="0" y="16" width="78" height="62" mask-type="alpha">
+                            <path d="M78 68.2272V78H0V68.263C4.53684 62.1999 10.4257 57.2791 17.1983 53.8916C23.9709 50.5042 31.4405 48.7436 39.013 48.75C54.951 48.75 69.108 56.4005 78 68.2272V68.2272ZM52.0065 29.2467C52.0065 32.6945 50.6369 36.0011 48.1989 38.4391C45.7609 40.8771 42.4543 42.2467 39.0065 42.2467C35.5587 42.2467 32.2521 40.8771 29.8141 38.4391C27.3761 36.0011 26.0065 32.6945 26.0065 29.2467C26.0065 25.7989 27.3761 22.4923 29.8141 20.0543C32.2521 17.6163 35.5587 16.2467 39.0065 16.2467C42.4543 16.2467 45.7609 17.6163 48.1989 20.0543C50.6369 22.4923 52.0065 25.7989 52.0065 29.2467V29.2467Z" fill="black"/>
+                        </mask>
+                        <g mask="url(#mask0_462_2363)">
+                            <rect width="78" height="78" rx="39" fill="#D1D5DB" />
+                        </g>
+                      </svg>
                   )}
                 </div>
                 <div className="flex flex-col h-auto w-auto">
@@ -380,10 +389,18 @@ const result = [
                 <DropdownMenuLabel>
                   <div className="flex justify-center items-center flex-col w-auto gap-2">
                   <div className="relative flex items-center justify-center w-15 h-15 bg-gray-400 rounded-full">
-                    {avatarImage ? (
-                      <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+                    {avatarImage && imageValid ? (
+                      <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" onError={() => setImageValid(false)}/>
                     ) : (
-                      <span className="text-white text-sm font-medium">{userName}</span>
+                       <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect width="78" height="78" rx="39" fill="#F3F4F6" />
+                          <mask id="mask0_462_2363" maskUnits="userSpaceOnUse" x="0" y="16" width="78" height="62" mask-type="alpha">
+                              <path d="M78 68.2272V78H0V68.263C4.53684 62.1999 10.4257 57.2791 17.1983 53.8916C23.9709 50.5042 31.4405 48.7436 39.013 48.75C54.951 48.75 69.108 56.4005 78 68.2272V68.2272ZM52.0065 29.2467C52.0065 32.6945 50.6369 36.0011 48.1989 38.4391C45.7609 40.8771 42.4543 42.2467 39.0065 42.2467C35.5587 42.2467 32.2521 40.8771 29.8141 38.4391C27.3761 36.0011 26.0065 32.6945 26.0065 29.2467C26.0065 25.7989 27.3761 22.4923 29.8141 20.0543C32.2521 17.6163 35.5587 16.2467 39.0065 16.2467C42.4543 16.2467 45.7609 17.6163 48.1989 20.0543C50.6369 22.4923 52.0065 25.7989 52.0065 29.2467V29.2467Z" fill="black"/>
+                          </mask>
+                          <g mask="url(#mask0_462_2363)">
+                              <rect width="78" height="78" rx="39" fill="#D1D5DB" />
+                          </g>
+                        </svg>
                     )}
                   </div>
                   <div className="flex flex-col items-center">
