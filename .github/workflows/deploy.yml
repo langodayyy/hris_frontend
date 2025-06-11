@@ -22,4 +22,4 @@ jobs:
         port: 22 
         script: |
           cd /home/$USER/hris_frontend
-          git pull origin main
+          git pull origin main --force
