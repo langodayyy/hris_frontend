@@ -24,37 +24,71 @@ export default function AddOvertimeSetting() {
   const [calculation, setCalculation] = useState<number | null>(null); 
   const [rate, setRate] = useState<number | null>(null); 
 
-  const handleSubmit = () => {
-    //idonow
-    // const payload = {
-    //   overtimeName,
-    //   type: selectedType,
-    //   category: selectedCategory,
-    //   calculation,
-    //   rate,
-    //   workWeekDuration,
-    //   formulaText,
-    //   employeeId: selectedEmployeeId,
-    //   overtimeId: selectedOvertimeName,
-    //   date: selectedDate,
-    //   totalHours: inputTotalHour,
-    //   overtimePay: calculatedPay,
-    // };
+   const handleSubmit = async () => {
+    setLoading(true);
+    // setError(false);
+    // setSuccess(false);
 
-    // console.log("Data yang dikirim:", payload);
+    try {
+      console.log(tempOvertimeType)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/overtime-settings/status?_method=PATCH`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${Cookies.get("token")}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            overtime_setting_id: tempOvertimeType
+      })
+    });
 
-    // Contoh fetch untuk POST data
-    // fetch('/api/overtime', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(payload),
-    // }).then(() => {
-    //   router.push("/overtime/setting");
-    // });
 
-    // Untuk sementara redirect setelah submit:
-    router.push("/overtime/setting");
-  };
+    const responseData = await response.json();
+    if (!response.ok) {
+        throw responseData; 
+    }
+    toast.success('Company updated successfully')
+    setActiveOvertimeType(tempOvertimeType);
+    // setSuccess(true);
+    } catch (err) {
+    // setError(true);
+    let message = "Unknown error occurred";
+    let messagesToShow: string[] = [];
+
+    if (
+    err &&
+    typeof err === "object" &&
+    "message" in err &&
+    typeof (err as any).message === "string"
+    ) {
+    const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+    if (backendError.message.toLowerCase().includes("failed to fetch")) {
+        message = "Unknown error occurred";
+    } else {
+        message = backendError.message;
+    }
+
+    messagesToShow = backendError.errors
+        ? Object.values(backendError.errors).flat()
+        : [message];
+    } else {
+    messagesToShow = [message]
+    }
+
+    toast.error(
+        <>
+            <p className="text-red-700 font-bold">Error</p>
+            {messagesToShow.map((msg, idx) => (
+            <div key={idx} className="text-red-700">• {msg}</div>
+            ))}
+        </>,
+        { duration: 30000 }
+    );
+    } finally {
+    setLoading(false);
+    }
+  }
   
   return (
     <Sidebar title="Overtime Setting">
@@ -154,7 +188,7 @@ export default function AddOvertimeSetting() {
                 id="ovt_formula"
                 name="ovt_formula"
                 value={
-                  calculation && rate ? `${calculation} hour x IDR ${rate}` : ""
+                  calculation && rate ? `Employees must work at least 2 hours of overtime, and will receive Rp.${rate} for every ${calculation} hours of overtime worked` : ""
                 }
                 disabled
                 className="bg-neutral-100 text-neutral-900"

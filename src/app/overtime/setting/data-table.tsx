@@ -1,5 +1,6 @@
 "use client";
 
+import Cookies from "js-cookie";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -19,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
@@ -35,13 +36,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { toast, Toaster } from "sonner";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
+interface HasIdName {
+  id: string;
+  name: string;
+}
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends HasIdName,  TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -82,11 +88,90 @@ export function DataTable<TData, TValue>({
 
   // Fungsi untuk menangani penerapan jenis lembur yang dipilih
   const handleApplyOvertimeType = () => {
-    setActiveOvertimeType(tempOvertimeType);
+    
+    editStatusSetting()
+    console.log(tempOvertimeType)
   };
 
+  const [loading, setLoading] = useState(true);
+  const editStatusSetting = async () => {
+    setLoading(true);
+    // setError(false);
+    // setSuccess(false);
+
+    try {
+      console.log(tempOvertimeType)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/overtime-settings/status?_method=PATCH`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${Cookies.get("token")}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            overtime_setting_id: tempOvertimeType
+      })
+    });
+
+
+    const responseData = await response.json();
+    if (!response.ok) {
+        throw responseData; 
+    }
+    toast.success('Company updated successfully')
+    setActiveOvertimeType(tempOvertimeType);
+    // setSuccess(true);
+    } catch (err) {
+    // setError(true);
+    let message = "Unknown error occurred";
+    let messagesToShow: string[] = [];
+
+    if (
+    err &&
+    typeof err === "object" &&
+    "message" in err &&
+    typeof (err as any).message === "string"
+    ) {
+    const backendError = err as { message: string; errors?: Record<string, string[]> };
+
+    if (backendError.message.toLowerCase().includes("failed to fetch")) {
+        message = "Unknown error occurred";
+    } else {
+        message = backendError.message;
+    }
+
+    messagesToShow = backendError.errors
+        ? Object.values(backendError.errors).flat()
+        : [message];
+    } else {
+    messagesToShow = [message]
+    }
+
+    toast.error(
+        <>
+            <p className="text-red-700 font-bold">Error</p>
+            {messagesToShow.map((msg, idx) => (
+            <div key={idx} className="text-red-700">• {msg}</div>
+            ))}
+        </>,
+        { duration: 30000 }
+    );
+    } finally {
+    setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    const activeItem = data.find((item: any) => item.status === "Active");
+    if (activeItem) {
+      setTempOvertimeType(activeItem.id);
+      setActiveOvertimeType(activeItem.id); // Jika kamu juga ingin default `activeOvertimeType`
+    }
+  }, [data]);
+
   return (
+    
     <div className="flex flex-col gap-[10px] w-full">
+      <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
       <div className="flex flex-row items-center justify-between gap-5 w-full px-6 py-[10px]">
         <div className="flex-1 flex gap-2 items-center max-w-[50%]">
           <span className="text-lg flex-none">Overtime Settings</span>
@@ -132,7 +217,9 @@ export function DataTable<TData, TValue>({
                   fill="#25703F"
                 />
               </svg>
-              {activeOvertimeType}
+              {/* {activeOvertimeType} */}
+              {data.find((item: any) => item.id === activeOvertimeType)?.name ?? "Unknown"}
+
             </div>
           </div>
 
@@ -177,7 +264,7 @@ export function DataTable<TData, TValue>({
                 >
                   <div className="">
                     <Label>Active Overtime</Label>
-                    <RadioGroup
+                    {/* <RadioGroup
                       value={tempOvertimeType} // Gunakan state sementara untuk pilihan dialog
                       onValueChange={(value) => setTempOvertimeType(value)} // Perbarui state sementara saat berubah
                       className="flex flex-col gap-5"
@@ -194,7 +281,23 @@ export function DataTable<TData, TValue>({
                         <RadioGroupItem value="Flat 02" id="r3" />
                         <Label htmlFor="r3">Flat 02</Label>
                       </div>
+                    </RadioGroup> */}
+                    <RadioGroup
+                      value={tempOvertimeType}
+                      onValueChange={(value) => setTempOvertimeType(value)}
+                      className="flex flex-col gap-5"
+                    >
+                      {data.map((item: any, index) => {
+                        const id = `radio-${index}`;
+                        return (
+                          <div key={id} className="flex items-center space-x-2">
+                            <RadioGroupItem value={item.id} id={id} />
+                            <Label htmlFor={id}>{item.name}</Label>
+                          </div>
+                        );
+                      })}
                     </RadioGroup>
+
                   </div>
                 </AlertDialogDescription>
               </AlertDialogHeader>

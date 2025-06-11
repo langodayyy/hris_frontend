@@ -20,10 +20,9 @@ type OvertimeSettingsRecord = {
   name: string;
   type: string;
   category: string;
-  work_day: number | null;
-  calculation: number | null;
-  rate: number | null;
-  formula: string;
+  working_days: number | null;
+  status: string;
+  formula: string[];
 };
 
 export const OvertimeSettingsColumn = (): ColumnDef<OvertimeSettingsRecord>[] => [
@@ -69,44 +68,60 @@ export const OvertimeSettingsColumn = (): ColumnDef<OvertimeSettingsRecord>[] =>
     accessorKey: "category",
     header: "Category",
   },
-  {
-    accessorKey: "work_day",
-    header: "Working Day",
-    cell: ({ getValue }) => {
-      const value = getValue();
-      return value == null ? "-" : `${value} days`;
-    },
+  // {
+  //   accessorKey: "work_day",
+  //   header: "Working Day",
+  //   cell: ({ getValue }) => {
+  //     const value = getValue();
+  //     return value == null ? "-" : `${value} days`;
+  //   },
+  // },
+  // {
+  //   accessorKey: "calculation",
+  //   header: "Calculation",
+  //   cell: ({ getValue }) => {
+  //     const value = getValue();
+  //     return value == null ? "-" : `per ${Number(value)} hour`;
+  //   },
+  // },
+  // {
+  //   accessorKey: "rate",
+  //   header: "Overtime Rate",
+  //   cell: ({ getValue }) => {
+  //     const value = getValue();
+  //     return value == null
+  //       ? "-"
+  //       : `IDR ${Number(value ?? 0).toLocaleString("id-ID")}`;
+  //   },
+  // },
+  // {
+  //   accessorKey: "formula",
+  //   header: "Formula",
+  //   cell: ({ getValue }) => {
+  //     const value = getValue();
+  //     return (
+  //       <div style={{ whiteSpace: "pre-line" }}>
+  //         {value ? String(value) : "-"}
+  //       </div>
+  //     );
+  //   },
+  // },
+{
+  accessorKey: "formulas",
+  header: "Formula",
+  cell: ({ getValue }) => {
+    const formulas = getValue(); // harus berupa array
+    return (
+      <div style={{ whiteSpace: "pre-line" }}>
+        {Array.isArray(formulas) && formulas.length > 0
+          ? formulas.join("\n")
+          : "-"}
+      </div>
+    );
   },
-  {
-    accessorKey: "calculation",
-    header: "Calculation",
-    cell: ({ getValue }) => {
-      const value = getValue();
-      return value == null ? "-" : `per ${Number(value)} hour`;
-    },
-  },
-  {
-    accessorKey: "rate",
-    header: "Overtime Rate",
-    cell: ({ getValue }) => {
-      const value = getValue();
-      return value == null
-        ? "-"
-        : `IDR ${Number(value ?? 0).toLocaleString("id-ID")}`;
-    },
-  },
-  {
-    accessorKey: "formula",
-    header: "Formula",
-    cell: ({ getValue }) => {
-      const value = getValue();
-      return (
-        <div style={{ whiteSpace: "pre-line" }}>
-          {value ? String(value) : "-"}
-        </div>
-      );
-    },
-  },
+},
+
+
   {
     accessorKey: "action",
     header: "Action",
