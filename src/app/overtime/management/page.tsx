@@ -48,9 +48,9 @@ export default function OvertimeManagement(){
   
   return (
     <Sidebar title="Overtime Management">
-      <Card className="p-[20px] flex flex-col">
+      <Card className="p-[20px] flex flex-col" id="overtime">
         <div className="flex flex-col gap-[10px]">
-          <div>
+          <div className="overflow-y-none">
             {/* Table */}
             <DataTable columns={column} data={data} />
           </div>

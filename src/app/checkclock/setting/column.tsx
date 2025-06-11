@@ -83,7 +83,7 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
      
       return (
         <div className="flex justify-center w-full items-center">
-          <div className="w-full flex items-center justify-center">
+          <div className="w-full flex items-center justify-center" id="edit-coci">
                 <Button variant={"outline"} size={"sm"}>
                   Edit
                 </Button>

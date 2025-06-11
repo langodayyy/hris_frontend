@@ -169,7 +169,7 @@ export function DataTable<TData, TValue>({
 
   return (
    <>
-      <div className="flex items-center py-4 gap-6">
+      <div className="flex items-center py-4 gap-6" >
         <span className="w-[187px] text-lg flex-none">Checkclock Overview</span>
         <Input
           placeholder="Search Employee"
@@ -200,9 +200,9 @@ export function DataTable<TData, TValue>({
         />
         <div className="w-fit">
           <Popover>
-            <PopoverTrigger asChild>
+            <PopoverTrigger asChild id="date-checkclock">
               <Button
-                variant={"calendar"}
+                variant={"calendar"} 
                 className={cn(
                   "w-[280px] justify-start text-left font-normal",
                   !date && "text-neutral-300"
@@ -224,7 +224,7 @@ export function DataTable<TData, TValue>({
         </div>
         <div className="w-fit">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild id="filter-checkclock">
               <Button
                 variant="outline"
                 icon={
@@ -322,7 +322,7 @@ export function DataTable<TData, TValue>({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="w-fit">
+        <div className="w-fit" id="add-checkclock">
             <Button
             icon={
               <svg
