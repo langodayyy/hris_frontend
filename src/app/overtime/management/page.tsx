@@ -19,11 +19,11 @@ export default function OvertimeManagement(){
   const totalPages = Math.ceil(overtimeDisplay.length / rowsPerPage);
   const router = useRouter();
 
-  const handleEdit = (id: string) => {
-    router.push(`management/edit/${id}`);
-  };
+  // const handleEdit = (id: string) => {
+  //   router.push(`management/edit/${id}`);
+  // };
 
-  const column = OvertimeColumn(handleEdit);
+  const column = OvertimeColumn();
 
   // Fungsi untuk menangani perubahan halaman
   const handlePageChange = (page: number) => {

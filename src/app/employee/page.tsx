@@ -9,6 +9,7 @@ import { Spinner } from "@/components/ui/spinner";
 import Cookies from "js-cookie";
 import { Toaster, toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import Joyride, { Step } from "react-joyride";
 
 export default function Employee() {
   const [employees, setEmployees] = useState<Employees[]>([]);
@@ -101,8 +102,106 @@ export default function Employee() {
     }
   }, []);
 
+    const [steps, setSteps] = useState<Step[]>([]);
+    const [joyrideKey, setJoyrideKey] = useState(0);
+  
+    const employeeSteps = {
+     employee: [
+    {
+      target: "#employee-data-this-month",
+      content: "This section shows the employee data for this month.",
+      disableBeacon: true,
+      placement: "bottom" as const,
+    },
+    {
+      target: "#table-employee",
+      content: "This table displays employee data. You can add, edit, or delete employee data here.",
+      disableBeacon: true,
+      placement: "top" as const,
+    },
+    {
+      target: "#filter-employee",
+      content: "You can filter employee data by position, department, or many more.",
+      disableBeacon: true,
+      placement: "top" as const,
+    },
+    {
+      target: "#export-employee",
+      content: "You can export employee data to CSV format.",
+      disableBeacon: true,
+      placement: "top" as const,
+    },
+    {
+      target: "#import-employee",
+      content: "You can import employee data from CSV format.", 
+      disableBeacon: true,
+      placement: "top" as const,
+    },
+    {
+      target: "#add-employee",
+      content: "You can add new employee data here manually.", 
+      disableBeacon: true,
+      placement: "top" as const,
+    },
+  ],
+    };
+  
+    function checkJoyride(key: string) {
+      const hasRun = localStorage.getItem(`joyride_shown_${key}`);
+      if (!hasRun) {
+        localStorage.setItem(`joyride_shown_${key}`, "true");
+        return true;
+      }
+      return false;
+    }
+  
+    useEffect(() => {
+      if (!isLoading) {
+        const checkclockEl = document.querySelector("#employee-data-this-month");
+        if (checkclockEl && checkJoyride("employee")) {
+          setSteps(employeeSteps["employee"]);
+          setJoyrideKey((prev) => prev + 1);
+        }
+      }
+    }, [isLoading]);
+
   if (!isLoading) {
     return (
+      <>
+      <Joyride
+        key={joyrideKey} // Force re-render when key changes
+        steps={steps}
+        continuous={true}
+        disableScrolling
+        styles={{
+          options: {
+            arrowColor: "#fff",
+            backgroundColor: "#fff",
+            primaryColor: "#1E3A5F",
+            zIndex: 10000,
+          },
+          tooltip: {
+            borderRadius: "12px",
+            padding: "16px",
+            fontSize: "16px",
+            boxShadow: "0 4px 5px rgba(0,0,0,0.2)",
+            height: "fit-content",
+          },
+
+          buttonBack: {
+            marginRight: 5,
+            color: "#1E3A5F",
+            border: "1px solid #1E3A5F",
+            backgroundColor: "#fff",
+            borderRadius: "5px",
+          },
+          buttonClose: {
+            display: "none",
+          },
+        }}
+        showProgress={true}
+        showSkipButton
+      />
       <Sidebar title="Employee Database">
         <Toaster
           position="bottom-right"
@@ -353,12 +452,13 @@ export default function Employee() {
           </div>
         </div>
       </Sidebar>
+      </>
     );
   }
   return (
     <Sidebar title="Employee Database">
       <div
-        id="employee-data-this-month"
+        
         className="flex flex-wrap justify-center gap-[30px] min-h-[141px] w-full mx-auto"
       >
         <Skeleton className="flex-1 min-w-[250px] max-w-[500px] "></Skeleton>

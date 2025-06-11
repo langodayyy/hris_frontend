@@ -158,6 +158,7 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
         key={joyrideKey} // Force re-render when key changes
         steps={steps}
         continuous={true}
+        disableScrolling
         styles={{
           options: {
             arrowColor: "#fff",
