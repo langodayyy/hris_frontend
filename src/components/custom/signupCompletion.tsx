@@ -18,6 +18,7 @@ import { Spinner } from "@/components/ui/spinner";
 
 import Cookies from "js-cookie";
 import PhoneInputt from "@/components/ui/phoneInput";
+import FormPhoneInput from "@/components/ui/phoneInput";
 
 const schema = z.object({
   first_name: z
@@ -39,7 +40,7 @@ const schema = z.object({
   //     .refine((val) => val.length >= 10 && val.length <= 15, {
   //         message: "Phone must be between 10 and 15 characters",
   //     }),
-
+  phone: z.string().min(10, { message: 'Phone number is invalid' }),
   company_name: z
     .string()
     .nonempty("Company name is required")
@@ -52,8 +53,8 @@ export default function SignupCompleteForm() {
   const router = useRouter();
   const { setErrors } = useFormContext();
   const [isLoading, setLoading] = useState(false);
-
-  const { form, errors } = useForm<SignupCompleteFormValues>({
+  const [phone, setPhone] = useState<string | undefined>(undefined);
+  const { form, errors, setFields } = useForm<SignupCompleteFormValues>({
     extend: [validator({ schema: schema }), reporter()],
     onSubmit: async (values) => {
       setLoading(true);
@@ -163,7 +164,13 @@ export default function SignupCompleteForm() {
           </div>
         </div>
 
-        <PhoneInputt></PhoneInputt>
+        {/* <PhoneInputt></PhoneInputt> */}
+         <FormPhoneInput placeholder="Enter employee phone number" value={phone} onValueChange={(value) => {
+          setPhone(value);
+          setFields("phone", value ?? ""); // sinkronisasi ke Felte
+          }} />
+          <input type="hidden" name="phone" value={phone ?? ""} />
+          {errors().phone && <p className="text-red-500">{errors().phone}</p>}
 
         <div className="flex flex-col gap-2 w-full">
           <Label htmlFor="companyname">Company Name</Label>
@@ -220,15 +227,17 @@ export default function SignupCompleteForm() {
 
 export async function completeRegister(data: Record<string, any>) {
   try {
+        console.log(data)
     const userCookie = Cookies.get("token");
     if (userCookie) {
+  
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/completeRegister`,
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userCookie}`,
+            "Authorization": `Bearer ${userCookie}`,
+            "Content-Type": "application/json"
           },
           body: JSON.stringify(data),
         }
@@ -242,6 +251,7 @@ export async function completeRegister(data: Record<string, any>) {
 
       // Parse and return the success response
       const responseData = await response.json();
+      console.log(responseData)
       return { success: true, data: responseData };
     } else {
       return {
