@@ -68,45 +68,6 @@ const menuSteps = {
       placement: "top" as const,
     },
   ],
-  employee: [
-    {
-      target: "#employee-data-this-month",
-      content: "This section shows the employee data for this month.",
-      disableBeacon: true,
-      placement: "bottom" as const,
-    },
-    {
-      target: "#table-employee",
-      content: "This table displays employee data. You can add, edit, or delete employee data here.",
-      disableBeacon: true,
-      placement: "top" as const,
-    },
-    {
-      target: "#filter-employee",
-      content: "You can filter employee data by position, department, or many more.",
-      disableBeacon: true,
-      placement: "top" as const,
-    },
-    {
-      target: "#export-employee",
-      content: "You can export employee data to CSV format.",
-      disableBeacon: true,
-      placement: "top" as const,
-    },
-    {
-      target: "#import-employee",
-      content: "You can import employee data from CSV format.", 
-      disableBeacon: true,
-      placement: "top" as const,
-    },
-    {
-      target: "#add-employee",
-      content: "You can add new employee data here manually.", 
-      disableBeacon: true,
-      placement: "top" as const,
-    },
-  ],
-  
     profile:
    [ 
     {
@@ -319,7 +280,7 @@ export default function RootLayout({
     // Reset Joyride visibility for the current page
     checkJoyride(pageKey);
     // Update Joyride key to force re-render
-    console.log(document.querySelector('#checkclock')) 
+    // console.log(document.querySelector('#checkclock')) 
     // console.log("skkjskja") 
     setJoyrideKey((prevKey) => prevKey + 1);
   }, [pathname]);

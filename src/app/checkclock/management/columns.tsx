@@ -65,6 +65,7 @@ export type CheckclockOverview = {
   presentEvidenceUrl?: string;
   absentEvidence?: string;
   absentEvidenceUrl?: string;
+  employeePhoto?: string;
 };
 
 const calculateWorkHours = (
@@ -277,6 +278,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
         setSelectedRow(rowData);
       };
 
+      // console.log('photo', selectedRow?.employeePhoto)
+
       return (
         <div className="w-full flex items-center justify-center">
           <Sheet>
@@ -297,8 +300,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                     <div className="flex px-2 py-4 border-2 border-neutral-300 gap-2 items-center justify-between rounded-sm">
                       <div className="flex gap-2">
                         <Avatar className="w-12 h-12 z-0">
-                          <AvatarImage src="https://github.com/shadcn.png" />
-                          <AvatarFallback>CN</AvatarFallback>
+                          <AvatarImage src={ !selectedRow?.employeePhoto !== null ? selectedRow?.employeePhoto : "https://github.com/shadcn.png"} />
+                          <AvatarFallback>EMP</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col gap-1">
                           <div
@@ -512,7 +515,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                               ) : (
                                 <Information
                                   label="Submitted by"
-                                  value="System (Auto Submitted)"
+                                  value={selectedRow?.submitter}
                                 ></Information>
                               )}
                             </div>
@@ -621,7 +624,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
 
                               <div className="py-4 flex flex-col gap-3">
                                 <Input
-                                  name="reject_reason"
+                                  name="reason"
                                   placeholder="Enter the reason"
                                   type="text"
                                 ></Input>
@@ -788,8 +791,8 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
                     <div className="flex px-2 py-4 border-2 border-neutral-300 gap-2 items-center justify-between rounded-sm">
                       <div className="flex gap-2">
                         <Avatar className="w-12 h-12 z-0">
-                          <AvatarImage src="https://github.com/shadcn.png" />
-                          <AvatarFallback>CN</AvatarFallback>
+                          <AvatarImage src={ !selectedRow?.employeePhoto !== null ? selectedRow?.employeePhoto : "https://github.com/shadcn.png"} />
+                          <AvatarFallback>EMP</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col gap-1">
                           <div
@@ -1160,7 +1163,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
 
                               <div className="py-4 flex flex-col gap-3">
                                 <Input
-                                  name="reject_reason"
+                                  name="reason"
                                   placeholder="Enter the reason"
                                   type="text"
                                 ></Input>
@@ -1287,7 +1290,7 @@ export const columns: ColumnDef<CheckclockOverview>[] = [
 
                                   <div className="py-4 flex flex-col gap-3">
                                     <Input
-                                      name="reject_reason"
+                                      name="reason"
                                       placeholder="Enter the reason"
                                       type="text"
                                     ></Input>
@@ -1336,7 +1339,7 @@ export async function updateCheckClockApproval(
 ) {
   try {
     isLoading(true);
-    console.log(data_id, status);
+    console.log(data_id, status, rejectReason);
     const userCookie = Cookies.get("token");
     if (!userCookie) {
       throw new Error("No authentication token found");
