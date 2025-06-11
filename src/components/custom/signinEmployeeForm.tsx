@@ -60,7 +60,7 @@ export default function SigninEmployeeForm() {
           // domain: ".example.com", // Set cookie for the main domain and subdomains
         });
 
-        window.location.href = "http://127.0.0.1:3000/dashboard";
+        window.location.href = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`;
       } else {
         setErrors(response.errors);
       }
