@@ -193,9 +193,12 @@ export default function AddCheckclockPage() {
 
   console.log(handleAttendanceType);
   console.log(valueAttendanceType);
-  console.log("start",date?.from);
-  console.log("Formatted start_date:", date?.from ? format(date.from, "yyyy-MM-dd") : "");
-  console.log("end",date?.to);
+  console.log("start", date?.from);
+  console.log(
+    "Formatted start_date:",
+    date?.from ? format(date.from, "yyyy-MM-dd") : ""
+  );
+  console.log("end", date?.to);
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const handleFileDrop = (files: File[]) => {
@@ -233,10 +236,11 @@ export default function AddCheckclockPage() {
         setErrors(responseData.errors);
         console.log("state err", errors);
       } else {
-        setSuccess({ message: responseData.message || "Successfully submitted"});
+        setSuccess({
+          message: responseData.message || "Successfully submitted",
+        });
         console.log("state succ", success);
       }
-
     } catch (err: any) {
       console.log("Submit error:", err);
       setErrors(err);
@@ -246,17 +250,17 @@ export default function AddCheckclockPage() {
   };
 
   React.useEffect(() => {
-  if (errors && Object.keys(errors).length > 0) {
-    Object.entries(errors).forEach(([field, messages]) => {
-      if (Array.isArray(messages)) {
-        messages.forEach((message) => toast.error(`${message}`));
-      } else {
-        toast.error(`${messages}`);
-      }
-    });
-    setErrors({});
-  }
-}, [errors]);
+    if (errors && Object.keys(errors).length > 0) {
+      Object.entries(errors).forEach(([field, messages]) => {
+        if (Array.isArray(messages)) {
+          messages.forEach((message) => toast.error(`${message}`));
+        } else {
+          toast.error(`${messages}`);
+        }
+      });
+      setErrors({});
+    }
+  }, [errors]);
 
   React.useEffect(() => {
     if (success && Object.keys(success).length > 0) {
@@ -275,7 +279,12 @@ export default function AddCheckclockPage() {
 
   return (
     <Sidebar title="Checkclock">
-      <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
+      <Toaster
+        position="bottom-right"
+        expand={true}
+        richColors
+        closeButton
+      ></Toaster>
       <Card>
         <CardContent className="flex flex-col gap-[15px]">
           <div className="px-[10px]">
@@ -429,14 +438,14 @@ export default function AddCheckclockPage() {
                   {validateAttendanceType ? (
                     <Popover>
                       <input
-                      name="check_clock_date"
-                      type="hidden"
-                      defaultValue={`${new Date().getFullYear()}-${String(
-                        new Date().getMonth() + 1
-                      ).padStart(2, "0")}-${String(
-                        new Date().getDate()
-                      ).padStart(2, "0")}`}
-                    ></input>
+                        name="check_clock_date"
+                        type="hidden"
+                        defaultValue={`${new Date().getFullYear()}-${String(
+                          new Date().getMonth() + 1
+                        ).padStart(2, "0")}-${String(
+                          new Date().getDate()
+                        ).padStart(2, "0")}`}
+                      ></input>
                       <PopoverTrigger asChild>
                         <Button
                           id="date"
@@ -630,7 +639,11 @@ export default function AddCheckclockPage() {
               </div>
               <div className="flex w-full gap-[15px] justify-end">
                 <div className="w-[93px]">
-                  <Button type="button" variant={"outline"} onClick={() => router.back()}>
+                  <Button
+                    type="button"
+                    variant={"outline"}
+                    onClick={() => router.back()}
+                  >
                     Cancel
                   </Button>
                 </div>

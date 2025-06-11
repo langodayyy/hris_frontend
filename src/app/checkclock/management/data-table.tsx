@@ -94,6 +94,14 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    initialState: {
+      sorting: [
+        {
+          id: "date", // The accessorKey of the column to sort by
+          desc: true, // Set to true for descending order
+        },
+      ],
+    },
     state: {
       sorting,
       columnFilters,

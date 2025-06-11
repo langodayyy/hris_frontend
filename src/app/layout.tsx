@@ -68,7 +68,7 @@ export default function RootLayout({
   //   try {
   //       // setIsLoading(true);
   //       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getUser`, {
-  //           method: "GET",
+  //           method: "GET",\
   //           headers: {
   //             "Authorization": `Bearer ${Cookies.get("token")}`,
   //           }
@@ -100,13 +100,11 @@ export default function RootLayout({
   //           return;
   //         }
   //       }
-     
   //       Cookies.set('full_name', data.full_name)
   //       Cookies.set('user_role', data.user_role)
   //       Cookies.set('plan_name', data.plan_name)
   //       Cookies.set('bill_period', data.bill_period)
   //       Cookies.set('bill_deadline', String(data.bill_deadline))
-
   //   } catch (err: any) {
   //       let message = "Unknown error occurred";
   //       let messagesToShow: string[] = [];
