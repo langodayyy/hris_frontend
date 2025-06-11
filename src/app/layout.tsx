@@ -6,6 +6,7 @@ import "./globals.css";
 import { FormProvider } from "@/context/FormContext";
 import { EditProvider } from "@/context/EditFormContext";
 import React, { useEffect, useState } from "react";
+import { AuthProvider } from '@/context/AuthContext';
 // import { GoogleOAuthProvider } from "@react-oauth/google";
 // import { AuthProvider } from "@/context/AuthContext";
 // import AuthGate from "@/components/custom/authGate";
@@ -59,36 +60,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  const router = useRouter();
-  const pathname = usePathname();
+  // const router = useRouter();
+  // const pathname = usePathname();
 
   // const fetchData = async () => {
 
   //   try {
   //       // setIsLoading(true);
   //       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getUser`, {
-  //           method: "GET",
-  //       headers: {
-  //           "Authorization": `Bearer ${Cookies.get("token")}`,
+  //           method: "GET",\
+  //           headers: {
+  //             "Authorization": `Bearer ${Cookies.get("token")}`,
   //           }
   //       });
   //       const data = await res.json();
   //       if (res.status === 403 || res.status === 401) {
-  //         Cookies.remove("token"); // hapus token agar tidak disimpan
+  //         Cookies.remove("token");
   //         router.replace("/sign-in");
   //         return;
   //       }
   //       if (!res.ok) {
   //           throw data; 
   //       }
-
-  //       // Cookies.set('is_profile_complete', String(data.is_profile_complete));
-  //       // const isProfileComplete = Cookies.get('is_profile_complete');
-  //       // if (isProfileComplete && isProfileComplete !== 'true' && isProfileComplete !== 'null') {
-  //       //   router.replace('/sign-up/complete-registration');
-  //       //   Cookies.set('is_profile_complete', String(false))
-  //       //   return;
-  //       // }
   //       const isProfileComplete = data.is_profile_complete === true;
   //       if (!isProfileComplete) {
   //         // Kalau belum lengkap profil dan bukan di halaman /sign-up/complete-registration, redirect
@@ -101,8 +94,7 @@ export default function RootLayout({
   //         if (
   //           pathname === '/sign-in' ||
   //           pathname === '/sign-up' ||
-  //           pathname === '/sign-up/complete-registration' ||
-  //           pathname === '/sign-in/as-employee'
+  //           pathname === '/sign-up/complete-registration'
   //         ) {
   //           router.replace('/dashboard');
   //           return;
@@ -113,17 +105,6 @@ export default function RootLayout({
   //       Cookies.set('plan_name', data.plan_name)
   //       Cookies.set('bill_period', data.bill_period)
   //       Cookies.set('bill_deadline', String(data.bill_deadline))
-  //       // if (pathname === '/sign-in' || pathname === '/sign-up') {
-  //       //   router.replace('/dashboard');
-  //       //   return;
-  //       // }
-  //       // if (isProfileComplete || pathname === '/sign-up/complete-registration') {
-  //       //   router.replace('/dashboard');
-  //       //   return;
-  //       // }
-        
-   
-
   //   } catch (err: any) {
   //       let message = "Unknown error occurred";
   //       let messagesToShow: string[] = [];
@@ -172,15 +153,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* <AuthProvider> */}
-        {/* <AuthGate> */}
-        <React.StrictMode>
-        <FormProvider>
-          <EditProvider>
-            {children}
-          </EditProvider>
-        </FormProvider>
-        </React.StrictMode>
+        <AuthProvider>
+          {/* <AuthProvider> */}
+          {/* <AuthGate> */}
+          <React.StrictMode>
+            
+          <FormProvider>
+            <EditProvider>
+              {children}
+            </EditProvider>
+            </FormProvider>
+        
+          </React.StrictMode>
+        </AuthProvider>
         {/* </AuthGate> */}
         {/* </AuthProvider> */}
 
