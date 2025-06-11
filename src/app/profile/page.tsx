@@ -61,6 +61,7 @@ export default function Profile() {
   // --- State Management ---
 
   // Avatar states
+  const [imageValid, setImageValid] = useState(true);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(
     null
@@ -189,6 +190,7 @@ export default function Profile() {
       if (file) {
         setSelectedAvatarFile(file);
         setAvatarPreview(URL.createObjectURL(file));
+        setImageValid(true)
       } else {
         setSelectedAvatarFile(null);
         setAvatarPreview(null);
@@ -1511,11 +1513,12 @@ export default function Profile() {
             <div className="flex flex-row justify-between items-center">
               <div className="flex flex-row items-center gap-5">
                 <div>
-                  {avatarPreview ? (
+                  {avatarPreview && imageValid ? (
                     <img
                       src={avatarPreview}
                       alt="Avatar Preview"
                       className="w-[78px] h-[78px] rounded-full object-cover border border-gray-300"
+                      onError={() => setImageValid(false)}
                     />
                   ) : (
                     <svg

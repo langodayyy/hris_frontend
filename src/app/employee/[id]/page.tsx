@@ -28,7 +28,7 @@ export default function EmployeeDetails(){
         if (employeeData.employee.employee_status) setEmployeeStatus(employeeData.employee.employee_status);
     }
     }, [employeeData?.employee.employee_status]);
-
+    const [imageValid, setImageValid] = useState(true);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const inputFileRef = useRef<HTMLInputElement>(null);
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -527,11 +527,12 @@ export default function EmployeeDetails(){
                        
                             <div className="flex mx-[20px] items-center">
                                 <div className="relative w-[78px] h-[78px]">
-                                    {(avatarPreview || employeeData?.employee_photo_url) ? (
+                                    {(avatarPreview || (employeeData?.employee_photo_url && imageValid))  ? (
                                         <img
                                         src={avatarPreview ?? employeeData?.employee_photo_url ?? ""}
                                         alt="Employee Photo"
                                         className="w-[78px] h-[78px] rounded-full object-cover bg-gray-200"
+                                        onError={() => setImageValid(false)}
                                         />
                                     ) : (
                                     <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
