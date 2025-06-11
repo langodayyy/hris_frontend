@@ -42,15 +42,20 @@ export default function CheckclockSettingPage() {
 
   const filteredData = selectedWorkType === "WFO" ? wfo : wfa;
 
+  
+
   return (
     <Sidebar title={"Checkclock"}>
       <Toaster position="bottom-right" expand={true} richColors closeButton></Toaster>
-      <DataTable
+      <div className="w-full" >
+
+      <DataTable 
         columns={selectedWorkType === "WFO" ? wfoColumns : wfaColumns}
         data={filteredData}
         selectedWorkType={selectedWorkType}
         setSelectedWorkType={setSelectedWorkType}
-      />
+        />
+        </div>
     </Sidebar>
   );
 }

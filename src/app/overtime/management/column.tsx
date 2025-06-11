@@ -165,6 +165,7 @@ export const OvertimeColumn = (): ColumnDef<OvertimeRecord>[] => [
   {
     accessorKey: "action",
     header: "Action",
+    
     cell: ({ row }) => {
       const status = row.getValue(
         "approval_status"

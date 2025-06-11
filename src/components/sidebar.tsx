@@ -171,6 +171,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
         className={`fixed top-0 left-0 h-full bg-white text-neutral-900 py-4 border-r-2 border-neutral-200 
         ${isOpen ? "w-64" : "w-[77px]"} 
         transition-all duration-300 ease-in-out z-50`}
+        
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -307,7 +308,7 @@ export default function Sidebar({ children, title }: LayoutProps) {
             )}
           </div>
 
-          <div className="pr-[15px]">
+          <div className="pr-[15px]" id="sidebar">
             <NavItem
               url="/dashboard"
               isOpen={isOpen}

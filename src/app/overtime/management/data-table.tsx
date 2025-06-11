@@ -154,7 +154,7 @@ export function DataTable<TData, TValue>({
 
         <div className="flex gap-2">
           <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
+            <PopoverTrigger asChild id="date-overtime">
               <Button
                 id="date"
                 variant={"calendar"}
@@ -274,7 +274,7 @@ export function DataTable<TData, TValue>({
                 }
               }}
             >
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger asChild id="filter-overtime">
                 <Button
                   variant="outline"
                   icon={
@@ -376,7 +376,7 @@ export function DataTable<TData, TValue>({
           </div>
 
           <Button
-            className="w-[80px] cursor-pointer"
+            className="w-[80px] cursor-pointer" id="add-overtime"
             variant="default"
             onClick={() => router.push("/overtime/management/add")}
           >
@@ -406,7 +406,7 @@ export function DataTable<TData, TValue>({
           </Button>
         </div>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-y-none">
         <Table>
           <TableHeader className="bg-neutral-50">
             {table.getHeaderGroups().map((headerGroup) => (

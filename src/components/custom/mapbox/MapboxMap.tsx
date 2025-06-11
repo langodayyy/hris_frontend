@@ -12,7 +12,7 @@ import { useCKSettingData } from "@/hooks/useCKSettingData";
 mapboxgl.accessToken = `${process.env.NEXT_PUBLIC_MAPBOX_KEY}`;
 
 export default function MapboxMap() {
-  const mapContainer = useRef(null);
+  // const mapContainer = useRef(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerRef = useRef<mapboxgl.Marker | null>(null);
 
@@ -27,6 +27,7 @@ export default function MapboxMap() {
   const designatedLat = parseFloat(locationRule?.latitude ?? "0");
   const designatedLng = parseFloat(locationRule?.longitude ?? "0");
   const radius = parseFloat(locationRule?.radius ?? "0");
+  const mapContainer = useRef<HTMLDivElement>(null);
 
   const getDistanceFromLatLonInMeters = (
     lat1: number,
@@ -51,6 +52,12 @@ export default function MapboxMap() {
 
   useEffect(() => {
     if (!mapContainer.current) return;
+
+     const isVisible = mapContainer.current.offsetWidth !== 0;
+     if (!isVisible) {
+    console.warn("mapContainer belum visible. Tunda inisialisasi.");
+    return;
+  }
 
     const map = new mapboxgl.Map({
       container: mapContainer.current,
@@ -122,6 +129,7 @@ export default function MapboxMap() {
 
     // Add radius circle
     map.on("load", () => {
+      map.resize();
       const circle = turf.circle([designatedLng, designatedLat], radius, {
         steps: 64,
         units: "meters",
@@ -230,6 +238,7 @@ export default function MapboxMap() {
         });
       });
     });
+   
 
     // GPS position
     if (navigator.geolocation) {
@@ -293,8 +302,8 @@ export default function MapboxMap() {
   };
 
   return (
-    <div>
-      <div className="relative w-full h-full rounded-md">
+    <div id="edit-location">
+      <div className="relative w-full h-full rounded-md" >
         <div>
           <div ref={mapContainer} className="w-full h-[300px] rounded-md" />
           <div className="absolute bottom-2 right-2 text-xs flex flex-col gap-2">
