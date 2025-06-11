@@ -513,9 +513,9 @@ export default function Sidebar({ children, title }: LayoutProps) {
 
       {/* Main Content Container */}
       <div
-        className={`transition-all duration-300 ease-in-out ${
-          isOpen ? "ml-64" : "ml-[77px]"
-        } w-full`}
+        className={`transition-all duration-300 ease-in-out w-full ${
+          isOpen ? "pl-64" : "pl-[77px]"
+        }`}
       >
         <div className="flex flex-col">
           <Navbar
