@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (res.status === 403 || res.status === 401) {
         Cookies.remove('token');
-        if (pathname !== '/' && pathname !== '/sign-in/as-employee') {
+        if (pathname !== '/' && pathname !== '/sign-up' && pathname !== '/sign-in/as-employee') {
           router.replace('/sign-in');
         }
         return;
