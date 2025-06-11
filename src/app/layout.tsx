@@ -28,19 +28,102 @@ const menuSteps = {
   dashboard: [
     {
       target: "#sidebar",
-      content: "Welcome!! Please spare a minute to learn about our page",
+      content: "This is your main navigation sidebar. You can access different menu of HRIS here.",
       disableBeacon: true,
+       placement: "right" as const,
+    },
+     {
+      target: "#nav-search-bar",
+      content: "Here you can search for anything you need in the HRIS system.",
+      disableBeacon: true,
+      placement: "bottom" as const,
+    },
+     {
+      target: "#notification",
+      content:
+        "This section shows important notifications for you. Such as leave and sick requests or overtime requests from employees .",
+      disableBeacon: true,
+      placement: "bottom" as const,
+    },
+     {
+      target: "#profile",
+      content:
+        "Click here to access your profile, subscription plan, and billing information.",
+      disableBeacon: true,
+      placement: "bottom" as const,
+    },
+     {
+      target: "#latest-employee-data",
+      content:
+        "This section shows the recent updates made to employee data in the HRIS system.",
+      disableBeacon: true,
+      placement: "bottom" as const,
     },
     {
-      target: "#navbar",
-      content: "You can log in here",
+      target: "#chart",
+      content:
+      "This section shows the recent updates made to employee data in the HRIS system.",
       disableBeacon: true,
+      placement: "top" as const,
     },
   ],
-  checkclock: [
+  employee: [
     {
-      target: "#checkclock",
-      content: "Welcome!! Please spare a minute to learn about our page",
+      target: "#employee-data-this-month",
+      content: "This section shows the employee data for this month.",
+      disableBeacon: true,
+      placement: "bottom" as const,
+    },
+    {
+      target: "#table-employee",
+      content: "This table displays employee data. You can add, edit, or delete employee data here.",
+      disableBeacon: true,
+      placement: "top" as const,
+    },
+    {
+      target: "#filter-employee",
+      content: "You can filter employee data by position, department, or many more.",
+      disableBeacon: true,
+      placement: "top" as const,
+    },
+    {
+      target: "#export-employee",
+      content: "You can export employee data to CSV format.",
+      disableBeacon: true,
+      placement: "top" as const,
+    },
+    {
+      target: "#import-employee",
+      content: "You can import employee data from CSV format.", 
+      disableBeacon: true,
+      placement: "top" as const,
+    },
+    {
+      target: "#add-employee",
+      content: "You can add new employee data here manually.", 
+      disableBeacon: true,
+      placement: "top" as const,
+    },
+  ],
+  "checkclock/setting": [
+    {
+      target: "#checkclock-setting",
+      content: "This is the Checkclock Management table. You can manage employee checkclock data here.",
+      disableBeacon: true,
+    },
+    {
+      target: "#date-checkclock",
+      content: "You can filter checkclock data by date.",
+      disableBeacon: true,
+    },
+    {
+      target: "#filter-checkclock",
+      content: "You can filter checkclock data by position, or work type.",
+      disableBeacon: true,
+    },
+    {
+      target: "#add-checkclock",
+      content: "You can add new checkclock for employee who you choose here manually.",
       disableBeacon: true,
     },
   ],
@@ -59,13 +142,13 @@ const menuSteps = {
       disableBeacon: true,
     },
   ],
-  "checkclock/add": [
-    {
-      target: "#checkclock-add",
-      content: "Welcome!! Please spare a minute to learn about our page",
-      disableBeacon: true,
-    },
-  ],
+  // "checkclock/add": [
+  //   {
+  //     target: "#checkclock-add",
+  //     content: "Welcome!! Please spare a minute to learn about our page",
+  //     disableBeacon: true,
+  //   },
+  // ],
 };
 
 export default function RootLayout({
@@ -198,12 +281,15 @@ export default function RootLayout({
     // Determine the page key based on the current route
     const pageKey = pathname.replace("/", ""); // Remove leading slash and fallback to "default"
     // Update steps dynamically based on the current route
-    setSteps(menuSteps[pageKey as keyof typeof menuSteps]);
+   setSteps(menuSteps[pageKey as keyof typeof menuSteps]);
     // Reset Joyride visibility for the current page
     checkJoyride(pageKey);
     // Update Joyride key to force re-render
+    console.log(document.querySelector('#checkclock')) 
+    // console.log("skkjskja") 
     setJoyrideKey((prevKey) => prevKey + 1);
   }, [pathname]);
+  
 
   return (
     <html lang="en">
@@ -217,14 +303,29 @@ export default function RootLayout({
             continuous={true}
             styles={{
               options: {
-                arrowColor: "#5caeab",
-                backgroundColor: "#5caeab",
-                overlayColor: "rgba(92, 174, 171, .3)",
-                primaryColor: "#5caeab",
-                textColor: "#fff",
+                arrowColor: "#fff",
+                backgroundColor: "#fff",
+                primaryColor: "#1E3A5F",
+                zIndex: 10000,
+                
               },
-              spotlight: {
-                backgroundColor: "transparent",
+              tooltip: {
+                borderRadius: "12px",
+                padding: "16px",
+                fontSize: "16px",
+                boxShadow: "0 4px 5px rgba(0,0,0,0.2)",
+                height: "fit-content",
+              },
+
+              buttonBack: {
+                marginRight: 5,
+                color: "#1E3A5F",
+                border: "1px solid #1E3A5F",
+                backgroundColor: "#fff",
+                borderRadius: "5px"
+              },
+              buttonClose: {
+                display: "none", 
               },
             }}
             showProgress={true}

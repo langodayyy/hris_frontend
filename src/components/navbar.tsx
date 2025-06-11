@@ -126,15 +126,15 @@ const result = [
           {title}
         </a>
       </div>
-      <div className="flex flex-row items-center justify-center w-full h-[36px] gap-[12px] relative">
+      <div className="flex flex-row items-center justify-center w-full h-[36px] gap-[12px] relative" id="nav-search-bar">
         <SearchBar results={result} />
       </div>
 
     {/* notification */}
-      <div className="flex flex-row gap-[24px] max-w-[450px] min-w-[300px] h-auto justify-end ">
+      <div className="flex flex-row gap-[24px] max-w-[450px] min-w-[300px] h-auto justify-end "  >
         <DropdownMenu>
         <DropdownMenuTrigger>
-        <div className="relative flex items-center">
+        <div className="relative flex items-center" id="notification">
           <div className="relative ">
             <a href="#">
               <svg
@@ -316,7 +316,7 @@ const result = [
           {/* user dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <div className="flex flex-row gap-3 w-full h-full rounded-full cursor-pointer transition duration-15 hover:bg-gray-100">
+              <div className="flex flex-row gap-3 w-full h-full rounded-full cursor-pointer transition duration-15 hover:bg-gray-100" id="profile">
                 <div className="relative flex items-center justify-center w-10 h-10 bg-gray-400 rounded-full">
                   {avatarImage ? (
                     <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />

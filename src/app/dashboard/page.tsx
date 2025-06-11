@@ -124,7 +124,7 @@ export default function Dashboard() {
   return (
     <Sidebar title="Dashboard">
       {/* Employee Data Number */}
-      <div className="grid grid-cols-4 gap-[30px] pb-[30px]">
+      <div className="grid grid-cols-4 gap-[30px] pb-[30px]" id="latest-employee-data">
         {/* Card Total Employee */}
         <StatCard
           icon={EmployeeIcon}
@@ -155,7 +155,7 @@ export default function Dashboard() {
         />
       </div>
       {/* Chart */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-[30px]">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-[30px]" id="chart">
         <div className="flex flex-col cols-span-1 gap-y-[30px]">
           {/* pie chart checkclock approval  */}
           <ApprovalCheckClock dashboardData={dashboardData.approvalStatus[0]}></ApprovalCheckClock>

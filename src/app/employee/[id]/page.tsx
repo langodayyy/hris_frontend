@@ -629,8 +629,8 @@ export default function EmployeeDetails(){
 
 
                                     <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button className="w-fit" size="icon" variant="link">
+                                        <DropdownMenuTrigger asChild >
+                                            <Button className="w-fit" size="icon" variant="link" id="action-employee">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="!w-[24px] !h-[24px]" viewBox="0 0 24 24" fill="none">
                                                 <path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                                 <path d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -833,7 +833,8 @@ export default function EmployeeDetails(){
                             </div>
 
                         </Card>
-                    </div>   )}  
+                    </div>  
+                 )}  
                 {/* </Card> */}
                   {isLoading ? ( 
                         <Skeleton className="min-h-[141px]"></Skeleton>

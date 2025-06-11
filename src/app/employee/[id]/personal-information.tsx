@@ -129,7 +129,7 @@ const PersonalInformation = ({ employeeData, onUpdate }: Props) => {
 
     };
     return (
-        <Card className="flex-1 h-full ml-[20px] gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden">
+        <Card className="flex-1 h-full ml-[20px] gap-[15px] rounded-[15px] border border-black/15 bg-white shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)] overflow-hidden" id="info-employee">
             <div className="flex mx-[20px] justify-between">
                 <p className="justify-center text-lg font-medium whitespace-nowrap">Personal Information</p>
                 <div>
