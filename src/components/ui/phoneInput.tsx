@@ -30,19 +30,60 @@
 //     </div>
 //   );
 // }
+
+
+
+
+// import PhoneInput from "react-phone-number-input";
+// import "react-phone-number-input/style.css";
+// import { Label } from "@/components/ui/label";
+
+// export default function FormPhoneInput({
+//   placeholder = "Enter your phone number",
+//   value,
+//   onValueChange,
+// }: {
+//   placeholder?: string;
+//   value: string | undefined;
+//   onValueChange: (value: string | undefined) => void;
+// }) {
+//   return (
+//     <div className="flex flex-col gap-2 w-full">
+//       <Label htmlFor="phone">Phone Number</Label>
+//       <PhoneInput
+//         id="phone"
+//         international
+//         countryCallingCodeEditable={false}
+//         placeholder={placeholder}
+//         value={value}
+//         onChange={onValueChange}
+//         defaultCountry="ID"
+//         className="file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+//       />
+//     </div>
+//   );
+// }
+
+
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { Label } from "@/components/ui/label";
 
-export default function FormPhoneInput({
-  placeholder = "Enter your phone number",
-  value,
-  onValueChange,
-}: {
+interface FormPhoneInputProps {
   placeholder?: string;
   value: string | undefined;
   onValueChange: (value: string | undefined) => void;
-}) {
+  disabled?: boolean;
+}
+
+export default function FormPhoneInput(props: FormPhoneInputProps) {
+  const {
+    placeholder = "Enter your phone number",
+    value,
+    onValueChange,
+    disabled = false,
+  } = props;
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <Label htmlFor="phone">Phone Number</Label>
@@ -54,6 +95,7 @@ export default function FormPhoneInput({
         value={value}
         onChange={onValueChange}
         defaultCountry="ID"
+        disabled={disabled}
         className="file:text-neutral-900 border-neutral-300 placeholder:text-neutral-300 selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full min-w-0 rounded-md border bg-transparent px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
       />
     </div>

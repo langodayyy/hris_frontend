@@ -33,6 +33,8 @@ export default function Navbar({ title }: NavbarProps) {
   const [avatarImage, setAvatarImage] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
+  const [company, setCompany] = useState<string | null>(null);
+  const [companyId, setCompanyId] = useState<string | null>(null);
   const [plan, setPlan] = useState<string | null>(null);
   const [period, setPeriod] = useState<string | null>(null);
   const [deadline, setDeadline] = useState<string | null>(null);
@@ -89,6 +91,8 @@ const result = [
         setAvatarImage(data.photo_url);
         setUserName(data.full_name);
         setRole(data.user_role);
+        setCompany(data.company_name);
+        setCompanyId(data.company_id);
         setPlan(data.plan_name);
         setPeriod(data.bill_period);
         setDeadline(String(data.bill_deadline))
@@ -403,6 +407,14 @@ const result = [
                       <span className="text-sm text-neutral-500">{role}</span>
                   </div>
                   <div className="flex flex-col justify-start items-start w-full gap-1">
+                    <div className="flex flex-row">
+                      <span className="font-medium text-neutral-900">Company ID:&nbsp;</span>{" "}
+                      <span className="text-neutral-500"> {companyId}</span>
+                    </div>
+                    <div className="flex flex-row">
+                      <span className="font-medium text-neutral-900">Company:&nbsp;</span>{" "}
+                      <span className="text-neutral-500"> {company}</span>
+                    </div>
                     <div className="flex flex-row">
                       <span className="font-medium text-neutral-900">Plan:&nbsp;</span>{" "}
                       <span className="text-neutral-500"> {plan}</span>

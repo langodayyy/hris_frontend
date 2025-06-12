@@ -83,6 +83,7 @@ export default function Profile() {
     email: "",
   });
   const [companyName, setCompanyName] = useState("");
+  const [companyId, setCompanyId] = useState("");
   const [departments, setDepartments] = useState<Department[]>([]);
   const [departmentsInUse, setDepartmentsInUse] = useState<number[]>([]);
   const [positionsInUse, setPositionsInUse] = useState<
@@ -237,17 +238,17 @@ export default function Profile() {
 
   const handleCancelCompanyEdit = useCallback(() => {
     setCompanyName(originalCompanyName);
-    setDepartments(originalDepartments);
+    // setDepartments(originalDepartments);
     setShowAddDepartmentForm(false);
-    setNewDepartmentName("");
-    setShowAddPositionForm({});
-    setNewPositionName({});
-    setShowEditDepartmentForm({});
-    setEditDepartmentName({});
-    setShowEditPositionForm({});
-    setEditPositionName({});
+    // setNewDepartmentName("");
+    // setShowAddPositionForm({});
+    // setNewPositionName({});
+    // setShowEditDepartmentForm({});
+    // setEditDepartmentName({});
+    // setShowEditPositionForm({});
+    // setEditPositionName({});
     setIsCompanyEditing(false);
-  }, [originalCompanyName, originalDepartments]);
+  }, [originalCompanyName]);
 
   const handleSaveCompanyEdit = useCallback(() => {
     console.log("Saving company name:", companyName);
@@ -630,6 +631,7 @@ export default function Profile() {
           throw dataProfile;
         }
         setCompanyName(dataProfile.company_name);
+        setCompanyId(dataProfile.company_id);
         setProfileData({
           fullName: dataProfile.full_name,
           phoneNumber: dataProfile.phone,
@@ -1567,7 +1569,7 @@ export default function Profile() {
                           placeholder="Enter your new password"
                         />
                         <PasswordInput
-                          label="Confirmation New Password"
+                          label="Confirm New Password"
                           name="new_password_confirmation"
                           id="new_password_confirmation"
                           placeholder="Enter your new password"
@@ -1917,6 +1919,13 @@ export default function Profile() {
                 </div>
                 <div className="flex flex-col gap-5">
                   <div className="flex flex-col gap-[8px]">
+                    <Label htmlFor="company_name">Company ID</Label>
+                    <Input
+                      value={companyId}
+                      disabled
+                    />
+                  </div>
+                  <div className="flex flex-col gap-[8px]">
                     <Label htmlFor="company_name">Company Name</Label>
                     <Input
                       type="text"
@@ -1928,7 +1937,6 @@ export default function Profile() {
                       disabled={!isCompanyEditing}
                     />
                   </div>
-
                   <div className="flex flex-col gap-[8px]">
                     <Label htmlFor="add_department">
                       Departments & Positions
@@ -2438,7 +2446,7 @@ export default function Profile() {
                       className="w-fit"
                       onClick={handleCancelCompanyEdit}
                     >
-                      Cancel
+                      Exit Editing
                     </Button>
                     <Button
                       disabled={loading}
