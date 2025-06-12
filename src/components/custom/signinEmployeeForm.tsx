@@ -57,7 +57,8 @@ export default function SigninEmployeeForm() {
         Cookies.set("token-employee", response.data.token, {
           expires: 7, // Cookie expires in 7 days
           secure: true, // Use secure cookies (HTTPS only)
-          // domain: ".example.com", // Set cookie for the main domain and subdomains
+          domain: ".hris.my.id",
+          sameSite: "None",
         });
 
         window.location.href = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`;
