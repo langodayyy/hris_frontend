@@ -272,21 +272,22 @@ export default function RootLayout({
   //   fetchData();
   // }, []);
 
-  useEffect(() => {
-    // Determine the page key based on the current route
-    const pageKey = pathname.replace("/", ""); // Remove leading slash and fallback to "default"
-    // Update steps dynamically based on the current route
-   setSteps(menuSteps[pageKey as keyof typeof menuSteps]);
-    // Reset Joyride visibility for the current page
-    checkJoyride(pageKey);
-    // Update Joyride key to force re-render
-    // console.log(document.querySelector('#checkclock')) 
-    // console.log("skkjskja") 
-    setJoyrideKey((prevKey) => prevKey + 1);
-  }, [pathname]);
+  // useEffect(() => {
+  //   // Determine the page key based on the current route
+  //   const pageKey = pathname.replace("/", ""); // Remove leading slash and fallback to "default"
+  //   // Update steps dynamically based on the current route
+  //  setSteps(menuSteps[pageKey as keyof typeof menuSteps]);
+  //   // Reset Joyride visibility for the current page
+  //   checkJoyride(pageKey);
+  //   // Update Joyride key to force re-render
+  //   // console.log(document.querySelector('#checkclock')) 
+  //   // console.log("skkjskja") 
+  //   setJoyrideKey((prevKey) => prevKey + 1);
+  // }, [pathname]);
   
 
   return (
+    <AuthProvider>
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -328,7 +329,7 @@ export default function RootLayout({
             disableScrolling
           />
         )}
-        {/* <AuthProvider> */}
+        
         {/* <AuthGate> */}
         <React.StrictMode>
           <FormProvider>
@@ -339,8 +340,9 @@ export default function RootLayout({
           </FormProvider>
         </React.StrictMode>
         {/* </AuthGate> */}
-        {/* </AuthProvider> */}
+       
       </body>
     </html>
+    </AuthProvider>
   );
 }

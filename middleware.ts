@@ -10,9 +10,6 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
   const path = request.nextUrl.pathname;
 
-  console.log('Path:', path);   
-  console.log('Token:', token);
-
   const isPublic = PUBLIC_ROUTES.some(route => path.startsWith(route));
   const isAuthPage = AUTH_ROUTES.includes(path);
 

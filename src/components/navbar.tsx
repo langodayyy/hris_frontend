@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 
@@ -71,6 +71,7 @@ const result = [
   
   const notificationCount = notifications.length;
   const router = useRouter();
+   const pathname = usePathname();
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -82,7 +83,6 @@ const result = [
         });
 
         const data = await res.json();
-
         if (!res.ok) {
           throw data;
         }
@@ -92,13 +92,6 @@ const result = [
         setPlan(data.plan_name);
         setPeriod(data.bill_period);
         setDeadline(String(data.bill_deadline))
-
-        // Cookies.set('user_photo', data.photo_url);
-        // Cookies.set('full_name', data.full_name);
-        // Cookies.set('user_role', data.user_role);
-        // Cookies.set('plan_name', data.plan_name);
-        // Cookies.set('bill_period', data.bill_period);
-        // Cookies.set('bill_deadline', String(data.bill_deadline));
 
       } catch (err) {
       
