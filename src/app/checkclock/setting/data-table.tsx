@@ -154,7 +154,7 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
 
   return (
     <>
-      <Joyride
+      {/* <Joyride
         key={joyrideKey} // Force re-render when key changes
         steps={steps}
         continuous={true}
@@ -187,7 +187,7 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
         }}
         showProgress={true}
         showSkipButton
-      />
+      /> */}
       <Card
         className="flex items-center p-5 gap-4 w-full"
         id="checkclock-setting"

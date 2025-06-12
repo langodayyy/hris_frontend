@@ -1430,7 +1430,7 @@ export default function Profile() {
 
   return (
     <>
-    {hasMounted && (
+    {/* {hasMounted && (
 
       <Joyride
         key={joyrideKey} // Force re-render when key changes
@@ -1466,7 +1466,7 @@ export default function Profile() {
         showProgress={true}
         showSkipButton
       />
-    )}
+    )} */}
       <Sidebar title="Profile">
         <Toaster
           position="bottom-right"

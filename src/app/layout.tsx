@@ -201,7 +201,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {showJoyride && (
+        {/* {showJoyride && (
           <Joyride
             key={joyrideKey} // Force re-render when key changes
             steps={steps}
@@ -236,7 +236,7 @@ export default function RootLayout({
             showSkipButton
             disableScrolling
           />
-        )}
+        )} */}
         {/* <AuthProvider> */}
         {/* <AuthGate> */}
         <React.StrictMode>
