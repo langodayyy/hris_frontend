@@ -168,7 +168,7 @@ export default function Employee() {
   if (!isLoading) {
     return (
       <>
-      <Joyride
+      {/* <Joyride
         key={joyrideKey} // Force re-render when key changes
         steps={steps}
         continuous={true}
@@ -201,7 +201,7 @@ export default function Employee() {
         }}
         showProgress={true}
         showSkipButton
-      />
+      /> */}
       <Sidebar title="Employee Database">
         <Toaster
           position="bottom-right"

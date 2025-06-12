@@ -220,7 +220,7 @@ export default function CheckclockOverviewPage() {
 
   return (
     <>
-      <Joyride
+      {/* <Joyride
         key={joyrideKey} // Force re-render when key changes
         steps={steps}
         continuous={true}
@@ -253,7 +253,7 @@ export default function CheckclockOverviewPage() {
         }}
         showProgress={true}
         showSkipButton
-      />
+      /> */}
       <Sidebar title="Checkclock">
         <Toaster
           position="bottom-right"

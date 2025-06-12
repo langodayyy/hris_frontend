@@ -55,7 +55,7 @@ export function Age({dashboardData}: Props) {
               </div>
               <div className="font-bold text-lg">Age</div>
             </div>
-            <DropdownMenu>
+            {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
               variant={"ghost"}
@@ -90,7 +90,7 @@ export function Age({dashboardData}: Props) {
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
             
           </div>
 

@@ -150,7 +150,7 @@ export default function Dashboard() {
         <StatCard
           icon={ResignedEmployeeIcon}
           title="Resigned Employee"
-          lastUpdated="21 April 2025"
+          // lastUpdated="21 April 2025"
           dashboardData={dashboardData.employeeCount[0]}
         />
       </div>
@@ -173,11 +173,10 @@ export default function Dashboard() {
           <MaritalStatus dashboardData={dashboardData.employeeMaritalStatus[0]}></MaritalStatus>
 
           {/* pie chart years of works */}
-          <YearsofWorks dashboardData={dashboardData.employeeWorkYear[0]}></YearsofWorks>
         </div>
         <div className="flex flex-col cols-span-1 gap-y-[30px]">
           {/* table late, absence, leave employee today  */}
-          <CheckClockListToday dashboardData={dashboardData.lateEmployee}></CheckClockListToday>
+          {/* <CheckClockListToday dashboardData={dashboardData.lateEmployee}></CheckClockListToday> */}
 
           {/* pie chart overtime approval today  */}
           <OvertimeApprovalToday dashboardData={dashboardData.approvalStatus[0]}></OvertimeApprovalToday>
@@ -190,6 +189,8 @@ export default function Dashboard() {
 
           {/* pie chart religion */}
           <Religion dashboardData={dashboardData.employeeReligion[0]}></Religion>
+
+          <YearsofWorks dashboardData={dashboardData.employeeWorkYear[0]}></YearsofWorks>
         </div>
       </div>
     </Sidebar>

@@ -426,8 +426,8 @@ const result = [
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => (window.location.href = "/profile")}
               className="cursor-pointer">Profile</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => (window.location.href = "/settings/plan")}
-              className="cursor-pointer">Change Plan</DropdownMenuItem>
+                {/* <DropdownMenuItem onClick={() => (window.location.href = "/bills")}
+              className="cursor-pointer">Change Plan</DropdownMenuItem> */}
                 <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

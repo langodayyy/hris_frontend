@@ -6,14 +6,14 @@ import "./globals.css";
 import { FormProvider } from "@/context/FormContext";
 import { EditProvider } from "@/context/EditFormContext";
 import React, { useEffect, useState } from "react";
-import { AuthProvider } from '@/context/AuthContext';
+import { AuthProvider } from "@/context/AuthContext";
 import Joyride from "react-joyride";
-
 
 import Cookies from "js-cookie";
 import { string } from "zod";
 import { toast } from "sonner";
 import { usePathname, useRouter } from "next/navigation";
+import { useRef } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,31 +29,32 @@ const menuSteps = {
   dashboard: [
     {
       target: "#sidebar",
-      content: "This is your main navigation sidebar. You can access different menu of HRIS here.",
+      content:
+        "This is your main navigation sidebar. You can access different menu of HRIS here.",
       disableBeacon: true,
-       placement: "right" as const,
+      placement: "right" as const,
     },
-     {
+    {
       target: "#nav-search-bar",
       content: "Here you can search for anything you need in the HRIS system.",
       disableBeacon: true,
       placement: "bottom" as const,
     },
-     {
+    {
       target: "#notification",
       content:
         "This section shows important notifications for you. Such as leave and sick requests or overtime requests from employees .",
       disableBeacon: true,
       placement: "bottom" as const,
     },
-     {
+    {
       target: "#profile",
       content:
         "Click here to access your profile, subscription plan, and billing information.",
       disableBeacon: true,
       placement: "bottom" as const,
     },
-     {
+    {
       target: "#latest-employee-data",
       content:
         "This section shows the recent updates made to employee data in the HRIS system.",
@@ -63,22 +64,21 @@ const menuSteps = {
     {
       target: "#chart",
       content:
-      "This section shows the recent updates made to employee data in the HRIS system.",
+        "This section shows the recent updates made to employee data in the HRIS system.",
       disableBeacon: true,
       placement: "top" as const,
     },
   ],
-    profile:
-   [ 
+  profile: [
     {
       target: "#profile-user",
-      content: "This is your profile page. You can update your personal information, change your password, and manage your company settings.",
+      content:
+        "This is your profile page. You can update your personal information, change your password, and manage your company settings.",
       disableBeacon: true,
-      // placement: "top" as const,
+      placement: "top" as const,
     },
-
   ],
-  
+
   // "checkclock/setting": [
   //   {
   //     target: "#checkclock-setting",
@@ -104,37 +104,46 @@ const menuSteps = {
   "overtime/management": [
     {
       target: "#overtime",
-      content: "This is the Overtime Management table. You can manage employee overtime data here. You can also approve or reject overtime requests submitted by employees.",
+      content:
+        "This is the Overtime Management table. You can manage employee overtime data here. You can also approve or reject overtime requests submitted by employees.",
       disableBeacon: true,
+      placement: "bottom" as const,
     },
     {
       target: "#date-overtime",
       content: "You can filter overtime data by date.",
       disableBeacon: true,
+      placement: "bottom" as const,
     },
     {
       target: "#filter-overtime",
       content: "You can filter overtime data by overtime type, and status.",
       disableBeacon: true,
+      placement: "bottom" as const,
     },
     {
       target: "#add-overtime",
-      content: "You can add new overtime for employee who you choose here manually.",
+      content:
+        "You can add new overtime for employee who you choose here manually.",
       disableBeacon: true,
+      placement: "bottom" as const,
     },
-    
   ],
   // contoh selain path luar
   "overtime/setting": [
     {
       target: "#overtime-setting",
-      content: "This is the Overtime Setting table. You can manage overtime settings here.",
+      content:
+        "This is the Overtime Setting table. You can manage overtime settings here.",
       disableBeacon: true,
+      placement: "top" as const,
     },
     {
       target: "#add-overtime-setting",
-      content: "This is the Overtime Setting table. You can manage overtime settings here.",
+      content:
+        "This is the Overtime Setting table. You can manage overtime settings here.",
       disableBeacon: true,
+      placement: "bottom" as const,
     },
   ],
   // "checkclock/add": [
@@ -155,7 +164,7 @@ export default function RootLayout({
   const [joyrideKey, setJoyrideKey] = useState(0); // Key to force Joyride re-render
   const [showJoyride, setShowJoyride] = useState(false); // State to control Joyride visibility
   const pathname = usePathname();
-  const router = useRouter();
+  const mounted = useRef(false);
 
   const checkJoyride = (pageKey: string) => {
     const hasSeenJoyride = localStorage.getItem(`hasSeenJoyride_${pageKey}`);
@@ -169,122 +178,23 @@ export default function RootLayout({
     }
   };
 
-  // const fetchData = async () => {
-  //   try {
-  //     // setIsLoading(true);
-  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getUser`, {
-  //       method: "GET",
-  //       headers: {
-  //         Authorization: `Bearer ${Cookies.get("token")}`,
-  //       },
-  //     });
-  //     const data = await res.json();
-  //     if (res.status === 403 || res.status === 401) {
-  //       Cookies.remove("token"); // hapus token agar tidak disimpan
-  //       router.replace("/sign-in");
-  //       return;
-  //     }
-  //     if (!res.ok) {
-  //       throw data;
-  //     }
+  useEffect(() => {
+    mounted.current = true; // Set mounted to true when component mounts
 
-  //     // Cookies.set('is_profile_complete', String(data.is_profile_complete));
-  //     // const isProfileComplete = Cookies.get('is_profile_complete');
-  //     // if (isProfileComplete && isProfileComplete !== 'true' && isProfileComplete !== 'null') {
-  //     //   router.replace('/sign-up/complete-registration');
-  //     //   Cookies.set('is_profile_complete', String(false))
-  //     //   return;
-  //     // }
-  //     const isProfileComplete = data.is_profile_complete === true;
-  //     if (!isProfileComplete) {
-  //       // Kalau belum lengkap profil dan bukan di halaman /sign-up/complete-registration, redirect
-  //       if (pathname !== "/sign-up/complete-registration") {
-  //         router.replace("/sign-up/complete-registration");
-  //         return;
-  //       }
-  //     } else {
-  //       // Kalau sudah lengkap profil dan masih di halaman auth atau complete-registration, redirect ke dashboard
-  //       if (
-  //         pathname === "/sign-in" ||
-  //         pathname === "/sign-up" ||
-  //         pathname === "/sign-up/complete-registration"
-  //       ) {
-  //         router.replace("/dashboard");
-  //         return;
-  //       }
-  //     }
-  //     Cookies.set("full_name", data.full_name);
-  //     Cookies.set("user_role", data.user_role);
-  //     Cookies.set("plan_name", data.plan_name);
-  //     Cookies.set("bill_period", data.bill_period);
-  //     Cookies.set("bill_deadline", String(data.bill_deadline));
-  //     // if (pathname === '/sign-in' || pathname === '/sign-up') {
-  //     //   router.replace('/dashboard');
-  //     //   return;
-  //     // }
-  //     // if (isProfileComplete || pathname === '/sign-up/complete-registration') {
-  //     //   router.replace('/dashboard');
-  //     //   return;
-  //     // }
-  //   } catch (err: any) {
-  //     let message = "Unknown error occurred";
-  //     let messagesToShow: string[] = [];
+    const pageKey = pathname.replace("/", "");
+    const selectedSteps = menuSteps[pageKey as keyof typeof menuSteps] || [];
 
-  //     if (
-  //       err &&
-  //       typeof err === "object" &&
-  //       "message" in err &&
-  //       typeof (err as any).message === "string"
-  //     ) {
-  //       const backendError = err as {
-  //         message: string;
-  //         errors?: Record<string, string[]>;
-  //       };
+    // Only update state if component is still mounted
+    if (mounted.current) {
+      setSteps(selectedSteps);
+      checkJoyride(pageKey);
+      setJoyrideKey((prevKey) => prevKey + 1);
+    }
 
-  //       if (backendError.message.toLowerCase().includes("failed to fetch")) {
-  //         message = "Unknown error occurred";
-  //       } else {
-  //         message = backendError.message;
-  //       }
-
-  //       messagesToShow = backendError.errors
-  //         ? Object.values(backendError.errors).flat()
-  //         : [message];
-  //     } else {
-  //       messagesToShow = [message];
-  //     }
-
-  //     toast.error(
-  //       <>
-  //         <p className="text-red-700 font-bold">Error</p>
-  //         {messagesToShow.map((msg, idx) => (
-  //           <div key={idx} className="text-red-700">
-  //             • {msg}
-  //           </div>
-  //         ))}
-  //       </>,
-  //       { duration: 30000 }
-  //     );
-  //   } finally {
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
-
-  // useEffect(() => {
-  //   // Determine the page key based on the current route
-  //   const pageKey = pathname.replace("/", ""); // Remove leading slash and fallback to "default"
-  //   // Update steps dynamically based on the current route
-  //  setSteps(menuSteps[pageKey as keyof typeof menuSteps]);
-  //   // Reset Joyride visibility for the current page
-  //   checkJoyride(pageKey);
-  //   // Update Joyride key to force re-render
-  //   // console.log(document.querySelector('#checkclock')) 
-  //   // console.log("skkjskja") 
-  //   setJoyrideKey((prevKey) => prevKey + 1);
-  // }, [pathname]);
-  
+    return () => {
+      mounted.current = false; // Set mounted to false when component unmounts
+    };
+  }, [pathname]);
 
   return (
     <AuthProvider>
@@ -292,7 +202,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-         {showJoyride && (
+        {/* {showJoyride && (
           <Joyride
             key={joyrideKey} // Force re-render when key changes
             steps={steps}
@@ -303,7 +213,6 @@ export default function RootLayout({
                 backgroundColor: "#fff",
                 primaryColor: "#1E3A5F",
                 zIndex: 10000,
-                
               },
               tooltip: {
                 borderRadius: "12px",
@@ -318,25 +227,22 @@ export default function RootLayout({
                 color: "#1E3A5F",
                 border: "1px solid #1E3A5F",
                 backgroundColor: "#fff",
-                borderRadius: "5px"
+                borderRadius: "5px",
               },
               buttonClose: {
-                display: "none", 
+                display: "none",
               },
             }}
             showProgress={true}
             showSkipButton
             disableScrolling
           />
-        )}
-        
+        )} */}
+        {/* <AuthProvider> */}
         {/* <AuthGate> */}
         <React.StrictMode>
           <FormProvider>
-            <EditProvider>
-              
-              {children}
-            </EditProvider>
+            <EditProvider>{children}</EditProvider>
           </FormProvider>
         </React.StrictMode>
         {/* </AuthGate> */}

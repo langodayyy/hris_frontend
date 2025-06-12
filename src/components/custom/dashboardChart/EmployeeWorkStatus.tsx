@@ -46,7 +46,7 @@ export function EmployeeWorkStatus({dashboardData}:Props) {
             </div>
             <div className="font-bold text-lg">Employee Work Status</div>
           </div>
-          <Button variant={"ghost"} size={"icon"} className="flex items-center">
+          {/* <Button variant={"ghost"} size={"icon"} className="flex items-center">
             <svg
               width="22"
               height="21"
@@ -62,7 +62,7 @@ export function EmployeeWorkStatus({dashboardData}:Props) {
                 strokeLinejoin="round"
               />
             </svg>
-          </Button>
+          </Button> */}
         </div>
       </CardHeader>
       <CardContent>
