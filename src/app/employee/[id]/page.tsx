@@ -19,6 +19,7 @@ import Cookies from "js-cookie";
 import React from "react";
 import { Toaster, toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import imageCompression from "browser-image-compression";
 
 export default function EmployeeDetails(){
     const [employeeData, setEmployeeData] = useState<EmployeeResponse | undefined>(undefined);
@@ -50,6 +51,7 @@ export default function EmployeeDetails(){
     const [loadingPhoto, setLoadingPhoto] = useState(false);
     const [successPhoto, setSuccessPhoto] = useState(false);
     const [errorPhoto, setErrorPhoto] = useState(false);
+    const MAX_FILE_SIZE = 100 * 1024;
     const handleSavePhotoCLick = async () => {
         setLoadingPhoto(true);
         setErrorPhoto(false);
@@ -58,9 +60,26 @@ export default function EmployeeDetails(){
         try {
             const formData = new FormData();
 
-            const file = inputFileRef.current?.files?.[0];
-            if (file) {
-                formData.append("employee_photo", file);
+            const selectedAvatarFile = inputFileRef.current?.files?.[0];
+            let avatarToUpload = selectedAvatarFile;
+            if (selectedAvatarFile && selectedAvatarFile.size > MAX_FILE_SIZE) {
+                try {
+                    const options = {
+                    maxSizeMB: 0.1,
+                    maxWidthOrHeight: 224,
+                    useWebWorker: true,
+                    fileType: 'image/jpeg',
+                    initialQuality: 0.6,
+                    };
+        
+                    const compressedFile = await imageCompression(selectedAvatarFile, options);
+                    avatarToUpload = compressedFile;
+                } catch (compressErr) {
+                    console.error("Gagal kompres gambar:", compressErr);
+                }
+            }
+            if (avatarToUpload) {
+                formData.append("employee_photo", avatarToUpload);
             }
 
             const response = await fetch(
@@ -298,7 +317,6 @@ export default function EmployeeDetails(){
             });
 
             const responseData = await response.json();
-            console.log("Response:", responseData);
             
             if (!response.ok) {
                 throw responseData; 
@@ -362,7 +380,6 @@ export default function EmployeeDetails(){
             });
 
             const responseData = await response.json();
-            console.log("Response:", responseData);
 
             if (!response.ok) {
             throw responseData; 
@@ -429,7 +446,6 @@ export default function EmployeeDetails(){
             });
 
             const responseData = await response.json();
-            console.log("Response:", responseData);
 
             if (!response.ok) {
                 throw responseData; 

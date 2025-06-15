@@ -44,6 +44,7 @@ import { useRouter } from "next/navigation";
 import { useFormContext } from "@/context/FormContext";
 import Cookies from "js-cookie";
 import { Toaster, toast } from "sonner";
+import imageCompression from "browser-image-compression";
 
 const employeeSchema = z.object({
     employee_photo: z.any().optional(),
@@ -100,7 +101,8 @@ const employeeSchema = z.object({
 
 export default function AddEmployeeForm() {
     const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
-     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const selectedPhotoRef = useRef<File | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [contractType, setContractType] = useState("");
     const [gender, setGender] = useState("");
     const [education, setEducation] = useState("");
@@ -120,6 +122,7 @@ export default function AddEmployeeForm() {
         if (file) {
             setAvatarPreview(URL.createObjectURL(file));
             setSelectedPhoto(file);
+            selectedPhotoRef.current = file;
         }
     };
 
@@ -230,6 +233,7 @@ export default function AddEmployeeForm() {
     const { setErrors } = useFormContext();
 
     const [phone, setPhone] = useState<string | undefined>(undefined);
+    const MAX_FILE_SIZE = 100 * 1024;
     const { form, errors, setFields } = useForm({
     extend: [validator({ schema: employeeSchema }), reporter()],
     onSubmit: async (values) => {
@@ -241,14 +245,30 @@ export default function AddEmployeeForm() {
         const formData = new FormData();
 
         for (const [key, value] of Object.entries(values)) {
-            if (value instanceof File) {
-                formData.append(key, value);
-            } else if (value !== undefined && value !== null) {
+            if (value !== undefined && value !== null) {
                 formData.append(key, String(value));
             }
         }
-        if (selectedPhoto) {
-            formData.append("employee_photo", selectedPhoto);
+        let avatarToUpload = selectedPhotoRef.current;
+        if (selectedPhotoRef.current && selectedPhotoRef.current.size > MAX_FILE_SIZE) {
+            try {
+                const options = {
+                maxSizeMB: 0.1,
+                maxWidthOrHeight: 224,
+                useWebWorker: true,
+                fileType: 'image/jpeg',
+                initialQuality: 0.6,
+                };
+
+                const compressedFile = await imageCompression(selectedPhotoRef.current, options);
+                avatarToUpload = compressedFile;
+            } catch (compressErr) {
+                console.error("Gagal kompres gambar:", compressErr);
+            }
+        }
+        
+        if (avatarToUpload) {
+            formData.append("employee_photo", avatarToUpload);
         }
         // Tambahkan manual dari state (jika tidak ada di Felte field)
         if (selectedBank) formData.append("bank_code", selectedBank);
@@ -350,7 +370,7 @@ export default function AddEmployeeForm() {
                         {/* File Input Hidden */}
                         <input
                         type="file"
-                        name="employee_photo"
+                        // name="employee_photo"
                         accept="image/*"
                         id="employee_photo"
                         className="hidden"

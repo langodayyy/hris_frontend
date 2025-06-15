@@ -32,7 +32,6 @@ export default function Employee() {
         }
     }, []);
 
-    console.log("Data preview:", previewData)
     const mapEmployeeDataToEmployees = (data: EmployeeData[]): Employees[] => {
     return data.map((employeeData) => {
         // Handle potential nulls or different types if necessary

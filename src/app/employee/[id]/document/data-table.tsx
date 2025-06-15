@@ -59,7 +59,6 @@ export function DataTable<TData, TValue>({
   isLoading,
   isActive,
 }: DataTableProps<TData, TValue>) {
-    console.log("Data struktur:", data);
 
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
