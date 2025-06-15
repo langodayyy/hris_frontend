@@ -100,11 +100,6 @@ import { toast, Toaster } from "sonner";
                 }
                 formData.append("employee_id", employeeId);
 
-                for (const [key, value] of formData.entries()) {
-                    console.log(`${key}:`, value);
-                }
-                console.log(employeeId)
-
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents`, {
                     method: "POST",
                      headers: {

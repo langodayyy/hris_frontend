@@ -53,7 +53,6 @@ const ContactInformation = ({ employeeData, onUpdate }: Props) => {
       );
 
       const responseData = await response.json();
-      console.log("Response:", responseData);
 
       if (!response.ok) {
        throw responseData; 

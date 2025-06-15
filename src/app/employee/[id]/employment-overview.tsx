@@ -176,8 +176,7 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
             if (selectedPosition?.id_position)
                 formData.append("position_id", selectedPosition.id_position.toString());
             if (selectedDepartmentId)
-                formData.append("department_id", selectedDepartmentId);
-            console.log("Submitting data:", Object.fromEntries(formData.entries()));   
+                formData.append("department_id", selectedDepartmentId);   
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees/${employeeData?.employee.employee_id}?_method=PATCH`, {
                     method: "POST",
                     headers: {
@@ -188,7 +187,6 @@ const EmploymentOverview = ({ employeeData, onUpdate }: Props) => {
             });
 
             const responseData = await response.json();
-            console.log("Response:", responseData);
             if (!response.ok) {
                 throw responseData; 
             }

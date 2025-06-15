@@ -40,6 +40,7 @@ import { reporter } from "@felte/reporter-react";
 import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
 import Joyride, { Step } from "react-joyride";
+import imageCompression from "browser-image-compression";
 
 // Define interfaces for better type safety and readability
 interface ProfileData {
@@ -801,14 +802,33 @@ export default function Profile() {
       setLoading(false);
     }
   };
+
+  const MAX_FILE_SIZE = 100 * 1024;
   const editProfile = async () => {
     setLoading(true);
 
     try {
       const formData = new FormData();
 
-      if (selectedAvatarFile) {
-        formData.append("user_photo", selectedAvatarFile);
+      let avatarToUpload = selectedAvatarFile;
+      if (selectedAvatarFile && selectedAvatarFile.size > MAX_FILE_SIZE) {
+        try {
+          const options = {
+            maxSizeMB: 0.1,
+            maxWidthOrHeight: 224,
+            useWebWorker: true,
+            fileType: 'image/jpeg',
+            initialQuality: 0.6,
+          };
+
+          const compressedFile = await imageCompression(selectedAvatarFile, options);
+          avatarToUpload = compressedFile;
+        } catch (compressErr) {
+          console.error("Gagal kompres gambar:", compressErr);
+        }
+      }
+      if (avatarToUpload) {
+        formData.append("user_photo", avatarToUpload);
       }
 
       formData.append("fullName", profileData.fullName);
