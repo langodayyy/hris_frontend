@@ -17,37 +17,36 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { format, setHours } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import {
-  employeesSample,
-  governmentFormula,
-  overtimeSettingSample,
-} from "@/components/dummy/overtimeData";
+        Dialog,
+        DialogTrigger,
+        DialogContent,
+        DialogHeader,
+        DialogTitle,
+        DialogFooter,
+        DialogClose,
+  } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/sonner";
+import { TimeInput } from "@/components/ui/timeInput";
 
 export default function AddOvertimeEmployees() {
+  const formRef = useRef<HTMLFormElement>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [isEmployeeDropdownOpen, setIsEmployeeDropdownOpen] = useState(false);
   // const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [selectedOvertimeName, setSelectedOvertimeName] = useState("");
-  const [inputTotalHour, setInputTotalHour] = useState(0);
+  
 
 
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
@@ -55,6 +54,9 @@ export default function AddOvertimeEmployees() {
 
   const [isloading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [preventRedirect, setPreventRedirect] = useState(false);
+  
   useEffect(() => {
     const fetchFormData = async () => {
       setIsLoading(true);
@@ -116,30 +118,25 @@ export default function AddOvertimeEmployees() {
   }, [])
 
 
-  const handleSubmit = async () => {
-    const payload = {
-      employee_id: selectedEmployeeId,
-      date: selectedDate,
-      total_hour: inputTotalHour,
-    };
-
-    console.log("Data yang dikirim:", payload);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
-    // setError(false);
-    // setSuccess(false);
+    setSuccess(false);
     try {
+      if (!formRef.current) return;
+
+      const formData = new FormData(formRef.current);
+      if (selectedEmployeeId && selectedDate){
+        formData.append("employee_id", selectedEmployeeId);
+        formData.append("date", selectedDate.toLocaleDateString('sv-SE'));
+      }
+     
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/overtime`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${Cookies.get("token")}`,
-            "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            employee_id: selectedEmployeeId,
-            date: selectedDate,
-            total_hour: inputTotalHour,
-
-      })
+          body: formData,
     });
 
 
@@ -148,8 +145,9 @@ export default function AddOvertimeEmployees() {
         throw responseData; 
     }
     toast.success('Overtime created successfully')
+    setSuccess(true);
     // setSuccess(true);
-    router.push("/overtime/management")
+    // router.push("/overtime/management")
     } catch (err) {
     // setError(true);
     let message = "Unknown error occurred";
@@ -197,7 +195,13 @@ export default function AddOvertimeEmployees() {
       {isloading ? (
           <Skeleton className="min-h-svh"></Skeleton>
         ):(
+          <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+      >
       <Card className="flex flex-col gap-[15px] px-[20px] py-[26px]">
+      
         <div className="px-[10px]">
           <p className="font-medium text-lg text-neutral-900">
             Add Overtime Employee
@@ -270,14 +274,14 @@ export default function AddOvertimeEmployees() {
 
           <div className="flex flex-row gap-[30px]">
             {/* Overtime Date */}
-            <div className="flex flex-col w-full gap-2">
+            <div className="flex flex-col w-full gap-4">
               <Label>Overtime Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-full justify-start text-left font-normal text-neutral-900 border-neutral-300",
+                      "w-full h-[46px] justify-start text-left font-normal text-neutral-900 border-neutral-300",
                       !selectedDate && "text-muted-foreground"
                     )}
                   >
@@ -304,21 +308,12 @@ export default function AddOvertimeEmployees() {
               </Popover>
             </div>
 
-            {/* Total Hour */}
+            
+            <div className="flex flex-col w-full">
+                <TimeInput label={"Start Hour"} name={"start_hour"}></TimeInput>
+            </div>
             <div className="flex flex-col w-full gap-2">
-              <Label>Total Hour</Label>
-              <div className="flex flex-row gap-2 items-center">
-                <Input
-                  type="number"
-                  placeholder="Enter overtime duration"
-                  // value={inputTotalHour}
-                  // onChange={}
-                  onChange={(e) => setInputTotalHour(Number(e.target.value))}
-                  required
-                  max="24"
-                  min="1"
-                />
-              </div>
+              <TimeInput label={"End Hour"} name={"end_hour"}></TimeInput>
             </div>
           </div>
         </Card>
@@ -339,7 +334,7 @@ export default function AddOvertimeEmployees() {
               <Spinner size="small" />
           )}
           </Button>
-          <Button type="submit" variant="default" className="w-[98px]" onClick={handleSubmit} disabled={loading}>
+          <Button type="submit" variant="default" className="w-[98px]" disabled={loading}>
            {!loading ? (
                 <>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -354,7 +349,55 @@ export default function AddOvertimeEmployees() {
             )}
           </Button>
         </div>
+        <Dialog
+          open={success}
+          onOpenChange={(open) => {
+              if (!open) {
+              setSuccess(false);
+
+              if (!preventRedirect) {
+                  // Jika bukan karena tombol Add Another Document, redirect
+                  router.push(`/overtime/management`);
+              } else {
+                  // reset flag supaya dialog bisa redirect normal di lain waktu
+                  setPreventRedirect(false);
+              }
+              }
+          }}
+          >
+          <DialogContent className="bg-white max-w-sm mx-auto">
+              <DialogHeader>
+              <DialogTitle>{success ? "Success!" : "Error"}</DialogTitle>
+              </DialogHeader>
+              <div className="mt-2">
+              {success && <p >Add another overtime?</p>}
+              </div>
+              <DialogFooter className="mt-4 flex gap-2 justify-end">
+              {success && (
+                  <div className="flex gap-2 justify-end w-full">
+                  <Button
+                      variant="outline"
+                      className="max-w-[180px] whitespace-nowrap"
+                      onClick={() => {
+            
+                      window.location.reload();
+                      setPreventRedirect(true);
+                      }}
+                  >
+                      Add Another overtime
+                  </Button>
+                  <DialogClose asChild>
+                      <Button variant="default" className="max-w-[180px] whitespace-nowrap">Close</Button>
+                  </DialogClose>
+                  </div>
+              )}
+              </DialogFooter>
+          </DialogContent>
+          </Dialog>
+
+      
       </Card>
+      </form>
         )}
     </Sidebar>
   );

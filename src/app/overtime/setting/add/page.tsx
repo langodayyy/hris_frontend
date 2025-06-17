@@ -196,19 +196,15 @@ export default function AddOvertimeSetting() {
             </div>
 
             {/* overtime formula */}
-            <div className="flex flex-col w-full gap-2">
-              <Label>Formula</Label>
-              <Input
-                type="text"
-                id="ovt_formula"
-                name="ovt_formula"
-                value={
-                  calculation && rate ? `Employees must work at least 2 hours of overtime, and will receive Rp.${rate} for every ${calculation} hours of overtime worked` : ""
-                }
-                disabled
-                className="bg-neutral-100 text-neutral-900"
-              />
+           <div className="flex flex-col w-full gap-2">
+              <Label>Payroll information</Label>
+              <p className="flex w-full min-w-0 rounded-md border border-neutral-300 px-4 py-3 text-base md:text-sm shadow-xs bg-white text-neutral-900">
+                {calculation && rate
+                  ? `Employees must work at least 2 hours of overtime, and will receive IDR ${Number(rate).toLocaleString("id-ID")} for every ${calculation} hours of overtime worked`
+                  : "-"}
+              </p>
             </div>
+
           </div>
         </Card>
 

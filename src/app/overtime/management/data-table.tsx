@@ -108,13 +108,13 @@ export function DataTable<TData, TValue>({
     const newColumnFilters: ColumnFiltersState = [];
     if (tempFilters.overtimeType.length > 0) {
       newColumnFilters.push({
-        id: "overtime_type", 
+        id: "type", 
         value: tempFilters.overtimeType,
       });
     }
     if (tempFilters.status.length > 0) {
       newColumnFilters.push({
-        id: "approval_status", 
+        id: "status", 
         value: tempFilters.status,
       });
     }
@@ -263,14 +263,8 @@ export function DataTable<TData, TValue>({
           <div className="w-fit ">
             <DropdownMenu
               onOpenChange={(open) => {
-                if (!open && !applyClickedRef.current) {
-                  // Jika ditutup tanpa apply, reset tempFilters ke filters yang terakhir diterapkan
-                  setTempFilters(filters);
-                  // Atau jika ingin filter langsung hilang saat ditutup tanpa apply:
-                  // table.setColumnFilters([]);
-                }
                 if (!open) {
-                  applyClickedRef.current = false; // Reset ref
+                  applyFiltersToTable();
                 }
               }}
             >

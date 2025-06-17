@@ -85,6 +85,20 @@ const result = [
         });
 
         const data = await res.json();
+        
+        if (res.status === 403 || res.status === 401) {
+          Cookies.remove('token');
+          if (pathname !== '/' && pathname !== '/sign-up' && pathname !== '/sign-in/as-employee') {
+            router.replace('/sign-in');
+          }
+          return;
+        }
+
+        if (!data.is_profile_complete && pathname !== '/sign-up/complete-registration') {
+          router.replace('/sign-up/complete-registration');
+          return;
+        }
+
         if (!res.ok) {
           throw data;
         }
