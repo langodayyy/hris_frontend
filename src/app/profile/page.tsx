@@ -84,6 +84,8 @@ export default function Profile() {
     email: "",
   });
   const [companyName, setCompanyName] = useState("");
+  const [maxAnnualLeave, setMaxAnnualLeave] = useState("");
+  const [maxWeeklyOvertime, setMaxWeeklyOvertime] = useState("");
   const [companyId, setCompanyId] = useState("");
   const [departments, setDepartments] = useState<Department[]>([]);
   const [departmentsInUse, setDepartmentsInUse] = useState<number[]>([]);
@@ -113,6 +115,10 @@ export default function Profile() {
     useState<ProfileData>(profileData);
   const [originalCompanyName, setOriginalCompanyName] =
     useState<string>(companyName);
+  const [originalMaxAnnualLeave, setOriginalMaxAnnualLeave] =
+    useState<string>(maxAnnualLeave);
+  const [originalMaxWeeklyOvertime, setOriginalMaxWeeklyOvertime] =
+    useState<string>(maxWeeklyOvertime);
   const [originalDepartments, setOriginalDepartments] =
     useState<Department[]>(departments);
 
@@ -232,13 +238,17 @@ export default function Profile() {
   const handleEditCompanyClick = useCallback(() => {
     if (!isCompanyEditing) {
       setOriginalCompanyName(companyName);
+      setOriginalMaxAnnualLeave(maxAnnualLeave);
+      setOriginalMaxWeeklyOvertime(maxWeeklyOvertime);
       setOriginalDepartments(departments);
       setIsCompanyEditing(true);
     }
-  }, [isCompanyEditing, companyName, departments]);
+  }, [isCompanyEditing, companyName, originalMaxAnnualLeave, originalMaxWeeklyOvertime, departments]);
 
   const handleCancelCompanyEdit = useCallback(() => {
     setCompanyName(originalCompanyName);
+    setMaxAnnualLeave(originalMaxAnnualLeave);
+    setMaxWeeklyOvertime(originalMaxWeeklyOvertime)
     // setDepartments(originalDepartments);
     setShowAddDepartmentForm(false);
     // setNewDepartmentName("");
@@ -249,7 +259,7 @@ export default function Profile() {
     // setShowEditPositionForm({});
     // setEditPositionName({});
     setIsCompanyEditing(false);
-  }, [originalCompanyName]);
+  }, [originalCompanyName, originalMaxAnnualLeave, originalMaxWeeklyOvertime]);
 
   const handleSaveCompanyEdit = useCallback(() => {
     console.log("Saving company name:", companyName);
@@ -264,8 +274,10 @@ export default function Profile() {
     setShowEditPositionForm({});
     setEditPositionName({});
     setOriginalCompanyName(companyName);
+    setOriginalMaxAnnualLeave(maxAnnualLeave);
+    setOriginalMaxWeeklyOvertime(maxWeeklyOvertime);
     setOriginalDepartments(departments);
-  }, [companyName, departments]);
+  }, [companyName, maxAnnualLeave, maxWeeklyOvertime, departments]);
 
   // Department Handlers
   const handleAddDepartmentClick = useCallback(() => {
@@ -633,6 +645,8 @@ export default function Profile() {
         }
         setCompanyName(dataProfile.company_name);
         setCompanyId(dataProfile.company_id);
+        setMaxAnnualLeave(dataProfile.max_annual_leave);
+        setMaxWeeklyOvertime(dataProfile.max_weekly_overtime);
         setProfileData({
           fullName: dataProfile.full_name,
           phoneNumber: dataProfile.phone,
@@ -921,6 +935,8 @@ export default function Profile() {
           },
           body: JSON.stringify({
             company_name: companyName,
+            max_annual_leave: maxAnnualLeave,
+            max_weekly_overtime: maxWeeklyOvertime
           }),
         }
       );
@@ -1954,6 +1970,40 @@ export default function Profile() {
                       placeholder="Enter company name"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
+                      disabled={!isCompanyEditing}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-[8px]">
+                    <Label htmlFor="max_annual_leave">Max Annual Leave (Day)</Label>
+                    <Input
+                      type="text"
+                      id="max_annual_leave"
+                      name="max_annual_leave"
+                      placeholder="Enter max annual leave"
+                      value={maxAnnualLeave}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "" || /^[0-9]+$/.test(value)) {
+                          setMaxAnnualLeave(value);
+                        }
+                      }}
+                      disabled={!isCompanyEditing}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-[8px]">
+                    <Label htmlFor="max_weekly_overtime">Max weekly overtime (Hour)</Label>
+                    <Input
+                      type="text"
+                      id="max_weekly_overtime"
+                      name="max_weekly_overtime"
+                      placeholder="Enter max weekly overtime"
+                      value={maxWeeklyOvertime}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "" || /^[0-9]+$/.test(value)) {
+                          setMaxWeeklyOvertime(value);
+                        }
+                      }}
                       disabled={!isCompanyEditing}
                     />
                   </div>
