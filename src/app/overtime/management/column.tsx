@@ -104,15 +104,20 @@ export const OvertimeColumn = (): ColumnDef<OvertimeRecord>[] => [
     cell: ({ row }) => <div>{row.getValue("date")}</div>,
   },
   {
-    accessorKey: "total_hour",
-    header: "Total total_Hour",
+    accessorKey: "start_hour",
+    header: "Start Hour",
+  },
+  {
+    accessorKey: "end_hour",
+    header: "End Hour",
   },
   {
     accessorKey: "payroll",
     header: "Overtime Payroll",
     cell: ({ getValue }) => {
       const value = getValue() as number;
-      return `IDR ${value ? value : "0"}`;
+      const formatted = (value || 0).toLocaleString("id-ID"); // 1.000.000
+      return `IDR ${formatted}`;
     },
   },
   {

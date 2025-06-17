@@ -143,25 +143,6 @@ export default function Sidebar({ children, title }: LayoutProps) {
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
 
-  const [fullName, setFullName] = useState("");
-  const [planName, setPlanName] = useState("");
-  const [role, setRole] = useState("");
-  const [period, setPeriod] = useState("");
-  const [deadline, setDeadline] = useState<string | null>(null);
-
-  useEffect(() => {
-    const name = Cookies.get("full_name");
-    if (name) setFullName(name);
-    const plan = Cookies.get("plan_name");
-    if (plan) setPlanName(plan);
-    const role = Cookies.get("user_role");
-    if (role) setRole(role);
-    const period = Cookies.get("bill_period");
-    if (period) setPeriod(period);
-    const deadline = Cookies.get("bill_deadline");
-    if (deadline) setDeadline(deadline);
-  }, []);
-
   return (
     <div className="flex">
       {/* Sidebar */}

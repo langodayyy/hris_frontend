@@ -13,6 +13,7 @@ import { overtimeDummy } from "@/components/dummy/overtimeData";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function OvertimeManagement(){
   // const overtimeDisplay = useMemo(() => overtimeDummy, []);
@@ -109,6 +110,9 @@ export default function OvertimeManagement(){
 
   return (
     <Sidebar title="Overtime Management">
+      {loading ? (
+          <Skeleton className="min-h-svh"></Skeleton>
+        ):(
       <Card className="p-[20px] flex flex-col" id="overtime">
         <div className="flex flex-col gap-[10px]">
 
@@ -226,6 +230,7 @@ export default function OvertimeManagement(){
           </div>
         </div>
       </Card>
+        )}
     </Sidebar>
   );  
 }
