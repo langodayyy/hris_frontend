@@ -319,7 +319,7 @@ export function DataTable<TData, TValue>({
                 ))}
 
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel>Status</DropdownMenuLabel>
+                <DropdownMenuLabel>Overtime Status</DropdownMenuLabel>
                 {["Approved", "Pending", "Rejected"].map((status) => (
                   <DropdownMenuCheckboxItem
                     key={status}
