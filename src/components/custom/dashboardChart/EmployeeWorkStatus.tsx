@@ -52,7 +52,7 @@ export function EmployeeWorkStatus({dashboardData}:Props) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex border-b-1 border-neutral-100 pb-[20px] justify-between">
+        <div className="flex border-b-2 border-neutral-100 pb-[20px] justify-between">
           <div>
             <div className="font-medium text-base text-[#acacac]">
               Employee Statistic

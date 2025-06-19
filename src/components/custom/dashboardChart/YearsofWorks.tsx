@@ -50,7 +50,7 @@ export function YearsofWorks({ dashboardData }: Props) {
           <div className=" max-h-[250px] flex items-center justify-center" />
         )}
         <div className="py-[20px] w-full">
-          <div className="border-b-1 border-neutral-100 pb-[20px]">
+          <div className="border-b-2 border-neutral-100 pb-[20px]">
             <div className="font-medium text-base text-[#acacac]">
               Employee Statistic
             </div>

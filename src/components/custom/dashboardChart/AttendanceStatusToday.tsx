@@ -59,7 +59,7 @@ export function AttendaceStatusToday({ dashboardData }: Props) {
         )}
 
         <div className="py-[20px] w-full">
-          <div className="border-b-1 border-neutral-100 pb-[20px]">
+          <div className="border-b-2 border-neutral-100 pb-[20px]">
             <div className="font-medium text-base text-[#acacac]">
               Check Clock Statistic
             </div>
