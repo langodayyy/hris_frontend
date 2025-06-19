@@ -13,6 +13,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { BillDetailRow } from "@/components/ui/bill-detail-row";
+import { BillDetailColumn } from "@/components/ui/bill-detail-column";
 import { ApprovalStatusBadge } from "@/components/ui/approval";
 import { BillStatusBadge } from "./BillStatusBadge";
 import { CheckclockSettingForm } from "@/types/cksettingForm";
@@ -282,142 +283,156 @@ export const wfoColumns: ColumnDef<CheckclockSettingForm>[] = [
             </Button>
           </SheetTrigger>
           <SheetContent className="bg-white">
-            <SheetHeader>
-              <SheetTitle className="text-xl">Pay the bill</SheetTitle>
-            </SheetHeader>
-            <div className="px-5 flex flex-col gap-2">
-              <div className="font-semibold ">Bill Details</div>
-              <BillDetailRow
-                label="Payment ID"
-                value={row.getValue("payment_id")}
-              />
-              <BillDetailRow
-                label="Period"
-                value={(() => {
-                  const period = row.getValue("period");
-                  let formatted = "";
-                  if (typeof period === "string") {
-                    const parts = period.split("-");
-                    let year = "";
-                    let month = "";
-                    if (parts.length >= 2) {
-                      if (parts[0].length === 4) {
-                        // Format: YYYY-MM
-                        year = parts[0];
-                        month = parts[1];
-                      } else if (parts[1].length === 4) {
-                        // Format: MM-YYYY
-                        year = parts[1];
-                        month = parts[0];
+            <div className="border rounded-lg border-gray-200 m-4 mt-12 h-fit px-1">
+              <SheetHeader className="flex flex-col gap-0 px-5">
+                <SheetTitle className="text-xl">Invoice</SheetTitle>
+                <BillDetailRow
+                  label="Payment ID:"
+                  value={row.getValue("payment_id")}
+                  className="!justify-start gap-2 text-neutral-400"
+                />
+              </SheetHeader>
+              <div className="w-full border-1 border-neutral-100 " />
+              <div className="px-5 flex flex-col gap-3 ">
+                <div className="grid grid-cols-2 justify-star items-center mt-3">
+                  <BillDetailColumn
+                    label="Plan Name"
+                    value={row.getValue("plan_name")}
+                  />
+                  <BillDetailColumn
+                    label="Status"
+                    value={
+                      <BillStatusBadge
+                        status={
+                          row.getValue("status") === "paid"
+                            ? "paid"
+                            : row.getValue("status") === "pending"
+                            ? "pending"
+                            : "overdue"
+                        }
+                      />
+                    }
+                  />
+                </div>
+                <div className="grid grid-cols-2 justify-start items-center mb-3">
+                  <BillDetailColumn
+                    label="Period"
+                    value={(() => {
+                      const period = row.getValue("period");
+                      let formatted = "";
+                      if (typeof period === "string") {
+                        const parts = period.split("-");
+                        let year = "";
+                        let month = "";
+                        if (parts.length >= 2) {
+                          if (parts[0].length === 4) {
+                            // Format: YYYY-MM
+                            year = parts[0];
+                            month = parts[1];
+                          } else if (parts[1].length === 4) {
+                            // Format: MM-YYYY
+                            year = parts[1];
+                            month = parts[0];
+                          }
+                          if (year && month) {
+                            const date = new Date(
+                              Number(year),
+                              Number(month) - 1
+                            );
+                            formatted = date.toLocaleString("en-US", {
+                              month: "long",
+                              year: "numeric",
+                            });
+                          } else {
+                            formatted = period;
+                          }
+                        } else {
+                          formatted = period;
+                        }
                       }
-                      if (year && month) {
-                        const date = new Date(Number(year), Number(month) - 1);
-                        formatted = date.toLocaleString("en-US", {
+                      return formatted;
+                    })()}
+                  />
+                  <BillDetailColumn
+                    label="Pay Before"
+                    value={(() => {
+                      const deadline = row.getValue("deadline");
+                      let formatted = "";
+                      if (
+                        typeof deadline === "string" &&
+                        /^\d{4}-\d{2}-\d{2}/.test(deadline)
+                      ) {
+                        const [year, month, day] = deadline.split("-");
+                        const date = new Date(
+                          Number(year),
+                          Number(month) - 1,
+                          Number(day)
+                        );
+                        formatted = date.toLocaleDateString("en-US", {
+                          day: "numeric",
                           month: "long",
                           year: "numeric",
                         });
                       } else {
-                        formatted = period;
+                        formatted =
+                          typeof deadline === "string" ? deadline : "";
                       }
-                    } else {
-                      formatted = period;
-                    }
-                  }
-                  return formatted;
-                })()}
-              />
-              <BillDetailRow
-                label="Plan Name"
-                value={row.getValue("plan_name")}
-              />
-              <BillDetailRow
-                label="Total Employee"
-                value={row.getValue("total_employee")}
-              />
-              <BillDetailRow
-                label="Pay Before"
-                value={(() => {
-                  const deadline = row.getValue("deadline");
-                  let formatted = "";
-                  if (
-                    typeof deadline === "string" &&
-                    /^\d{4}-\d{2}-\d{2}/.test(deadline)
-                  ) {
-                    const [year, month, day] = deadline.split("-");
-                    const date = new Date(
-                      Number(year),
-                      Number(month) - 1,
-                      Number(day)
-                    );
-                    formatted = date.toLocaleDateString("en-US", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    });
-                  } else {
-                    formatted = typeof deadline === "string" ? deadline : "";
-                  }
-                  return formatted;
-                })()}
-              />
-              <BillDetailRow
-                label="Status"
-                value={
-                  <BillStatusBadge
-                    status={
-                      row.getValue("status") === "paid"
-                        ? "paid"
-                        : row.getValue("status") === "pending"
-                        ? "pending"
-                        : "overdue"
-                    }
+                      return formatted;
+                    })()}
                   />
-                }
-              />
-              <div className="w-full border border-neutral-300 my-2"></div>
-              <BillDetailRow
-                label="Amount"
-                value={`IDR ${Number(row.getValue("amount")).toLocaleString(
-                  "en-US"
-                )}`}
-              />
-              <BillDetailRow
-                label="Fine (20%)"
-                value={`IDR ${Number(row.getValue("fine")).toLocaleString(
-                  "en-US"
-                )}`}
-              />
-              <div className="w-full border border-neutral-300 my-2"></div>
-              <BillDetailRow
-                label="Total"
-                labelClassName="font-semibold text-neutral-900"
-                value={(() => {
-                  const amount = Number(row.getValue("amount") || 0);
-                  const fine = Number(row.getValue("fine") || 0);
-                  const total = amount + fine;
-                  return `IDR ${total.toLocaleString("en-US")}`;
-                 
-                })()}
-              />
+                </div>
+                {/* <div className="w-full border-1 border-neutral-100 " /> */}
+                <div className="font-semibold text-sm mt-1">Bill Details</div>
+                <BillDetailRow
+                  label="Total Employee"
+                  value={row.getValue("total_employee")}
+                />
+                <div className="w-full border border-neutral-300 my-2"></div>
+                <div className="flex flex-col gap-1">
+                  <BillDetailRow
+                    label="Amount"
+                    value={`IDR ${Number(row.getValue("amount")).toLocaleString(
+                      "en-US"
+                    )}`}
+                  />
+                  <BillDetailRow
+                    label="Fine (20%)"
+                    value={`IDR ${Number(row.getValue("fine")).toLocaleString(
+                      "en-US"
+                    )}`}
+                  />
+                </div>
+                <div className="w-full border border-neutral-300 my-2"></div>
+                <BillDetailRow
+                  label="Total"
+                  labelClassName="font-semibold text-neutral-900"
+                  value={(() => {
+                    const amount = Number(row.getValue("amount") || 0);
+                    const fine = Number(row.getValue("fine") || 0);
+                    const total = amount + fine;
+                    return `IDR ${total.toLocaleString("en-US")}`;
+                  })()}
+                />
+              </div>
+              <SheetFooter className=" grid grid-cols-2 mt-4">
+                <SheetClose asChild>
+                  <Button variant={"outline"}>Close</Button>
+                </SheetClose>
+                {(row.getValue("status") === "pending" ||
+                  row.getValue("status") === "overdue") && (
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      console.log("Pay Bill clicked");
+                      handleRedirect(row.getValue("payment_id"));
+                    }}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? <Spinner size={"small"} /> : "Pay Bill"}
+                  </Button>
+                )}
+              </SheetFooter>
             </div>
-            <SheetFooter className="mt-4">
-              {(row.getValue("status") === "pending" ||
-                row.getValue("status") === "overdue") && (
-                <Button
-                  type="submit"
-                  onClick={() => {
-                    console.log("Pay Bill clicked");
-                    handleRedirect(row.getValue("payment_id"));
-                  }}
-                  disabled={isLoading}
-                >
-                  {isLoading ? <Spinner size={"small"} /> : "Pay Bill"}
-                </Button>
-              )}
-              <SheetClose asChild>
-                <Button variant={"outline"}>Close</Button>
-              </SheetClose>
-            </SheetFooter>
           </SheetContent>
         </Sheet>
       );
