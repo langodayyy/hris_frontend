@@ -7,7 +7,7 @@ import { FormProvider } from "@/context/FormContext";
 import { EditProvider } from "@/context/EditFormContext";
 import React, { useEffect, useState } from "react";
 import { AuthProvider } from "@/context/AuthContext";
-import Joyride from "react-joyride";
+import Joyride from "react-joyride-react-19";
 
 import Cookies from "js-cookie";
 import { string } from "zod";
@@ -202,7 +202,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* {showJoyride && (
+        {showJoyride && (
           <Joyride
             key={joyrideKey} // Force re-render when key changes
             steps={steps}
@@ -237,7 +237,7 @@ export default function RootLayout({
             showSkipButton
             disableScrolling
           />
-        )} */}
+        )}
         {/* <AuthProvider> */}
         {/* <AuthGate> */}
         <React.StrictMode>

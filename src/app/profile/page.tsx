@@ -39,7 +39,7 @@ import { z } from "zod";
 import { reporter } from "@felte/reporter-react";
 import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
-import Joyride, { Step } from "react-joyride";
+import Joyride, { Step } from "react-joyride-react-19";
 import imageCompression from "browser-image-compression";
 
 // Define interfaces for better type safety and readability
@@ -1468,7 +1468,7 @@ export default function Profile() {
 
   return (
     <>
-    {/* {hasMounted && (
+    {hasMounted && (
 
       <Joyride
         key={joyrideKey} // Force re-render when key changes
@@ -1504,7 +1504,7 @@ export default function Profile() {
         showProgress={true}
         showSkipButton
       />
-    )} */}
+    )}
       <Sidebar title="Profile">
         <Toaster
           position="bottom-right"
