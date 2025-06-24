@@ -21,6 +21,7 @@
 ## 🎯 Table of Contents
 
 * [🌟 System Description](#-system-description)
+* [🧠 Team](#-team)
 * [🛠️ Tech Stack](#️-tech-stack)
 * [🏗️ System Architecture](#️-system-architecture)
 * [🔗 API Documentation](#-api-documentation)
@@ -39,6 +40,23 @@
 Pengembangan produk berupa aplikasi untuk memudahkan aktivitas dan tugas tim HR yang akan dikembangkan dalam versi website. Aplikasi ini berfokus pada fitur utama yaitu manajemen data karyawan seperti data kepegawaian, surat menyurat,  absensi kehadiran, dan lembur serta menambahkan fitur langganan berbayar.
 
 ![HRIS Application Screenshot](/public/hris.jpeg)
+
+---
+
+## 🧠 Team
+
+1. Ahmad Mumtaz Haris (2241720136/01)
+
+    [![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/mumtazharis/)
+2. Lucky Kurniawan Langoday (2241720168/12)
+
+    [![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/langodayyy/)
+3. Muhammad Kemal Nugraha (2241720044/14)
+
+    [![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/mkemaln/)
+4. Silfi Nazarina (2241720054/21)
+
+    [![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/Silfinazarina/)
 
 ---
 
