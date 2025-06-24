@@ -13,7 +13,6 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   reactStrictMode: true,
-  swcMinify: false,
 };
 
 export default nextConfig;

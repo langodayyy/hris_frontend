@@ -42,7 +42,7 @@ import EditWfoForm from "@/components/custom/ck-setting-form/EditWfoForm";
 import MapboxMap from "@/components/custom/mapbox/MapboxMap";
 import EditWfaForm from "@/components/custom/ck-setting-form/EditWfaFrom";
 import { Skeleton } from "@/components/ui/skeleton";
-import Joyride, { Step } from "react-joyride";
+import Joyride, { Step } from "react-joyride-react-19";
 import { useEffect } from "react";
 
 interface DataTableProps<TData, TValue> {
@@ -154,7 +154,7 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
 
   return (
     <>
-      {/* <Joyride
+      <Joyride
         key={joyrideKey} // Force re-render when key changes
         steps={steps}
         continuous={true}
@@ -187,7 +187,7 @@ export function DataTable<TData extends { [key: string]: any }, TValue>({
         }}
         showProgress={true}
         showSkipButton
-      /> */}
+      />
       <Card
         className="flex items-center p-5 gap-4 w-full"
         id="checkclock-setting"

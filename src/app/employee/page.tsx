@@ -9,7 +9,7 @@ import { Spinner } from "@/components/ui/spinner";
 import Cookies from "js-cookie";
 import { Toaster, toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import Joyride, { Step } from "react-joyride";
+import Joyride, { Step } from "react-joyride-react-19";
 
 export default function Employee() {
   const [employees, setEmployees] = useState<Employees[]>([]);
@@ -168,7 +168,7 @@ export default function Employee() {
   if (!isLoading) {
     return (
       <>
-      {/* <Joyride
+      <Joyride
         key={joyrideKey} // Force re-render when key changes
         steps={steps}
         continuous={true}
@@ -201,7 +201,7 @@ export default function Employee() {
         }}
         showProgress={true}
         showSkipButton
-      /> */}
+      />
       <Sidebar title="Employee Database">
         <Toaster
           position="bottom-right"

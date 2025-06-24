@@ -9,7 +9,7 @@ import { CheckclockResponse } from "@/types/checkclock";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEdit } from "@/context/EditFormContext";
 import { Toaster, toast } from "sonner";
-import Joyride, { Step } from "react-joyride";
+import Joyride, { Step } from "react-joyride-react-19";
 
 export default function CheckclockOverviewPage() {
   const [date, setDate] = useState<Date | undefined>();
@@ -220,7 +220,7 @@ export default function CheckclockOverviewPage() {
 
   return (
     <>
-      {/* <Joyride
+      <Joyride
         key={joyrideKey} // Force re-render when key changes
         steps={steps}
         continuous={true}
@@ -253,7 +253,7 @@ export default function CheckclockOverviewPage() {
         }}
         showProgress={true}
         showSkipButton
-      /> */}
+      />
       <Sidebar title="Checkclock">
         <Toaster
           position="bottom-right"
