@@ -15,6 +15,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
+import { formatDistanceToNow } from 'date-fns';
 
 interface NavbarProps {
   title: string; 
@@ -26,7 +27,17 @@ interface NavbarProps {
   // deadline?: string | null;
   
 }
+type Notification = {
+  id: string;
+  message: string;
+  url: string;
+  created_at: string;
+  read_at: string | null;
+};
 
+function formatTimeAgo(dateString: string) {
+  return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+}
 // export default function Navbar({ title, avatarImage, userName, role, plan, period, deadline }: NavbarProps) {
 export default function Navbar({ title }: NavbarProps) {
   const [imageValid, setImageValid] = useState(true);
@@ -38,6 +49,10 @@ export default function Navbar({ title }: NavbarProps) {
   const [plan, setPlan] = useState<string | null>(null);
   const [period, setPeriod] = useState<string | null>(null);
   const [deadline, setDeadline] = useState<string | null>(null);
+
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
   // Fungsi untuk mengambil inisial dari nama pengguna
   const getInitials = (name: string) => {
     const nameParts = name.split(" ");
@@ -62,61 +77,66 @@ const result = [
   { label: 'Plan', path: '/settings/plan' },
 ];
 
-  // array notification sample
-  const notifications = [
-    { user: "Silfi Nazarina", message: "Has sent a checkclock request", type: "checkclock", time: "1 minute ago" },
-    { user: "Silfi Nazarina", message: "Has sent a checkclock request", type: "checkclock", time: "1 minute ago" },
-    { user: "Silfi Nazarina", message: "Has sent a checkclock request", type: "checkclock", time: "1 minute ago" },
-    { user: "Silfi Nazarina", message: "Has sent a checkclock request", type: "checkclock", time: "1 minute ago" },
-    { user: "Silfi Nazarina", message: "Has sent a checkclock request", type: "checkclock", time: "1 minute ago" },
-  ];
-  
-  const notificationCount = notifications.length;
   const router = useRouter();
-   const pathname = usePathname();
+  const pathname = usePathname();
+  
   useEffect(() => {
+    const token = Cookies.get('token');
+
     const fetchUser = async () => {
-      try {
-        const token = Cookies.get('token');
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getUser`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getUser`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        const data = await res.json();
-        
-        if (res.status === 403 || res.status === 401) {
-          Cookies.remove('token');
-          if (pathname !== '/' && pathname !== '/sign-up' && pathname !== '/sign-in/as-employee') {
-            router.replace('/sign-in');
-          }
-          return;
+      const data = await res.json();
+
+      if (res.status === 403 || res.status === 401) {
+        Cookies.remove('token');
+        if (pathname !== '/' && pathname !== '/sign-up' && pathname !== '/sign-in/as-employee') {
+          router.replace('/sign-in');
         }
-
-        if (!data.is_profile_complete && pathname !== '/sign-up/complete-registration') {
-          router.replace('/sign-up/complete-registration');
-          return;
-        }
-
-        if (!res.ok) {
-          throw data;
-        }
-        setAvatarImage(data.photo_url);
-        setUserName(data.full_name);
-        setRole(data.user_role);
-        setCompany(data.company_name);
-        setCompanyId(data.company_id);
-        setPlan(data.plan_name);
-        setPeriod(data.bill_period);
-        setDeadline(String(data.bill_deadline))
-
-      } catch (err) {
-      
+        return;
       }
+
+      if (!data.is_profile_complete && pathname !== '/sign-up/complete-registration') {
+        router.replace('/sign-up/complete-registration');
+        return;
+      }
+
+      if (!res.ok) throw data;
+
+      // Set data user
+      setAvatarImage(data.photo_url);
+      setUserName(data.full_name);
+      setRole(data.user_role);
+      setCompany(data.company_name);
+      setCompanyId(data.company_id);
+      setPlan(data.plan_name);
+      setPeriod(data.bill_period);
+      setDeadline(String(data.bill_deadline));
     };
+
+    const fetchNotifications = async () => {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+      setNotifications(data.notifications);
+      setUnreadCount(data.unread_count);
+    };
+
+    // Panggil kedua fungsi
     fetchUser();
-  }, [])
+    fetchNotifications();
+  }, []);
+
   
   const handleLogout = async () => {
     try {
@@ -213,9 +233,9 @@ const result = [
                 />
               </svg>
             </a>
-            {notificationCount > 0 && (
+            {unreadCount > 0 && (
               <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-[16px] h-[16px] bg-red-600 text-white text-xs rounded-full">
-                {notificationCount}
+                {unreadCount}
               </span>
             )}
           </div>
@@ -224,112 +244,43 @@ const result = [
         <DropdownMenuContent className="absolute w-[300px] p-0 top-3 right-0">
         <DropdownMenuLabel className="bg-neutral-50 text-neutral-900 h-[42px] px-4 py-[10px] text-base items-center">Notification</DropdownMenuLabel>
           <DropdownMenuSeparator className="m-0"/>
-          <DropdownMenuItem className="h-[91px]">
-            <div className="flex items-center flex-row gap-[10px] w-auto h-[91px] py-3">
-              {/* weight avatarnya gj ding */}
-              <div className="w-13">
-              <div className="relative flex items-center justify-center w-full h-10 bg-gray-400 rounded-full">
-                {avatarImage ? (
-                  <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
-                ) : (
-                  <span className="text-white text-sm font-medium">{userName}</span>
-                )}
-              </div>
-              </div>
-              <div className="flex flex-col gap-[2px] h-auto w-full">
-                <div className="flex flex-col">
-                  <span className="text-base font-medium text-neutral-950">
-                    {userName}
+          {notifications.map((notif) => (
+            <DropdownMenuItem key={notif.id} className="h-[91px]"
+            onClick={async () => {
+                try {
+                  const token = Cookies.get("token");
+
+                  // Tandai sebagai sudah dibaca di backend
+                  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications/read/${notif.id}`, {
+                    method: "POST",
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  });
+
+                  // Redirect setelah sukses
+                  router.push(notif.url);
+                } catch (error) {
+                  console.error("Failed to mark as read", error);
+                  router.push(notif.url); // Tetap redirect meskipun gagal
+                }
+              }}
+            >
+              <div className="flex items-center flex-row gap-[10px] w-auto h-[91px] py-3">
+                <div className="flex flex-col gap-[2px] h-auto w-full">
+                  <div className="flex flex-col">
+                    <span className="text-base font-medium text-neutral-950">
+                      {notif.message}
+                    </span>
+                  </div>
+                  <span className="text-sm text-info-500">
+                    {formatTimeAgo(notif.created_at)}
                   </span>
-                  <span className="text-sm text-neutral-500">Has sent a checkclock request</span>
                 </div>
-                <span className="text-sm text-info-500">1 minute ago</span>
               </div>
-            </div>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="h-[91px]">
-            <div className="flex items-center flex-row gap-2.5 w-auto h-[91px] py-3">
-              {/* weight avatarnya gj ding */}
-              <div className="flex -space-x-7 overflow-hidden">
-              <div className="relative flex items-center justify-center w-13 h-10 bg-gray-400 rounded-full ring-2 ring-white">
-                {avatarImage ? (
-                  <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
-                ) : (
-                  <span className="text-white text-sm font-medium">{userName}</span>
-                )}
-              </div>
-              <div className="relative flex items-center justify-center w-13 h-10 bg-gray-400 rounded-full ring-2 ring-white">
-                {avatarImage ? (
-                  <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
-                ) : (
-                  <span className="text-white text-sm font-medium">{userName}</span>
-                )}
-              </div>
-              </div>
-              <div className="flex flex-col gap-[2px] h-auto w-full">
-                <div className="flex flex-col">
-                  <span className="text-base font-medium text-neutral-950">
-                    {userName} + 10 others
-                  </span>
-                  <span className="text-sm text-neutral-500">Has sent a checkclock request</span>
-                </div>
-                <span className="text-sm text-info-500">1 minute ago</span>
-              </div>
-            </div>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="h-[91px]">
-            <div className="flex items-center flex-row gap-2.5 w-auto h-[91px] py-3">
-              {/* weight avatarnya gj ding */}
-              <div className="w-13">
-              <div className="relative flex items-center justify-center w-full h-10 bg-gray-400 rounded-full">
-                {avatarImage ? (
-                  <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
-                ) : (
-                  <span className="text-white text-sm font-medium">{userName}</span>
-                )}
-              </div>
-              </div>
-              <div className="flex flex-col gap-[2px] h-auto w-full">
-                <div className="flex flex-col">
-                  <span className="text-base font-medium text-neutral-950">
-                    {userName}
-                  </span>
-                  <span className="text-sm text-neutral-500">Has sent a overtime request</span>
-                </div>
-                <span className="text-sm text-info-500">1 minute ago</span>
-              </div>
-            </div>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="h-[91px]">
-            <div className="flex items-center flex-row gap-2.5 w-auto h-[91px] py-3">
-              {/* weight avatarnya gj ding */}
-              <div className="flex -space-x-6 overflow-hidden">
-              <div className="relative flex items-center justify-center w-13 h-10 bg-gray-400 rounded-full ring-2 ring-white">
-                {avatarImage ? (
-                  <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
-                ) : (
-                  <span className="text-white text-sm font-medium">{userName}</span>
-                )}
-              </div>
-              <div className="relative flex items-center justify-center w-13 h-10 bg-gray-400 rounded-full ring-2 ring-white">
-                {avatarImage ? (
-                  <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
-                ) : (
-                  <span className="text-white text-sm font-medium">{userName}</span>
-                )}
-              </div>
-              </div>
-              <div className="flex flex-col gap-[2px] h-auto w-full">
-                <div className="flex flex-col">
-                  <span className="text-base font-medium text-neutral-950">
-                    {userName} + 10 others
-                  </span>
-                  <span className="text-sm text-neutral-500">Has sent a overtime request</span>
-                </div>
-                <span className="text-sm text-info-500">1 minute ago</span>
-              </div>
-            </div>
-          </DropdownMenuItem>
+            </DropdownMenuItem>
+          ))}
+
           <DropdownMenuLabel className="bg-neutral-50 text-neutral-900 h-[42px] px-[10px] py-[10px] text-base items-center">
             <div className="flex justify-center gap-[10px]">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
